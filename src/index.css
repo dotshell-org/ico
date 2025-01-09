@@ -1,11 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Déclaration des polices Aileron */
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-BlackItalic.otf') format('opentype');
+  font-weight: 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-Heavy.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-HeavyItalic.otf') format('opentype');
+  font-weight: 800;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-LightItalic.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-SemiBoldItalic.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-Thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-ThinItalic.otf') format('opentype');
+  font-weight: 100;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-UltraLight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('./assets/font/Aileron-UltraLightItalic.otf') format('opentype');
+  font-weight: 200;
+  font-style: italic;
+}
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Aileron', sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: rgba(255, 255, 255, 0.871);
+  background-color: #030712;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
