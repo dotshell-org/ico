@@ -1,16 +1,27 @@
 import React from 'react';
 import NavItem from './NavItem';  // Assuming NavItem is in the same directory
-
-interface NavItemData {
-    href: string;
-    text: string;
-}
+import { useTranslation } from 'react-i18next';
+import { Window } from '../../types/Window';
 
 interface NavItemsGroupProps {
-    items?: NavItemData[];
+    window: Window;
 }
 
-export const NavItemsGroup: React.FC<NavItemsGroupProps> = ({ items = [] }) => {
+export const NavItemsGroup: React.FC<NavItemsGroupProps> = ({ window }) => {
+
+    const { t } = useTranslation();
+
+    let items: { href: string, text: string }[] = [];
+    if (window === Window.Accounting) {
+        items = [
+            { href: '/dashboard', text: t('dashboard') },
+            { href: '/entry', text: t('entry') },
+            { href: '/outflow', text: t('outflow') },
+        ];
+    } else if (window === Window.Stock) {
+    } else if (window === Window.Sales) {
+    } else if (window === Window.SchoolCafetManager) {
+    }
 
     return (
         <div className="nav-items-group">

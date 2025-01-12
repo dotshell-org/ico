@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 interface NavItemProps {
     window: Window;
+    selectedWindow: Window;
+    setSelectedWindow: (window: Window) => void;
 }
 
 const windowColors: { [key in Window]: string } = {
@@ -20,9 +22,8 @@ const windowStrings: { [key in Window]: string } = {
     [Window.SchoolCafetManager]: 'schoolCafetManager',
 };
 
-const NavItem: React.FC<NavItemProps> = ({ window }) => {
+const NavItem: React.FC<NavItemProps> = ({ window, selectedWindow, setSelectedWindow }) => {
     const { t } = useTranslation();
-    const [selectedWindow, setSelectedWindow] = useState<Window>(window);
     const [isOpen, setIsOpen] = useState(false);
 
     const handleButtonClick = () => {
@@ -40,7 +41,7 @@ const NavItem: React.FC<NavItemProps> = ({ window }) => {
         <div className="relative inline-block text-left">
             <button
                 onClick={handleButtonClick}
-                className={`${color} border-none text-white w-48 px-3 py-2 text-sm font-medium rounded-md transition-all flex items-center justify-between`}
+                className={`${color} border-none text-white w-56 px-3 py-2 text-sm font-medium rounded-md transition-all flex items-center justify-between`}
             >
                 {t(windowStrings[selectedWindow])}
                 <svg
