@@ -1,30 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import noProfile from '/no-profile.svg';
-import UserMenuItem from './user_menu/UserMenuItem';
-import { useTranslation } from 'react-i18next';
-import UserMenuItemsGroup from './user_menu/UserMenuItemsGroup';
+import UserMenuItemsGroup from './UserMenuItemsGroup';
 
 const UserMenu: React.FC = () => {
-    const { t } = useTranslation();
+
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
     const handleButtonClick = () => {
         setIsOpen(!isOpen);
     };
-
-    const handleClickOutside = (event: MouseEvent) => {
-        if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-            setIsOpen(false);
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
 
     return (
         <div className="relative ml-3" ref={menuRef}>

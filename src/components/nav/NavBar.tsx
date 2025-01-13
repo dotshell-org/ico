@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import UserMenu from './UserMenu';
-import WindowSwitch from './WindowSwitch';
+import UserMenu from './user_menu/UserMenu';
+import WindowSwitch from './tabs/WindowSwitch';
 import { Window } from '../../types/Window';
-import { NavItemsGroup } from './NavItemsGroup';
+import { NavItemsGroup } from './tabs/NavItemsGroup';
 import GlomeLogo from '/glome.svg';
 
 const NavBar: React.FC = () => {

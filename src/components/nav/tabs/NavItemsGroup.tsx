@@ -1,7 +1,7 @@
 import React from 'react';
 import NavItem from './NavItem';  // Assuming NavItem is in the same directory
 import { useTranslation } from 'react-i18next';
-import { Window } from '../../types/Window';
+import { Window } from '../../../types/Window';
 
 interface NavItemsGroupProps {
     window: Window;
