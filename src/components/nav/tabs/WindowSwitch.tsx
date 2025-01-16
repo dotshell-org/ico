@@ -59,13 +59,13 @@ const NavItem: React.FC<NavItemProps> = ({ window, selectedWindow, setSelectedWi
                 </svg>
             </button>
             {isOpen && (
-                <div className="absolute mt-2 w-full shadow-lg bg-white rounded-md">
+                <div className="absolute mt-2 w-full shadow-lg bg-white rounded-md dark:bg-gray-800">
                     <div role="menu" aria-orientation="vertical" aria-labelledby="options-menu" className="rounded-md overflow-hidden w-full">
                         {Object.keys(Window).map((key) => (
                             <button
                                 key={key}
                                 onClick={() => handleSelect(Window[key as keyof typeof Window])}
-                                className="block p-3 text-sm text-gray-700 bg-white hover:bg-gray-100 w-full text-left border-none transition-all"
+                                className="block p-3 text-sm text-gray-700 bg-white hover:bg-gray-100 w-full text-left border-none transition-all dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
                                 role="menuitem"
                             >
                                 {t(windowStrings[Window[key as keyof typeof Window]])}
