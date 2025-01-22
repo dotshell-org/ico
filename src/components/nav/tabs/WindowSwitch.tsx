@@ -12,14 +12,14 @@ const windowColors: { [key in Window]: string } = {
     [Window.Accounting]: 'bg-red-500 hover:bg-red-400',
     [Window.Stock]: 'bg-green-500 hover:bg-green-400',
     [Window.Sales]: 'bg-blue-500 hover:bg-blue-400',
-    [Window.SchoolCafetManager]: 'bg-yellow-500 hover:bg-yellow-400',
+    [Window.Cafeteria]: 'bg-yellow-500 hover:bg-yellow-400',
 };
 
 const windowStrings: { [key in Window]: string } = {
     [Window.Accounting]: 'accounting',
     [Window.Stock]: 'stock',
     [Window.Sales]: 'sales',
-    [Window.SchoolCafetManager]: 'schoolCafetManager',
+    [Window.Cafeteria]: 'cafeteria',
 };
 
 const NavItem: React.FC<NavItemProps> = ({ window, selectedWindow, setSelectedWindow }) => {
@@ -59,7 +59,7 @@ const NavItem: React.FC<NavItemProps> = ({ window, selectedWindow, setSelectedWi
                 </svg>
             </button>
             {isOpen && (
-                <div className="absolute mt-2 w-full shadow-lg bg-white rounded-md dark:bg-gray-800">
+                <div className="absolute mt-2 w-full shadow-lg bg-white rounded-md dark:bg-gray-800 dark:ring-1 dark:ring-gray-600">
                     <div role="menu" aria-orientation="vertical" aria-labelledby="options-menu" className="rounded-md overflow-hidden w-full">
                         {Object.keys(Window).map((key) => (
                             <button
