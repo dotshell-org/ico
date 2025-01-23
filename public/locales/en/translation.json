@@ -1,10 +1,14 @@
 {
     "dashboard": "📊 Dashboard",
-    "entry": "🏦 Entry",
-    "outflow": "🌍 Outflow",
+    "credit": "📈 Credit",
+    "debit": "📉 Debit",
     "accounting": "💰 Accounting",
     "stock": "📦 Stock",
     "sales": "🛒 Sales",
     "cafeteria": "☕ Cafeteria",
-    "settings": "⚙️ Settings"
+    "settings": "⚙️ Settings",
+    "date": "📅 Date",
+    "title": "🏷️ Title",
+    "amount": "💵 Amount",
+    "category": "📑 Category"
 }

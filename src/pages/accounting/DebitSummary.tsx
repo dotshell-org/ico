@@ -1,6 +1,6 @@
 
 
-function Outflow() {
+function DebitSummary() {
   
     return (
         <>
@@ -9,4 +9,4 @@ function Outflow() {
     )
 }
 
-export default Outflow;
+export default DebitSummary;

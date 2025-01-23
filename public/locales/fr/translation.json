@@ -1,10 +1,14 @@
 {
     "dashboard": "📊 Tableau de bord",
-    "entry": "🏦 Entrée",
-    "outflow": "🌍 Sortie",
+    "credit": "📈 Crédit",
+    "debit": "📉 Débit",
     "accounting": "💰 Comptabilité",
     "stock": "📦 Stock",
     "sales": "🛒 Ventes",
     "cafeteria": "☕ Cafeteria",
-    "settings": "⚙️ Paramètres"
+    "settings": "⚙️ Paramètres",
+    "date": "📅 Date",
+    "title": "🏷️ Titre",
+    "amount": "💵 Montant",
+    "category": "📑 Catégorie"
 }

@@ -7,8 +7,8 @@ import { Tabs } from './types/Tabs';
 
 // import accounting pages
 import Dashboard from './pages/accounting/Dashboard';
-import Entry from './pages/accounting/Entry';
-import Outflow from './pages/accounting/Outflow';
+import DebitSummary from './pages/accounting/DebitSummary';
+import CreditSummary from './pages/accounting/CreditSummary';
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
@@ -16,10 +16,10 @@ function App() {
   const renderContent = () => {
     if (selectedTab == Tabs.AccountingDashboard) {
       return <Dashboard />;
-    } else if (selectedTab == Tabs.AccountingEntry) {
-      return <Entry />;
-    } else if (selectedTab == Tabs.AccountingOutflow) {
-      return <Outflow />;
+    } else if (selectedTab == Tabs.AccountingCredit) {
+      return <CreditSummary />;
+    } else if (selectedTab == Tabs.AccountingDebit) {
+      return <DebitSummary />;
     }
   };
 

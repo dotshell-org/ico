@@ -1,5 +1,5 @@
 export enum Tabs {
     AccountingDashboard = 'accounting_dashboard',
-    AccountingEntry = 'accounting_entry',
-    AccountingOutflow = 'accounting_outflow',
+    AccountingCredit = 'accounting_credit',
+    AccountingDebit = 'accounting_debit',
 }
