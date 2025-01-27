@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { CreditSummaryTR, CreditSummaryTH } from "../../components/credit-summary/CreditSummaryRow";
 import { CreditSummaryProperty } from "../../types/SummaryProperties";
+import FilterSelection from "../../components/filter-selection/FilterSelection";
 
 
 function CreditSummary() {
@@ -21,16 +22,21 @@ function CreditSummary() {
 
     return (
         <>
-            <h1 className="text-3xl mt-2 mb-6 font-bold cursor-default">{t("credit")}</h1>
-            <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-pointer">
-                <thead>
-                    <tr>
-                        <CreditSummaryTH property={CreditSummaryProperty.Date} />
-                        <CreditSummaryTH property={CreditSummaryProperty.Title} />
-                        <CreditSummaryTH property={CreditSummaryProperty.Amount} />
-                        <CreditSummaryTH property={CreditSummaryProperty.Category} />
-                    </tr>
-                </thead>
+            <div className="sticky top-16 bg-white dark:bg-gray-950 pt-10">
+                <h1 className="text-3xl mt-2 mb-2 font-bold cursor-default">{t("credit")}</h1>
+                <FilterSelection />
+                <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-pointer">
+                    <thead>
+                        <tr>
+                            <CreditSummaryTH property={CreditSummaryProperty.Date} />
+                            <CreditSummaryTH property={CreditSummaryProperty.Title} />
+                            <CreditSummaryTH property={CreditSummaryProperty.Amount} />
+                            <CreditSummaryTH property={CreditSummaryProperty.Category} />
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-copy mt-0">
                 <tbody>
                     {
                         creditData.map((data, index) => {
@@ -46,6 +52,7 @@ function CreditSummary() {
                     }
                 </tbody>
             </table>
+            <div className="h-20"></div>
         </>
     )
 }
