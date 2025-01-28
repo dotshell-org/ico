@@ -22,10 +22,10 @@ function CreditSummary() {
 
     return (
         <>
-            <div className="sticky top-16 bg-white dark:bg-gray-950 pt-10">
+            <div className="fixed left-10 right-10 top-16 bg-white dark:bg-gray-950 pt-10">
                 <h1 className="text-3xl mt-2 mb-2 font-bold cursor-default">{t("credit")}</h1>
                 <FilterSelection />
-                <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-pointer">
+                <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-t-0 border-b-gray-300 dark:border-b-gray-700 border-b-2 cursor-pointer">
                     <thead>
                         <tr>
                             <CreditSummaryTH property={CreditSummaryProperty.Date} />
@@ -36,7 +36,7 @@ function CreditSummary() {
                     </thead>
                 </table>
             </div>
-            <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-copy mt-0">
+            <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-copy mt-40">
                 <tbody>
                     {
                         creditData.map((data, index) => {
