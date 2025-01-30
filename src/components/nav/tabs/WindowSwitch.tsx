@@ -22,7 +22,7 @@ const windowStrings: { [key in Window]: string } = {
     [Window.Cafeteria]: 'cafeteria',
 };
 
-const NavItem: React.FC<NavItemProps> = ({ window, selectedWindow, setSelectedWindow }) => {
+const NavItem: React.FC<NavItemProps> = ({ selectedWindow, setSelectedWindow }) => {
     const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
 

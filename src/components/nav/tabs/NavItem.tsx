@@ -7,7 +7,7 @@ interface NavItemProps {
     onClick: () => void;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ href, text, active, onClick }) => {
+const NavItem: React.FC<NavItemProps> = ({ text, active, onClick }) => {
     return (
         <label
             onClick={onClick}
