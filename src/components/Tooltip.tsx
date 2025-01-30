@@ -29,7 +29,7 @@ const Tooltip: React.FC<TooltipProps> = ({ children, text }) => {
                 {children}
             </div>
             {showTooltip && (
-                <div className="absolute z-10 w-max p-1 text-sm text-white bg-blue-500 rounded-md shadow-lg -translate-x-1/2 left-1/2 bottom-full mb-2">
+                <div className="absolute z-10 w-max p-1 text-sm text-white bg-blue-500 dark:bg-blue-600 rounded-md shadow-lg -translate-x-1/2 left-1/2 bottom-full mb-2">
                     {text}
                 </div>
             )}

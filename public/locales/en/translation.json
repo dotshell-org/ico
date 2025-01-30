@@ -10,5 +10,13 @@
     "date": "📅 Date",
     "title": "🏷️ Title",
     "amount": "💵 Amount",
-    "category": "📑 Category"
+    "category": "📑 Category",
+    "sort": "🔀 Sort",
+    "filter": "🔍 Filter",
+
+    "raw_newFilter": "New filter",
+    "raw_date": "Date",
+    "raw_title": "Title",
+    "raw_amount": "Amount",
+    "raw_category": "Category"
 }

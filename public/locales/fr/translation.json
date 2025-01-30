@@ -10,5 +10,13 @@
     "date": "📅 Date",
     "title": "🏷️ Titre",
     "amount": "💵 Montant",
-    "category": "📑 Catégorie"
+    "category": "📑 Catégorie",
+    "sort": "🔀 Trier",
+    "filter": "🔍 Filtrer",
+
+    "raw_newFilter": "Nouveau filtre",
+    "raw_date": "Date",
+    "raw_title": "Titre",
+    "raw_amount": "Montant",
+    "raw_category": "Catégorie"
 }
