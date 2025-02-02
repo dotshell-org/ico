@@ -3,22 +3,9 @@ import { CreditSummaryTR, CreditSummaryTH } from "../../components/credit-summar
 import { CreditSummaryProperty } from "../../types/SummaryProperties";
 import FilterSelection from "../../components/filter-selection/FilterSelection";
 
-
 function CreditSummary() {
 
     const { t } = useTranslation();
-  
-    const creditData = [
-        
-    ];
-    for (let i = 1; i <= 50; i++) {
-        creditData.push({
-            date: `Date ${i}`,
-            title: `Title ${i}`,
-            amount: `€${i * 100}.00`,
-            category: `Category ${i}`
-        });
-    }
 
     return (
         <>
@@ -38,18 +25,10 @@ function CreditSummary() {
             </div>
             <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-copy mt-40">
                 <tbody>
-                    {
-                        creditData.map((data, index) => {
-                            return (
-                                <tr key={index}>
-                                    <CreditSummaryTR content={data.date} />
-                                    <CreditSummaryTR content={data.title} />
-                                    <CreditSummaryTR content={data.amount} />
-                                    <CreditSummaryTR content={data.category} />
-                                </tr>
-                            )
-                        })
-                    }
+                    <CreditSummaryTR content={"A"} />
+                    <CreditSummaryTR content={"B"} />
+                    <CreditSummaryTR content={"C"} />
+                    <CreditSummaryTR content={"D"} />
                 </tbody>
             </table>
             <div className="h-20"></div>
