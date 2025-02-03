@@ -2,10 +2,12 @@ import { useTranslation } from "react-i18next";
 import { CreditSummaryTR, CreditSummaryTH } from "../../components/credit-summary/CreditSummaryRow";
 import { CreditSummaryProperty } from "../../types/SummaryProperties";
 import FilterSelection from "../../components/filter-selection/FilterSelection";
+import DBUtils from "../../utils/database";
 
 function CreditSummary() {
 
     const { t } = useTranslation();
+    const one = DBUtils.getOne();
 
     return (
         <>
@@ -25,7 +27,7 @@ function CreditSummary() {
             </div>
             <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-copy mt-40">
                 <tbody>
-                    <CreditSummaryTR content={"A"} />
+                    <CreditSummaryTR content={one.toString()} />
                     <CreditSummaryTR content={"B"} />
                     <CreditSummaryTR content={"C"} />
                     <CreditSummaryTR content={"D"} />

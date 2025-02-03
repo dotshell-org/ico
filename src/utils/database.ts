@@ -1,9 +1,6 @@
 import Database from 'better-sqlite3';
 
 class DatabaseUtils {
-    static fetchCredits() {
-        throw new Error("Method not implemented.");
-    }
     private db: Database.Database;
 
     constructor() {
@@ -21,6 +18,10 @@ class DatabaseUtils {
         insert.run('2021-01-01', 'Title 1', 100.00, 'Category 1');
     }
 
+    public getOne(): number {
+        return 1;
+    }
+
     public getDb(): Database.Database {
         return this.db;
     }
@@ -31,4 +32,5 @@ class DatabaseUtils {
 
 }
 
-export default DatabaseUtils;
+const DBUtils = new DatabaseUtils();
+export default DBUtils;
