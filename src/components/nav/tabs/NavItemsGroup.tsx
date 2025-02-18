@@ -11,7 +11,7 @@ interface NavItemsGroupProps {
 }
 
 export const NavItemsGroup: React.FC<NavItemsGroupProps> = ({ window, selectedTab, setSelectedTab }) => {
-    const { t } = useTranslation();
+    const { t }: { t: (key: string) => string } = useTranslation();
 
     let items: { href: string, text: string, tab: Tabs }[] = [];
     if (window === Window.Accounting) {
@@ -24,9 +24,8 @@ export const NavItemsGroup: React.FC<NavItemsGroupProps> = ({ window, selectedTa
 
     return (
         <div className="nav-items-group">
-            {items.map((item, index) => (
+            {items.map((item) => (
                 <NavItem
-                    key={`nav-item-${index}`}
                     href={item.href}
                     text={item.text}
                     active={selectedTab === item.tab}

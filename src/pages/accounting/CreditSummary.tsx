@@ -6,8 +6,8 @@ import FilterSelection from "../../components/filter-selection/FilterSelection";
 
 function CreditSummary() {
 
-    const { t } = useTranslation();
-
+    const { t }: { t: (key: string) => string } = useTranslation();
+    
     return (
         <>
             <div className="fixed left-10 right-10 top-16 bg-white dark:bg-gray-950 pt-10">

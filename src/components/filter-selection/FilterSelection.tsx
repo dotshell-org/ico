@@ -9,7 +9,7 @@ interface FilterSelectionProps {
 }
 
 const FilterSelection: React.FC<FilterSelectionProps> = ({ filters }) => {
-    filters = filters;
+    console.log(filters);
     return (
         <div className="w-full h-6 my-4 inline-flex">
             <img src='/filter.svg' alt="Filter" className="w-6 h-6 mr-2" />

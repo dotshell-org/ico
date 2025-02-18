@@ -23,7 +23,7 @@ const windowStrings: { [key in Window]: string } = {
 };
 
 const NavItem: React.FC<NavItemProps> = ({ selectedWindow, setSelectedWindow }) => {
-    const { t } = useTranslation();
+    const { t }: { t: (key: string) => string } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
 
     const handleButtonClick = () => {

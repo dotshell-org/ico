@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Filter } from "../../types/Filter";
+import React from "react";
 
 interface FilterSelectionProps {
     filter: Filter;
@@ -7,7 +8,7 @@ interface FilterSelectionProps {
 
 const FilterLabel: React.FC<FilterSelectionProps> = ({ filter }) => {
 
-    const { t } = useTranslation();
+    const { t }: { t: (key: string) => string } = useTranslation();
 
     return (
         <div className='relative'>

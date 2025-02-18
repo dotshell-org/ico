@@ -1,8 +1,9 @@
 import { useTranslation } from "react-i18next";
+import React from "react";
 
 const SortOrFilterSwitch: React.FC = () => {
 
-    const { t } = useTranslation();
+    const { t }: { t: (key: string) => string } = useTranslation();
 
     return (
         <div className="absolute mt-2 w-fit shadow-lg bg-white rounded-md dark:bg-gray-800 dark:ring-1 dark:ring-gray-600 -translate-x-1/2 ml-4">

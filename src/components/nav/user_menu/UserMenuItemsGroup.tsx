@@ -5,7 +5,7 @@ import Divider from '../Divider';
 import noProfile from '/no-profile.svg';
 
 const UserMenuItemsGroup: React.FC = () => {
-    const { t } = useTranslation();
+    const { t }: { t: (key: string) => string } = useTranslation();
 
     return (
         <div className="absolute right-0 mt-2 p-2 pb-4 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-600">

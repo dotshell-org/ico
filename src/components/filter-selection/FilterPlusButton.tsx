@@ -9,7 +9,7 @@ interface FilterPlusButtonProps {
 
 const FilterPlusButton: React.FC<FilterPlusButtonProps> = ({ alreadySorted }) => {
 
-    const { t } = useTranslation();
+    const { t }: { t: (key: string) => string } = useTranslation();
     const [showSelect, setShowSelect] = useState(false);
 
     return (
