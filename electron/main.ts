@@ -1,6 +1,7 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import {addCredit, getCredits} from "../src/db/database.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -16,7 +17,7 @@ let win: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, '../public/glome-icon.png'), // Chemin vers votre icône
+    icon: path.join(process.env.VITE_PUBLIC!, '../public/glome-icon.png'), // Chemin vers votre icône
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
@@ -43,6 +44,26 @@ function createWindow() {
     })
   }
 }
+
+
+ipcMain.handle("getCredits", async () => {
+  try {
+    return getCredits();
+  } catch (error) {
+    console.error("Erreur lors de la récupération des crédits", error);
+    throw error;
+  }
+});
+ipcMain.handle("addCredit", async (_event, credit) => {
+  try {
+    const { date, title, amount, category } = credit;
+    return addCredit(date, title, amount, category);
+  } catch (error) {
+    console.error("Erreur lors de l'ajout du crédit", error);
+    throw error;
+  }
+});
+
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
