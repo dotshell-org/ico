@@ -1,6 +1,35 @@
-import { app, BrowserWindow } from "electron";
+import { ipcMain, app, BrowserWindow } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { createRequire } from "module";
+const require2 = createRequire(import.meta.url);
+const Database = require2("better-sqlite3");
+const DATABASE_PATH = "./local.db";
+const DB_OPTIONS = { verbose: console.log };
+const CREATE_CREDITS_TABLE = `
+    CREATE TABLE IF NOT EXISTS credits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT,
+        title TEXT,
+        amount REAL,
+        category TEXT
+    );
+`;
+const INSERT_CREDIT_QUERY = `
+    INSERT INTO credits (date, title, amount, category)
+    VALUES (?, ?, ?, ?)
+`;
+const SELECT_CREDITS_QUERY = "SELECT * FROM credits";
+const db = new Database(DATABASE_PATH, DB_OPTIONS);
+db.exec(CREATE_CREDITS_TABLE);
+function addCredit(date, title, amount, category) {
+  const stmt = db.prepare(INSERT_CREDIT_QUERY);
+  return stmt.run(date, title, amount, category);
+}
+function getCredits() {
+  const stmt = db.prepare(SELECT_CREDITS_QUERY);
+  return stmt.all();
+}
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -34,6 +63,23 @@ function createWindow() {
     });
   }
 }
+ipcMain.handle("getCredits", async () => {
+  try {
+    return getCredits();
+  } catch (error) {
+    console.error("Erreur lors de la récupération des crédits", error);
+    throw error;
+  }
+});
+ipcMain.handle("addCredit", async (_event, credit) => {
+  try {
+    const { date, title, amount, category } = credit;
+    return addCredit(date, title, amount, category);
+  } catch (error) {
+    console.error("Erreur lors de l'ajout du crédit", error);
+    throw error;
+  }
+});
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
