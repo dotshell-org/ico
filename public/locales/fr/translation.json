@@ -18,5 +18,18 @@
     "raw_date": "Date",
     "raw_title": "Titre",
     "raw_amount": "Montant",
-    "raw_category": "Catégorie"
+    "raw_category": "Catégorie",
+
+    "raw_days": "jour(s)",
+
+    "selected_count": "🔢 Compte",
+    "sum": "➕ Somme",
+    "average": "📊 Moyenne",
+    "median": "📏 Médiane",
+    "std_dev": "📉 Écart-type",
+    "min": "🔻 Min",
+    "max": "🔺 Max",
+    "date_range": "\uD83D\uDCCF Plage",
+    "unique_count": "🔑 Valeurs uniques"
+
 }

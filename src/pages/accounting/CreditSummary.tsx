@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CreditSummaryProperty } from "../../types/SummaryProperties";
+import { SummaryProperty, SummaryPropertyIndex } from "../../types/SummaryProperties";
 import FilterSelection from "../../components/filter-selection/FilterSelection";
 import SummaryTR from "../../components/summary/SummaryTR";
 import SummaryTH from "../../components/summary/SummaryTH";
+import AggregationToolbar from "../../components/summary/AggregationToolbar";
 
 interface Credit {
     id: number;
@@ -14,12 +15,10 @@ interface Credit {
 }
 
 function CreditSummary() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [credits, setCredits] = useState<Credit[]>([]);
-    // État pour stocker la colonne sélectionnée et les id des lignes sélectionnées
     const [selectedColumn, setSelectedColumn] = useState<number | null>(null);
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
-    // On enregistre l'index de la dernière cellule sélectionnée
     const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
 
     useEffect(() => {
@@ -33,14 +32,32 @@ function CreditSummary() {
             });
     }, []);
 
-    // Gestion du clic sur une cellule en gérant aussi la touche Shift.
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                setSelectedColumn(null);
+                setSelectedRows([]);
+                setLastSelectedIndex(null);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []);
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat(i18n.language).format(date);
+    };
+
     const handleCellClick = (
         event: React.MouseEvent<HTMLTableCellElement>,
         columnIndex: number,
         rowIndex: number,
         rowId: number
     ) => {
-        // Si on clique sur une colonne différente
         if (selectedColumn !== null && selectedColumn !== columnIndex) {
             setSelectedColumn(columnIndex);
             setSelectedRows([rowId]);
@@ -48,17 +65,14 @@ function CreditSummary() {
             return;
         }
 
-        // Même colonne
         setSelectedColumn(columnIndex);
 
         if (event.shiftKey && lastSelectedIndex !== null) {
-            // Si la touche Shift est enfoncée, on récupère la plage de sélection
             const start = Math.min(lastSelectedIndex, rowIndex);
             const end = Math.max(lastSelectedIndex, rowIndex);
             const idsToSelect = credits.slice(start, end + 1).map((credit) => credit.id);
             setSelectedRows(idsToSelect);
         } else {
-            // Clique normal : toggle la sélection de la cellule cliquée
             if (selectedRows.includes(rowId)) {
                 setSelectedRows(selectedRows.filter((id) => id !== rowId));
             } else {
@@ -68,6 +82,26 @@ function CreditSummary() {
         }
     };
 
+    const selectedValues =
+        selectedColumn !== null
+            ? credits
+                .filter((credit) => selectedRows.includes(credit.id))
+                .map((credit) => {
+                    switch (selectedColumn) {
+                        case 0:
+                            return formatDate(credit.date);
+                        case 1:
+                            return credit.title;
+                        case 2:
+                            return credit.amount.toString();
+                        case 3:
+                            return credit.category;
+                        default:
+                            return "";
+                    }
+                })
+            : [];
+
     return (
         <>
             <div className="fixed left-10 right-10 top-16 bg-white dark:bg-gray-950 pt-10">
@@ -76,10 +110,10 @@ function CreditSummary() {
                 <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-t-0 border-b-gray-300 dark:border-b-gray-700 border-b-2 cursor-pointer">
                     <thead>
                     <tr>
-                        <SummaryTH property={CreditSummaryProperty.Date} />
-                        <SummaryTH property={CreditSummaryProperty.Title} />
-                        <SummaryTH property={CreditSummaryProperty.Amount} />
-                        <SummaryTH property={CreditSummaryProperty.Category} />
+                        <SummaryTH property={SummaryProperty.Date} />
+                        <SummaryTH property={SummaryProperty.Title} />
+                        <SummaryTH property={SummaryProperty.Amount} />
+                        <SummaryTH property={SummaryProperty.Category} />
                     </tr>
                     </thead>
                 </table>
@@ -89,29 +123,31 @@ function CreditSummary() {
                 {credits.map((credit, index) => (
                     <tr key={credit.id}>
                         <SummaryTR
-                            content={credit.date}
-                            isSelected={selectedColumn === 0 && selectedRows.includes(credit.id)}
-                            onClick={(event) => handleCellClick(event, 0, index, credit.id)}
+                            content={formatDate(credit.date)}
+                            isSelected={selectedColumn === SummaryPropertyIndex.Date && selectedRows.includes(credit.id)}
+                            onClick={(event) => handleCellClick(event, SummaryPropertyIndex.Date, index, credit.id)}
                         />
                         <SummaryTR
                             content={credit.title}
-                            isSelected={selectedColumn === 1 && selectedRows.includes(credit.id)}
-                            onClick={(event) => handleCellClick(event, 1, index, credit.id)}
+                            isSelected={selectedColumn === SummaryPropertyIndex.Title && selectedRows.includes(credit.id)}
+                            onClick={(event) => handleCellClick(event, SummaryPropertyIndex.Title, index, credit.id)}
                         />
                         <SummaryTR
                             content={"€" + credit.amount.toFixed(2)}
-                            isSelected={selectedColumn === 2 && selectedRows.includes(credit.id)}
-                            onClick={(event) => handleCellClick(event, 2, index, credit.id)}
+                            isSelected={selectedColumn === SummaryPropertyIndex.Amount && selectedRows.includes(credit.id)}
+                            onClick={(event) => handleCellClick(event, SummaryPropertyIndex.Amount, index, credit.id)}
                         />
                         <SummaryTR
                             content={credit.category}
-                            isSelected={selectedColumn === 3 && selectedRows.includes(credit.id)}
-                            onClick={(event) => handleCellClick(event, 3, index, credit.id)}
+                            isSelected={selectedColumn === SummaryPropertyIndex.Category && selectedRows.includes(credit.id)}
+                            onClick={(event) => handleCellClick(event, SummaryPropertyIndex.Category, index, credit.id)}
                         />
                     </tr>
                 ))}
                 </tbody>
             </table>
+
+            <AggregationToolbar columnIndex={selectedColumn} values={selectedValues} />
             <div className="h-20"></div>
         </>
     );

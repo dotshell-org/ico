@@ -18,5 +18,17 @@
     "raw_date": "Date",
     "raw_title": "Title",
     "raw_amount": "Amount",
-    "raw_category": "Category"
+    "raw_category": "Category",
+
+    "raw_days": "day(s)",
+
+    "selected_count": "🔢 Selected count",
+    "sum": "➕ Sum",
+    "average": "📊 Average",
+    "median": "📏 Median",
+    "std_dev": "📉 Std Dev",
+    "min": "🔻 Min",
+    "max": "🔺 Max",
+    "date_range": "\uD83D\uDCCF Range",
+    "unique_count": "🔑 Unique Values"
 }
