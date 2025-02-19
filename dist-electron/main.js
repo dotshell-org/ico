@@ -5,7 +5,7 @@ import { createRequire } from "module";
 const require2 = createRequire(import.meta.url);
 const Database = require2("better-sqlite3");
 const DATABASE_PATH = "./local.db";
-const DB_OPTIONS = { verbose: console.log };
+const DB_OPTIONS = {};
 const CREATE_CREDITS_TABLE = `
     CREATE TABLE IF NOT EXISTS credits (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

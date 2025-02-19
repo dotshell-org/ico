@@ -4,7 +4,7 @@ const Database = require('better-sqlite3');
 
 // Database configuration
 const DATABASE_PATH = "./local.db";
-const DB_OPTIONS = { verbose: console.log };
+const DB_OPTIONS = { };
 
 // SQL queries
 const CREATE_CREDITS_TABLE = `
