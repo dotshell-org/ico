@@ -3,21 +3,21 @@ import detector from "i18next-browser-languagedetector";
 import backend from "i18next-http-backend";
 import { initReactI18next } from "react-i18next";
 
-// translations are already at
-// '../public/locales/en/translation.json'
-// which is the default for the xhr backend to load from
-
 i18n
-    .use(detector) // detect user language
-    .use(backend)
-    .use(initReactI18next) // passes i18n down to react-i18next
+    .use(detector) // détection de la langue utilisateur
+    .use(backend)  // pour le chargement des fichiers de traduction
+    .use(initReactI18next) // passe i18n à react-i18next
     .init({
-        fallbackLng: "en", // use en if detected lng is not available
+        fallbackLng: "en", // langue de secours
+        keySeparator: false, // nous n'utilisons pas de séparateur pour les clés
 
-        keySeparator: false, // we do not use keys in form messages.welcome
+        backend: {
+            loadPath: `${process.env.NODE_ENV === "production" ? "./" : "/"}i18n-locales/{{lng}}/{{ns}}.json`
+        },
 
         interpolation: {
-        escapeValue: false // react already safes from xss
+                escapeValue: false // react se charge de la protection contre les XSS
         }
     });
 
+export default i18n;

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Déclaration des polices Aileron */
+/* Declaration of Aileron fonts */
 @font-face {
   font-family: 'Aileron';
   src: url('./assets/font/Aileron-Black.otf') format('opentype');

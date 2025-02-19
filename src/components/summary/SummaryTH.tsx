@@ -1,9 +1,9 @@
 import React from 'react';
-import { CreditSummaryProperty } from '../../types/SummaryProperties';
+import { SummaryProperty } from '../../types/SummaryProperties';
 import { useTranslation } from 'react-i18next';
 
 interface SummaryTHProps {
-    property: CreditSummaryProperty;
+    property: SummaryProperty;
 }
 
 const SummaryTH: React.FC<SummaryTHProps> = ({ property }) => {

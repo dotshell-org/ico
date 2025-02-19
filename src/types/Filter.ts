@@ -1,6 +1,6 @@
-import { CreditSummaryProperty } from "./SummaryProperties"
+import { SummaryProperty } from "./SummaryProperties"
 
 export interface Filter {
-    property: CreditSummaryProperty,
+    property: SummaryProperty,
     value: string;
 }

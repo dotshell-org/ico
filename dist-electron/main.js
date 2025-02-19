@@ -1,12 +1,8 @@
-import { ipcMain, app, BrowserWindow } from "electron";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
-import { createRequire } from "module";
-const require2 = createRequire(import.meta.url);
-const Database = require2("better-sqlite3");
-const DATABASE_PATH = "./local.db";
-const DB_OPTIONS = {};
-const CREATE_CREDITS_TABLE = `
+import { ipcMain as E, app as n, BrowserWindow as l } from "electron";
+import { fileURLToPath as u } from "node:url";
+import t from "node:path";
+import { createRequire as _ } from "module";
+const w = _(import.meta.url), f = w("better-sqlite3"), I = "./local.db", h = {}, A = `
     CREATE TABLE IF NOT EXISTS credits (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT,
@@ -14,85 +10,64 @@ const CREATE_CREDITS_TABLE = `
         amount REAL,
         category TEXT
     );
-`;
-const INSERT_CREDIT_QUERY = `
+`, C = `
     INSERT INTO credits (date, title, amount, category)
     VALUES (?, ?, ?, ?)
-`;
-const SELECT_CREDITS_QUERY = "SELECT * FROM credits";
-const db = new Database(DATABASE_PATH, DB_OPTIONS);
-db.exec(CREATE_CREDITS_TABLE);
-function addCredit(date, title, amount, category) {
-  const stmt = db.prepare(INSERT_CREDIT_QUERY);
-  return stmt.run(date, title, amount, category);
+`, P = "SELECT * FROM credits", a = new f(I, h);
+a.exec(A);
+function S(r, i, o, s) {
+  return a.prepare(C).run(r, i, o, s);
 }
-function getCredits() {
-  const stmt = db.prepare(SELECT_CREDITS_QUERY);
-  return stmt.all();
+function O() {
+  return a.prepare(P).all();
 }
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-process.env.APP_ROOT = path.join(__dirname, "..");
-const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
-path.join(process.env.APP_ROOT, "dist-electron");
-const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
-let win;
-function createWindow() {
-  win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, "../public/glome-icon.png"),
-    // Chemin vers votre icône
+const T = t.dirname(u(import.meta.url));
+process.env.APP_ROOT = t.join(T, "..");
+const c = process.env.VITE_DEV_SERVER_URL;
+t.join(process.env.APP_ROOT, "dist-electron");
+const R = t.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = c ? t.join(process.env.APP_ROOT, "public") : R;
+let e;
+function p() {
+  e = new l({
+    icon: t.join(process.env.VITE_PUBLIC, "../public/glome-icon.png"),
+    // Path to your icon
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs")
+      preload: t.join(T, "preload.mjs")
     }
+  }), e.setMenuBarVisibility(!1), e.webContents.on("did-finish-load", () => {
+    e == null || e.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  }), c ? e.loadURL(c).then(() => {
+    if (!e)
+      throw new Error('"win" is not defined');
+  }) : e.loadFile(t.join(R, "index.html")).then(() => {
+    if (!e)
+      throw new Error('"win" is not defined');
   });
-  win.setMenuBarVisibility(false);
-  win.webContents.on("did-finish-load", () => {
-    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  });
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL).then(() => {
-      if (!win) {
-        throw new Error('"win" is not defined');
-      }
-    });
-  } else {
-    win.loadFile(path.join(RENDERER_DIST, "index.html")).then(() => {
-      if (!win) {
-        throw new Error('"win" is not defined');
-      }
-    });
-  }
 }
-ipcMain.handle("getCredits", async () => {
+E.handle("getCredits", async () => {
   try {
-    return getCredits();
-  } catch (error) {
-    console.error("Erreur lors de la récupération des crédits", error);
-    throw error;
+    return O();
+  } catch (r) {
+    throw console.error("Erreur lors de la récupération des crédits", r), r;
   }
 });
-ipcMain.handle("addCredit", async (_event, credit) => {
+E.handle("addCredit", async (r, i) => {
   try {
-    const { date, title, amount, category } = credit;
-    return addCredit(date, title, amount, category);
-  } catch (error) {
-    console.error("Erreur lors de l'ajout du crédit", error);
-    throw error;
+    const { date: o, title: s, amount: d, category: m } = i;
+    return S(o, s, d, m);
+  } catch (o) {
+    throw console.error("Erreur lors de l'ajout du crédit", o), o;
   }
 });
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-    win = null;
-  }
+n.on("window-all-closed", () => {
+  process.platform !== "darwin" && (n.quit(), e = null);
 });
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+n.on("activate", () => {
+  l.getAllWindows().length === 0 && p();
 });
-app.whenReady().then(createWindow);
+n.whenReady().then(p);
 export {
-  RENDERER_DIST,
-  VITE_DEV_SERVER_URL
+  R as RENDERER_DIST,
+  c as VITE_DEV_SERVER_URL
 };

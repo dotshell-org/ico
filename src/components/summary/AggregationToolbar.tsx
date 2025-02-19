@@ -10,7 +10,7 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
     const { t } = useTranslation();
     const isVisible = columnIndex !== null && values.length > 0;
 
-    // Compteur des cellules sélectionnées (affiché dans toutes les configurations)
+    // Cell counter (displayed in all configurations)
     const selectedCountElement = (
         <div className="px-3">
             <strong>{t("selected_count")}:</strong> {values.length}
@@ -20,21 +20,21 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
     let additionalElement = null;
 
     if (columnIndex === 2) {
-        // Colonne numérique : somme, moyenne, médiane, écart-type, minimum et maximum.
+        // Numeric column: sum, average, median, standard deviation, minimum, and maximum.
         const numbers = values.map(val => parseFloat(val)).filter(num => !isNaN(num));
         const sum = numbers.reduce((acc, num) => acc + num, 0);
         const avg = numbers.length > 0 ? sum / numbers.length : 0;
         const min = numbers.length > 0 ? Math.min(...numbers) : 0;
         const max = numbers.length > 0 ? Math.max(...numbers) : 0;
 
-        // Calcul de la médiane.
+        // Calculation of the median.
         const sorted = [...numbers].sort((a, b) => a - b);
         const median =
             sorted.length % 2 === 0
                 ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
                 : sorted[Math.floor(sorted.length / 2)];
 
-        // Calcul de l'écart-type.
+        // Calculation of the standard deviation.
         const variance =
             numbers.length > 0
                 ? numbers.reduce((acc, num) => acc + Math.pow(num - avg, 2), 0) / numbers.length
@@ -64,7 +64,7 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
             </>
         );
     } else if (columnIndex === 0) {
-        // Colonne date : plage de dates et nombre de jours entre la date minimale et maximale.
+        // Date column: date range and number of days between the minimum and maximum date.
         const dates = values
             .map(dateStr => new Date(dateStr))
             .filter(date => !isNaN(date.getTime()));
@@ -79,11 +79,11 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
         additionalElement = (
             <div className="px-3">
                 <strong>{t("date_range")}:</strong> {minDate ? minDate.toLocaleDateString() : "-"} → {" "}
-                {maxDate ? maxDate.toLocaleDateString() : "-"} ({dayDiff} {t("days")})
+                {maxDate ? maxDate.toLocaleDateString() : "-"} ({dayDiff} {t("raw_days")})
             </div>
         );
     } else if (columnIndex === 3) {
-        // Colonne catégorie : fréquence de chaque catégorie affichée dans une zone défilable.
+        // Category column: frequency of each category displayed in a scrollable area.
         const frequency: { [key: string]: number } = {};
         values.forEach(val => {
             frequency[val] = (frequency[val] || 0) + 1;
@@ -98,7 +98,7 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
             </div>
         );
     } else if (columnIndex === 1) {
-        // Colonne texte (par exemple titre) : nombre de valeurs uniques.
+        // Text column (e.g., title): number of unique values.
         const uniqueValues = Array.from(new Set(values));
         additionalElement = (
             <div className="px-3">

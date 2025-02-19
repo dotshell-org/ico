@@ -11,7 +11,7 @@ const Tooltip: React.FC<TooltipProps> = ({ children, text }) => {
     const [hover, setHover] = useState(false);
 
     useEffect(() => {
-        let timer: number;
+        let timer: ReturnType<typeof setTimeout>;
         if (hover) {
             timer = setTimeout(() => setShowTooltip(true), 400);
         } else {

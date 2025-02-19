@@ -17,7 +17,7 @@ let win: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC!, '../public/glome-icon.png'), // Chemin vers votre icône
+    icon: path.join(process.env.VITE_PUBLIC!, '../public/glome-icon.png'), // Path to your icon
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
