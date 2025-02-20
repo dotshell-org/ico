@@ -1,8 +1,24 @@
-import { ipcMain as E, app as n, BrowserWindow as l } from "electron";
-import { fileURLToPath as u } from "node:url";
-import t from "node:path";
-import { createRequire as _ } from "module";
-const w = _(import.meta.url), f = w("better-sqlite3"), I = "./local.db", h = {}, A = `
+import { ipcMain, app, BrowserWindow } from "electron";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+import { createRequire } from "module";
+var FilterType = /* @__PURE__ */ ((FilterType2) => {
+  FilterType2["Is"] = ": ";
+  FilterType2["IsExactly"] = " = ";
+  FilterType2["LessThan"] = " < ";
+  FilterType2["MoreThan"] = " > ";
+  return FilterType2;
+})(FilterType || {});
+var SortType = /* @__PURE__ */ ((SortType2) => {
+  SortType2["Asc"] = "↓";
+  SortType2["Desc"] = "↑";
+  return SortType2;
+})(SortType || {});
+const require2 = createRequire(import.meta.url);
+const Database = require2("better-sqlite3");
+const DATABASE_PATH = "./local.db";
+const DB_OPTIONS = {};
+const CREATE_CREDITS_TABLE = `
     CREATE TABLE IF NOT EXISTS credits (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT,
@@ -10,64 +26,114 @@ const w = _(import.meta.url), f = w("better-sqlite3"), I = "./local.db", h = {},
         amount REAL,
         category TEXT
     );
-`, C = `
-    INSERT INTO credits (date, title, amount, category)
-    VALUES (?, ?, ?, ?)
-`, P = "SELECT * FROM credits", a = new f(I, h);
-a.exec(A);
-function S(r, i, o, s) {
-  return a.prepare(C).run(r, i, o, s);
+`;
+const db = new Database(DATABASE_PATH, DB_OPTIONS);
+db.exec(CREATE_CREDITS_TABLE);
+function addCredit(date, title, amount, category) {
+  const INSERT_CREDIT_QUERY = `
+        INSERT INTO credits (date, title, amount, category)
+        VALUES (?, ?, ?, ?)
+    `;
+  const stmt = db.prepare(INSERT_CREDIT_QUERY);
+  return stmt.run(date, title, amount, category);
 }
-function O() {
-  return a.prepare(P).all();
+function getCredits(filters, sort) {
+  let query = "SELECT * FROM credits";
+  const queryParams = [];
+  function typeToOperator(type) {
+    if (type === FilterType.Is) {
+      return "LIKE";
+    } else if (type === FilterType.IsExactly) {
+      return "=";
+    } else if (type === FilterType.MoreThan) {
+      return ">";
+    } else if (type === FilterType.LessThan) {
+      return "<";
+    } else if (type === SortType.Asc) {
+      return "ASC";
+    } else if (type === SortType.Desc) {
+      return "DESC";
+    } else {
+      throw new Error(`Unsupported operator type: ${type}`);
+    }
+  }
+  if (filters.length > 0) {
+    const conditions = filters.map((filter) => {
+      queryParams.push(filter.value);
+      return `${filter.property} ${typeToOperator(filter.type)} ?`;
+    });
+    query += " WHERE " + conditions.join(" AND ");
+  }
+  if (sort.length > 0) {
+    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.type)}`);
+    query += " ORDER BY " + sortConditions.join(", ");
+  }
+  const stmt = db.prepare(query);
+  return stmt.all(...queryParams);
 }
-const T = t.dirname(u(import.meta.url));
-process.env.APP_ROOT = t.join(T, "..");
-const c = process.env.VITE_DEV_SERVER_URL;
-t.join(process.env.APP_ROOT, "dist-electron");
-const R = t.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = c ? t.join(process.env.APP_ROOT, "public") : R;
-let e;
-function p() {
-  e = new l({
-    icon: t.join(process.env.VITE_PUBLIC, "../public/glome-icon.png"),
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path.join(__dirname, "..");
+const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+path.join(process.env.APP_ROOT, "dist-electron");
+const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
+let win;
+function createWindow() {
+  win = new BrowserWindow({
+    icon: path.join(process.env.VITE_PUBLIC, "../public/glome-icon.png"),
     // Path to your icon
     webPreferences: {
-      preload: t.join(T, "preload.mjs")
+      preload: path.join(__dirname, "preload.mjs")
     }
-  }), e.setMenuBarVisibility(!1), e.webContents.on("did-finish-load", () => {
-    e == null || e.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  }), c ? e.loadURL(c).then(() => {
-    if (!e)
-      throw new Error('"win" is not defined');
-  }) : e.loadFile(t.join(R, "index.html")).then(() => {
-    if (!e)
-      throw new Error('"win" is not defined');
   });
+  win.setMenuBarVisibility(false);
+  win.webContents.on("did-finish-load", () => {
+    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  });
+  if (VITE_DEV_SERVER_URL) {
+    win.loadURL(VITE_DEV_SERVER_URL).then(() => {
+      if (!win) {
+        throw new Error('"win" is not defined');
+      }
+    });
+  } else {
+    win.loadFile(path.join(RENDERER_DIST, "index.html")).then(() => {
+      if (!win) {
+        throw new Error('"win" is not defined');
+      }
+    });
+  }
 }
-E.handle("getCredits", async () => {
+ipcMain.handle("getCredits", async (_event, filters, sorts) => {
   try {
-    return O();
-  } catch (r) {
-    throw console.error("Erreur lors de la récupération des crédits", r), r;
+    return getCredits(filters, sorts);
+  } catch (error) {
+    console.error("Error when fetching credits", error);
+    throw error;
   }
 });
-E.handle("addCredit", async (r, i) => {
+ipcMain.handle("addCredit", async (_event, credit) => {
   try {
-    const { date: o, title: s, amount: d, category: m } = i;
-    return S(o, s, d, m);
-  } catch (o) {
-    throw console.error("Erreur lors de l'ajout du crédit", o), o;
+    const { date, title, amount, category } = credit;
+    return addCredit(date, title, amount, category);
+  } catch (error) {
+    console.error("Error when adding credit", error);
+    throw error;
   }
 });
-n.on("window-all-closed", () => {
-  process.platform !== "darwin" && (n.quit(), e = null);
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+    win = null;
+  }
 });
-n.on("activate", () => {
-  l.getAllWindows().length === 0 && p();
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
-n.whenReady().then(p);
+app.whenReady().then(createWindow);
 export {
-  R as RENDERER_DIST,
-  c as VITE_DEV_SERVER_URL
+  RENDERER_DIST,
+  VITE_DEV_SERVER_URL
 };

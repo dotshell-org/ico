@@ -2,6 +2,8 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import {addCredit, getCredits} from "../src/db/database.ts";
+import { Filter } from "../src/types/filter/Filter.ts"
+import { Sort } from "../src/types/sort/Sort.ts"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -46,11 +48,11 @@ function createWindow() {
 }
 
 
-ipcMain.handle("getCredits", async () => {
+ipcMain.handle("getCredits", async (_event, filters: Filter[], sorts: Sort[]) => {
   try {
-    return getCredits();
+    return getCredits(filters, sorts);
   } catch (error) {
-    console.error("Erreur lors de la récupération des crédits", error);
+    console.error("Error when fetching credits", error);
     throw error;
   }
 });
@@ -59,7 +61,7 @@ ipcMain.handle("addCredit", async (_event, credit) => {
     const { date, title, amount, category } = credit;
     return addCredit(date, title, amount, category);
   } catch (error) {
-    console.error("Erreur lors de l'ajout du crédit", error);
+    console.error("Error when adding credit", error);
     throw error;
   }
 });

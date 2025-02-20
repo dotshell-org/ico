@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { SummaryProperty, SummaryPropertyIndex } from "../../types/SummaryProperties";
+import {useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
+import {SummaryProperty, SummaryPropertyIndex} from "../../types/SummaryProperties";
 import FilterSelection from "../../components/filter-selection/FilterSelection";
 import SummaryTR from "../../components/summary/SummaryTR";
 import SummaryTH from "../../components/summary/SummaryTH";
 import AggregationToolbar from "../../components/summary/AggregationToolbar";
+import {Filter} from "../../types/filter/Filter.ts";
+import {Sort} from "../../types/sort/Sort.ts";
+import {SortType} from "../../types/sort/SortType.ts";
+import {FilterType} from "../../types/filter/FilterType.ts";
 
 interface Credit {
     id: number;
@@ -20,17 +24,24 @@ function CreditSummary() {
     const [selectedColumn, setSelectedColumn] = useState<number | null>(null);
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
     const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+    const [filters, setFilters] = useState<Filter[]>([]);
+    const [sorts, setSorts] = useState<Sort[]>([]);
+
+    useEffect(() => {
+        setFilters([{property: SummaryProperty.Amount, type: FilterType.LessThan, value: 80}])
+        setSorts([{property: SummaryProperty.Category, type: SortType.Asc}])
+    }, []);
 
     useEffect(() => {
         window.ipcRenderer
-            .invoke("getCredits")
+            .invoke("getCredits", filters, sorts)
             .then((result: Credit[]) => {
                 setCredits(result);
             })
             .catch((error: any) => {
                 console.error("Erreur lors de la récupération des crédits", error);
             });
-    }, []);
+    }, [filters, sorts]);
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -101,12 +112,12 @@ function CreditSummary() {
                     }
                 })
             : [];
-
+    
     return (
         <>
             <div className="fixed left-10 right-10 top-16 bg-white dark:bg-gray-950 pt-10">
                 <h1 className="text-3xl mt-2 mb-2 font-bold cursor-default">{t("credit")}</h1>
-                <FilterSelection filters={[]} />
+                <FilterSelection filters={filters} sorts={sorts} />
                 <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-t-0 border-b-gray-300 dark:border-b-gray-700 border-b-2 cursor-pointer">
                     <thead>
                     <tr>
