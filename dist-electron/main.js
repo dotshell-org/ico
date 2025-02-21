@@ -1,31 +1,9 @@
-import { ipcMain, app, BrowserWindow } from "electron";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
-import { createRequire } from "module";
-var Operator = /* @__PURE__ */ ((Operator2) => {
-  Operator2["Is"] = ": ";
-  Operator2["IsExactly"] = " = ";
-  Operator2["LessThan"] = " < ";
-  Operator2["MoreThan"] = " > ";
-  return Operator2;
-})(Operator || {});
-var Orientation = /* @__PURE__ */ ((Orientation2) => {
-  Orientation2["Asc"] = "↓";
-  Orientation2["Desc"] = "↑";
-  return Orientation2;
-})(Orientation || {});
-var SummaryProperty = /* @__PURE__ */ ((SummaryProperty2) => {
-  SummaryProperty2["Date"] = "date";
-  SummaryProperty2["Title"] = "title";
-  SummaryProperty2["Amount"] = "amount";
-  SummaryProperty2["Category"] = "category";
-  return SummaryProperty2;
-})(SummaryProperty || {});
-const require2 = createRequire(import.meta.url);
-const Database = require2("better-sqlite3");
-const DATABASE_PATH = "./local.db";
-const DB_OPTIONS = {};
-const CREATE_CREDITS_TABLE = `
+import { ipcMain as R, app as u, BrowserWindow as I } from "electron";
+import { fileURLToPath as f } from "node:url";
+import E from "node:path";
+import { createRequire as w } from "module";
+var c = /* @__PURE__ */ ((e) => (e.Is = ": ", e.IsExactly = " = ", e.LessThan = " < ", e.MoreThan = " > ", e))(c || {}), l = /* @__PURE__ */ ((e) => (e.Asc = "↓", e.Desc = "↑", e))(l || {}), h = /* @__PURE__ */ ((e) => (e.Date = "date", e.Title = "title", e.Amount = "amount", e.Category = "category", e))(h || {});
+const C = w(import.meta.url), D = C("better-sqlite3"), g = "./local.db", S = {}, L = `
     CREATE TABLE IF NOT EXISTS credits (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT,
@@ -33,8 +11,7 @@ const CREATE_CREDITS_TABLE = `
         amount REAL,
         category TEXT
     );
-`;
-const CREATE_DEBITS_TABLE = `
+`, N = `
     CREATE TABLE IF NOT EXISTS debits (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT,
@@ -42,181 +19,139 @@ const CREATE_DEBITS_TABLE = `
         amount REAL,
         category TEXT
     )
-`;
-const db = new Database(DATABASE_PATH, DB_OPTIONS);
-db.exec(CREATE_CREDITS_TABLE);
-db.exec(CREATE_DEBITS_TABLE);
-function addCredit(date, title, amount, category) {
-  const INSERT_CREDIT_QUERY = `
+`, T = new D(g, S);
+T.exec(L);
+T.exec(N);
+function b(e, s, t, n) {
+  return T.prepare(`
         INSERT INTO credits (date, title, amount, category)
         VALUES (?, ?, ?, ?)
-    `;
-  const stmt = db.prepare(INSERT_CREDIT_QUERY);
-  return stmt.run(date, title, amount, category);
+    `).run(e, s, t, n);
 }
-function getCredits(filters, sort) {
-  let query = "SELECT * FROM credits";
-  const queryParams = [];
-  function typeToOperator(type) {
-    if (type === Operator.Is) {
+function v(e, s) {
+  let t = "SELECT * FROM credits";
+  const n = [];
+  function i(r) {
+    if (r === c.Is)
       return "LIKE";
-    } else if (type === Operator.IsExactly) {
+    if (r === c.IsExactly)
       return "=";
-    } else if (type === Operator.MoreThan) {
+    if (r === c.MoreThan)
       return ">";
-    } else if (type === Operator.LessThan) {
+    if (r === c.LessThan)
       return "<";
-    } else if (type === Orientation.Asc) {
+    if (r === l.Asc)
       return "ASC";
-    } else if (type === Orientation.Desc) {
+    if (r === l.Desc)
       return "DESC";
-    } else {
-      throw new Error(`Unsupported operator type: ${type}`);
-    }
+    throw new Error(`Unsupported operator type: ${r}`);
   }
-  if (filters.length > 0) {
-    const conditions = filters.map((filter) => {
-      if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
-        queryParams.push(`%${filter.value}%`);
-      } else {
-        queryParams.push(filter.value);
-      }
-      return `${filter.property} ${typeToOperator(filter.operator)} ?`;
-    });
-    query += " WHERE " + conditions.join(" AND ");
+  if (e.length > 0) {
+    const r = e.map((o) => (o.operator === c.Is && o.property !== h.Amount ? n.push(`%${o.value}%`) : n.push(o.value), `${o.property} ${i(o.operator)} ?`));
+    t += " WHERE " + r.join(" AND ");
   }
-  if (sort.length > 0) {
-    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.orientation)}`);
-    query += " ORDER BY " + sortConditions.join(", ");
+  if (s.length > 0) {
+    const r = s.map((o) => `${o.property} ${i(o.orientation)}`);
+    t += " ORDER BY " + r.join(", ");
   }
-  const stmt = db.prepare(query);
-  return stmt.all(...queryParams);
+  return T.prepare(t).all(...n);
 }
-function addDebit(date, title, amount, category) {
-  const INSERT_CREDIT_QUERY = `
+function O(e, s, t, n) {
+  return T.prepare(`
         INSERT INTO debits (date, title, amount, category)
         VALUES (?, ?, ?, ?)
-    `;
-  const stmt = db.prepare(INSERT_CREDIT_QUERY);
-  return stmt.run(date, title, amount, category);
+    `).run(e, s, t, n);
 }
-function getDebits(filters, sort) {
-  let query = "SELECT * FROM debits";
-  const queryParams = [];
-  function typeToOperator(type) {
-    if (type === Operator.Is) {
+function y(e, s) {
+  let t = "SELECT * FROM debits";
+  const n = [];
+  function i(r) {
+    if (r === c.Is)
       return "LIKE";
-    } else if (type === Operator.IsExactly) {
+    if (r === c.IsExactly)
       return "=";
-    } else if (type === Operator.MoreThan) {
+    if (r === c.MoreThan)
       return ">";
-    } else if (type === Operator.LessThan) {
+    if (r === c.LessThan)
       return "<";
-    } else if (type === Orientation.Asc) {
+    if (r === l.Asc)
       return "ASC";
-    } else if (type === Orientation.Desc) {
+    if (r === l.Desc)
       return "DESC";
-    } else {
-      throw new Error(`Unsupported operator type: ${type}`);
-    }
+    throw new Error(`Unsupported operator type: ${r}`);
   }
-  if (filters.length > 0) {
-    const conditions = filters.map((filter) => {
-      if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
-        queryParams.push(`%${filter.value}%`);
-      } else {
-        queryParams.push(filter.value);
-      }
-      return `${filter.property} ${typeToOperator(filter.operator)} ?`;
-    });
-    query += " WHERE " + conditions.join(" AND ");
+  if (e.length > 0) {
+    const r = e.map((o) => (o.operator === c.Is && o.property !== h.Amount ? n.push(`%${o.value}%`) : n.push(o.value), `${o.property} ${i(o.operator)} ?`));
+    t += " WHERE " + r.join(" AND ");
   }
-  if (sort.length > 0) {
-    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.orientation)}`);
-    query += " ORDER BY " + sortConditions.join(", ");
+  if (s.length > 0) {
+    const r = s.map((o) => `${o.property} ${i(o.orientation)}`);
+    t += " ORDER BY " + r.join(", ");
   }
-  const stmt = db.prepare(query);
-  return stmt.all(...queryParams);
+  return T.prepare(t).all(...n);
 }
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-process.env.APP_ROOT = path.join(__dirname, "..");
-const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
-path.join(process.env.APP_ROOT, "dist-electron");
-const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
-let win;
-function createWindow() {
-  win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, "../public/glome-icon.png"),
+const m = E.dirname(f(import.meta.url));
+process.env.APP_ROOT = E.join(m, "..");
+const p = process.env.VITE_DEV_SERVER_URL;
+E.join(process.env.APP_ROOT, "dist-electron");
+const A = E.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = p ? E.join(process.env.APP_ROOT, "public") : A;
+let a;
+function _() {
+  a = new I({
+    icon: E.join(process.env.VITE_PUBLIC, "../public/glome-icon.png"),
     // Path to your icon
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs")
+      preload: E.join(m, "preload.mjs")
     }
+  }), a.setMenuBarVisibility(!1), a.webContents.on("did-finish-load", () => {
+    a == null || a.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  }), p ? a.loadURL(p).then(() => {
+    if (!a)
+      throw new Error('"win" is not defined');
+  }) : a.loadFile(E.join(A, "index.html")).then(() => {
+    if (!a)
+      throw new Error('"win" is not defined');
   });
-  win.setMenuBarVisibility(false);
-  win.webContents.on("did-finish-load", () => {
-    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  });
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL).then(() => {
-      if (!win) {
-        throw new Error('"win" is not defined');
-      }
-    });
-  } else {
-    win.loadFile(path.join(RENDERER_DIST, "index.html")).then(() => {
-      if (!win) {
-        throw new Error('"win" is not defined');
-      }
-    });
-  }
 }
-ipcMain.handle("getCredits", async (_event, filters, sorts) => {
+R.handle("getCredits", async (e, s, t) => {
   try {
-    return getCredits(filters, sorts);
-  } catch (error) {
-    console.error("Error when fetching credits", error);
-    throw error;
+    return v(s, t);
+  } catch (n) {
+    throw console.error("Error when fetching credits", n), n;
   }
 });
-ipcMain.handle("addCredit", async (_event, credit) => {
+R.handle("addCredit", async (e, s) => {
   try {
-    const { date, title, amount, category } = credit;
-    return addCredit(date, title, amount, category);
-  } catch (error) {
-    console.error("Error when adding credit", error);
-    throw error;
+    const { date: t, title: n, amount: i, category: d } = s;
+    return b(t, n, i, d);
+  } catch (t) {
+    throw console.error("Error when adding credit", t), t;
   }
 });
-ipcMain.handle("getDebits", async (_event, filters, sorts) => {
+R.handle("getDebits", async (e, s, t) => {
   try {
-    return getDebits(filters, sorts);
-  } catch (error) {
-    console.error("Error when fetching debits", error);
-    throw error;
+    return y(s, t);
+  } catch (n) {
+    throw console.error("Error when fetching debits", n), n;
   }
 });
-ipcMain.handle("addDebit", async (_event, debit) => {
+R.handle("addDebit", async (e, s) => {
   try {
-    const { date, title, amount, category } = debit;
-    return addDebit(date, title, amount, category);
-  } catch (error) {
-    console.error("Error when adding debit", error);
+    const { date: t, title: n, amount: i, category: d } = s;
+    return O(t, n, i, d);
+  } catch (t) {
+    console.error("Error when adding debit", t);
   }
 });
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-    win = null;
-  }
+u.on("window-all-closed", () => {
+  process.platform !== "darwin" && (u.quit(), a = null);
 });
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+u.on("activate", () => {
+  I.getAllWindows().length === 0 && _();
 });
-app.whenReady().then(createWindow);
+u.whenReady().then(_);
 export {
-  RENDERER_DIST,
-  VITE_DEV_SERVER_URL
+  A as RENDERER_DIST,
+  p as VITE_DEV_SERVER_URL
 };

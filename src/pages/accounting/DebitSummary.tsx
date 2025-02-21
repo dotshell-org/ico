@@ -41,7 +41,7 @@ function DebitSummary() {
     }, [filters, sorts]);
 
     return (
-        <Summary title={t("credit")} objects={debits} sorts={sorts} filters={filters} onFilterAdded={handleFilterAdded} onFilterRemoved={handleFilterRemoved} onSortAdded={handleSortAdded} onSortRemoved={handleSortRemoved} />
+        <Summary title={t("debit")} objects={debits} sorts={sorts} filters={filters} onFilterAdded={handleFilterAdded} onFilterRemoved={handleFilterRemoved} onSortAdded={handleSortAdded} onSortRemoved={handleSortRemoved} />
     );
 }
 
