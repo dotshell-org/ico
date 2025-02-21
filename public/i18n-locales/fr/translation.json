@@ -15,6 +15,9 @@
     "filter": "🔍 Filtrer",
 
     "raw_newFilter": "Nouveau filtre",
+    "raw_property": "Propriété",
+    "raw_operator": "Opérateur",
+    "raw_value": "Valeur",
     "raw_date": "Date",
     "raw_title": "Titre",
     "raw_amount": "Montant",
@@ -30,6 +33,15 @@
     "min": "🔻 Min",
     "max": "🔺 Max",
     "date_range": "\uD83D\uDCCF Plage",
-    "unique_count": "🔑 Valeurs uniques"
+    "unique_count": "🔑 Valeurs uniques",
+
+    "raw_is": "Est",
+    "raw_is_exactly": "Est Exactement",
+    "raw_more_than": "Plus Que",
+    "raw_less_than": "Moins Que",
+    "raw_before": "Avant",
+    "raw_after": "Après",
+    "raw_enter_value": "Entrez une valeur",
+    "raw_add": "Ajouter"
 
 }

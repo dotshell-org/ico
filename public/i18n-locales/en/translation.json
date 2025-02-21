@@ -15,6 +15,9 @@
     "filter": "🔍 Filter",
 
     "raw_newFilter": "New filter",
+    "raw_property": "Property",
+    "raw_operator": "Operator",
+    "raw_value": "Value",
     "raw_date": "Date",
     "raw_title": "Title",
     "raw_amount": "Amount",
@@ -30,5 +33,15 @@
     "min": "🔻 Min",
     "max": "🔺 Max",
     "date_range": "\uD83D\uDCCF Range",
-    "unique_count": "🔑 Unique Values"
+    "unique_count": "🔑 Unique Values",
+
+    "raw_is": "Is",
+    "raw_is_exactly": "Is Exactly",
+    "raw_more_than": "More Than",
+    "raw_less_than": "Less Than",
+    "raw_before": "Before",
+    "raw_after": "After",
+    "raw_enter_value": "Enter Value",
+    "raw_add": "Add"
+
 }

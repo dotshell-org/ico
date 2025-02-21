@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import {addCredit, getCredits} from "../src/db/database.ts";
+import {addCredit, addDebit, getCredits, getDebits} from "../src/db/database.ts";
 import { Filter } from "../src/types/filter/Filter.ts"
 import { Sort } from "../src/types/sort/Sort.ts"
 
@@ -65,6 +65,22 @@ ipcMain.handle("addCredit", async (_event, credit) => {
     throw error;
   }
 });
+ipcMain.handle("getDebits", async (_event, filters: Filter[], sorts: Sort[]) => {
+  try {
+    return getDebits(filters, sorts);
+  } catch (error) {
+    console.error("Error when fetching debits", error);
+    throw error;
+  }
+})
+ipcMain.handle("addDebit", async (_event, debit) => {
+  try {
+    const { date, title, amount, category } = debit;
+    return addDebit(date, title, amount, category);
+  } catch (error) {
+    console.error("Error when adding debit", error);
+  }
+})
 
 
 app.on('window-all-closed', () => {

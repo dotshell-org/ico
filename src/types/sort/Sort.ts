@@ -1,4 +1,4 @@
-import { SummaryProperty } from "../SummaryProperties.ts"
+import { SummaryProperty } from "../summary/SummaryProperty.ts"
 import { SortType } from "./SortType.ts";
 
 export interface Sort {

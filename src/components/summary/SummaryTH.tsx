@@ -1,5 +1,5 @@
 import React from 'react';
-import { SummaryProperty } from '../../types/SummaryProperties';
+import { SummaryProperty } from '../../types/summary/SummaryProperty.ts';
 import { useTranslation } from 'react-i18next';
 
 interface SummaryTHProps {
