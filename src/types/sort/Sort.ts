@@ -1,7 +1,7 @@
 import { SummaryProperty } from "../summary/SummaryProperty.ts"
-import { SortType } from "./SortType.ts";
+import { Orientation } from "./Orientation.ts";
 
 export interface Sort {
     property: SummaryProperty,
-    type: SortType,
+    orientation: Orientation,
 }

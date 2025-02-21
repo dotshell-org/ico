@@ -41,6 +41,9 @@
     "raw_less_than": "Moins Que",
     "raw_before": "Avant",
     "raw_after": "Après",
+    "raw_asc": "Ascendant",
+    "raw_desc": "Descendant",
+    "raw_orientation": "Orientation",
     "raw_enter_value": "Entrez une valeur",
     "raw_add": "Ajouter"
 

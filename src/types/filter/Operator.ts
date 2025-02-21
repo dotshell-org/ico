@@ -1,4 +1,4 @@
-export enum FilterType {
+export enum Operator {
     Is = ": ",
     IsExactly = " = ",
     LessThan = " < ",

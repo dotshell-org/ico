@@ -2,28 +2,27 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import SelectPropertyComponent from "../SelectPropertyComponent";
 import { SummaryProperty } from "../../../../types/summary/SummaryProperty";
-import SelectOperatorComponent from "../SelectOperatorComponent";
-import { FilterType } from "../../../../types/filter/FilterType";
+import SelectOperatorComponent from "./SelectOperatorComponent.tsx";
+import { Operator } from "../../../../types/filter/Operator.ts";
 import { Filter } from "../../../../types/filter/Filter";
 
 interface SelectFilterInterfaceProps {
     onAdded: (filter: Filter) => void;
-    onClose: () => void; // Gestionnaire pour fermer la boîte
+    onClose: () => void;
 }
 
 const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, onClose }) => {
     const { t } = useTranslation();
     const [property, setProperty] = useState<SummaryProperty>(SummaryProperty.Date);
-    const [operator, setOperator] = useState<FilterType>(FilterType.Is);
+    const [operator, setOperator] = useState<Operator>(Operator.Is);
     const [value, setValue] = useState<string | number>("");
 
     const handlePropertyChange = (selectedProperty: SummaryProperty) => {
         setProperty(selectedProperty);
-        // Remise à zéro de la valeur lors du changement de propriété si nécessaire
         setValue("");
     };
 
-    const handleOperatorChange = (selectedOperator: FilterType) => {
+    const handleOperatorChange = (selectedOperator: Operator) => {
         setOperator(selectedOperator);
     };
 
@@ -35,12 +34,11 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
         setValue(inputValue);
     };
 
-    const handleClickSearch = () => {
-        // Ne déclenche pas l'ajout si aucune valeur n'est saisie
+    const handleClickAdd = () => {
         if (value === "") return;
         onAdded({
             property: property,
-            type: operator,
+            operator: operator,
             value: value,
         });
     };
@@ -94,7 +92,7 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
 
                 <button
                     className="mt-6 dark:bg-gray-700"
-                    onClick={handleClickSearch}
+                    onClick={handleClickAdd}
                     disabled={value === ""}
                 >
                     {t("raw_add")}

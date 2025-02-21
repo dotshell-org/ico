@@ -2,18 +2,18 @@ import { ipcMain, app, BrowserWindow } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { createRequire } from "module";
-var FilterType = /* @__PURE__ */ ((FilterType2) => {
-  FilterType2["Is"] = ": ";
-  FilterType2["IsExactly"] = " = ";
-  FilterType2["LessThan"] = " < ";
-  FilterType2["MoreThan"] = " > ";
-  return FilterType2;
-})(FilterType || {});
-var SortType = /* @__PURE__ */ ((SortType2) => {
-  SortType2["Asc"] = "↓";
-  SortType2["Desc"] = "↑";
-  return SortType2;
-})(SortType || {});
+var Operator = /* @__PURE__ */ ((Operator2) => {
+  Operator2["Is"] = ": ";
+  Operator2["IsExactly"] = " = ";
+  Operator2["LessThan"] = " < ";
+  Operator2["MoreThan"] = " > ";
+  return Operator2;
+})(Operator || {});
+var Orientation = /* @__PURE__ */ ((Orientation2) => {
+  Orientation2["Asc"] = "↓";
+  Orientation2["Desc"] = "↑";
+  return Orientation2;
+})(Orientation || {});
 var SummaryProperty = /* @__PURE__ */ ((SummaryProperty2) => {
   SummaryProperty2["Date"] = "date";
   SummaryProperty2["Title"] = "title";
@@ -58,17 +58,17 @@ function getCredits(filters, sort) {
   let query = "SELECT * FROM credits";
   const queryParams = [];
   function typeToOperator(type) {
-    if (type === FilterType.Is) {
+    if (type === Operator.Is) {
       return "LIKE";
-    } else if (type === FilterType.IsExactly) {
+    } else if (type === Operator.IsExactly) {
       return "=";
-    } else if (type === FilterType.MoreThan) {
+    } else if (type === Operator.MoreThan) {
       return ">";
-    } else if (type === FilterType.LessThan) {
+    } else if (type === Operator.LessThan) {
       return "<";
-    } else if (type === SortType.Asc) {
+    } else if (type === Orientation.Asc) {
       return "ASC";
-    } else if (type === SortType.Desc) {
+    } else if (type === Orientation.Desc) {
       return "DESC";
     } else {
       throw new Error(`Unsupported operator type: ${type}`);
@@ -76,17 +76,17 @@ function getCredits(filters, sort) {
   }
   if (filters.length > 0) {
     const conditions = filters.map((filter) => {
-      if (filter.type === FilterType.Is && filter.property !== SummaryProperty.Amount) {
+      if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
         queryParams.push(`%${filter.value}%`);
       } else {
         queryParams.push(filter.value);
       }
-      return `${filter.property} ${typeToOperator(filter.type)} ?`;
+      return `${filter.property} ${typeToOperator(filter.operator)} ?`;
     });
     query += " WHERE " + conditions.join(" AND ");
   }
   if (sort.length > 0) {
-    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.type)}`);
+    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.orientation)}`);
     query += " ORDER BY " + sortConditions.join(", ");
   }
   const stmt = db.prepare(query);
@@ -104,17 +104,17 @@ function getDebits(filters, sort) {
   let query = "SELECT * FROM debits";
   const queryParams = [];
   function typeToOperator(type) {
-    if (type === FilterType.Is) {
+    if (type === Operator.Is) {
       return "LIKE";
-    } else if (type === FilterType.IsExactly) {
+    } else if (type === Operator.IsExactly) {
       return "=";
-    } else if (type === FilterType.MoreThan) {
+    } else if (type === Operator.MoreThan) {
       return ">";
-    } else if (type === FilterType.LessThan) {
+    } else if (type === Operator.LessThan) {
       return "<";
-    } else if (type === SortType.Asc) {
+    } else if (type === Orientation.Asc) {
       return "ASC";
-    } else if (type === SortType.Desc) {
+    } else if (type === Orientation.Desc) {
       return "DESC";
     } else {
       throw new Error(`Unsupported operator type: ${type}`);
@@ -122,17 +122,17 @@ function getDebits(filters, sort) {
   }
   if (filters.length > 0) {
     const conditions = filters.map((filter) => {
-      if (filter.type === FilterType.Is && filter.property !== SummaryProperty.Amount) {
+      if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
         queryParams.push(`%${filter.value}%`);
       } else {
         queryParams.push(filter.value);
       }
-      return `${filter.property} ${typeToOperator(filter.type)} ?`;
+      return `${filter.property} ${typeToOperator(filter.operator)} ?`;
     });
     query += " WHERE " + conditions.join(" AND ");
   }
   if (sort.length > 0) {
-    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.type)}`);
+    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.orientation)}`);
     query += " ORDER BY " + sortConditions.join(", ");
   }
   const stmt = db.prepare(query);

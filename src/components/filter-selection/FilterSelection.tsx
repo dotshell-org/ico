@@ -9,21 +9,23 @@ import SortLabel from "./SortLabel";
 interface FilterSelectionProps {
     filters: Filter[];
     sorts: Sort[];
-    onAdded: (filter: Filter) => void;
-    onRemoved: (filter: Filter) => void;
+    onAddedFilter: (filter: Filter) => void;
+    onRemovedFilter: (filter: Filter) => void;
+    onAddedSort: (sort: Sort) => void;
+    onRemovedSort: (sort: Sort) => void;
 }
 
-const FilterSelection: React.FC<FilterSelectionProps> = ({ filters, sorts, onAdded, onRemoved }) => {
+const FilterSelection: React.FC<FilterSelectionProps> = ({ filters, sorts, onAddedFilter, onRemovedFilter, onAddedSort, onRemovedSort }) => {
     return (
         <div className="w-full h-6 my-4 inline-flex items-center">
             <img src={filterSvg} alt="Filter" className="w-6 h-6 mr-2" />
             {sorts.map((sort, index) => (
-                <SortLabel key={index} sort={sort} />
+                <SortLabel key={index} sort={sort} onRemove={onRemovedSort} />
             ))}
             {filters.map((filter, index) => (
-                <FilterLabel key={index} filter={filter} onRemove={onRemoved} />
+                <FilterLabel key={index} filter={filter} onRemove={onRemovedFilter} />
             ))}
-            <FilterPlusButton onAdded={onAdded} />
+            <FilterPlusButton onAddedFilter={onAddedFilter} onAddedSort={onAddedSort}/>
         </div>
     );
 };

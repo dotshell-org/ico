@@ -4,12 +4,15 @@ import SortOrFilterSwitch from './sort-or-filter-switch/SortOrFilterSwitch';
 import { useTranslation } from 'react-i18next';
 import SelectFilterInterface from "./sort-or-filter-switch/filter/SelectFilterInterface.tsx";
 import {Filter} from "../../types/filter/Filter.ts";
+import SelectSortInterface from "./sort-or-filter-switch/sort/SelectSortInterface.tsx";
+import {Sort} from "../../types/sort/Sort.ts";
 
 interface FilterPlusButtonProps {
-    onAdded: (filter: Filter) => void;
+    onAddedFilter: (filter: Filter) => void;
+    onAddedSort: (sort: Sort) => void;
 }
 
-const FilterPlusButton: React.FC<FilterPlusButtonProps> = ({ onAdded }) => {
+const FilterPlusButton: React.FC<FilterPlusButtonProps> = ({ onAddedFilter, onAddedSort }) => {
     const { t } = useTranslation();
     const [showSelect, setShowSelect] = useState(false);
     const [showSort, setShowSort] = useState(false);
@@ -26,14 +29,17 @@ const FilterPlusButton: React.FC<FilterPlusButtonProps> = ({ onAdded }) => {
     const handleShowSort = () => {
         setShowSort(true);
     }
+    const handleOnAddedSort = (sort: Sort): void => {
+        setShowSort(false);
+        onAddedSort(sort);
+    }
 
     const handleShowFilter = () => {
         setShowFilter(true);
     }
-
-    const handleOnAdded = (filter: Filter): void => {
+    const handleOnAddedFilter = (filter: Filter): void => {
         setShowFilter(false);
-        onAdded(filter);
+        onAddedFilter(filter);
     }
 
     return (
@@ -51,8 +57,8 @@ const FilterPlusButton: React.FC<FilterPlusButtonProps> = ({ onAdded }) => {
                     <SortOrFilterSwitch onClose={handleCloseSwitch} onClickSort={handleShowSort} onClickFilter={handleShowFilter} />
                 )}
             </div>
-            {showSort && null}
-            {showFilter && <SelectFilterInterface onAdded={handleOnAdded} onClose={() => setShowFilter(false)} />}
+            {showSort && <SelectSortInterface onAdded={handleOnAddedSort} onClose={() => setShowSort(false)}/>}
+            {showFilter && <SelectFilterInterface onAdded={handleOnAddedFilter} onClose={() => setShowFilter(false)} />}
         </>
     );
 };

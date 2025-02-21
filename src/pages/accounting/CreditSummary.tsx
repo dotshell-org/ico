@@ -17,9 +17,12 @@ function CreditSummary() {
         setFilters(prev => prev.filter(f => f !== filter));
     }
 
-    useEffect(() => {
-        setSorts([])
-    }, []);
+    const handleSortAdded = (sort: Sort) => {
+        setSorts(prev => [...prev, sort]);
+    }
+    const handleSortRemoved = (sort: Sort) => {
+        setSorts(prev => prev.filter(s => s !== sort));
+    }
 
     useEffect(() => {
         window.ipcRenderer
@@ -28,12 +31,12 @@ function CreditSummary() {
                 setCredits(result);
             })
             .catch((error: any) => {
-                console.error("Erreur lors de la récupération des crédits", error);
+                console.error("Error when fetching credits", error);
             });
     }, [filters, sorts]);
     
     return (
-        <Summary title={t("credit")} objects={credits} sorts={sorts} filters={filters} onFilterAdded={handleFilterAdded} onFilterRemoved={handleFilterRemoved} />
+        <Summary title={t("credit")} objects={credits} sorts={sorts} filters={filters} onFilterAdded={handleFilterAdded} onFilterRemoved={handleFilterRemoved} onSortAdded={handleSortAdded} onSortRemoved={handleSortRemoved} />
     );
 }
 

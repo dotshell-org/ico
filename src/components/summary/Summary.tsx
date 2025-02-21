@@ -16,9 +16,11 @@ interface SummaryProps {
     sorts: Sort[];
     onFilterAdded: (filter: Filter) => void;
     onFilterRemoved: (filter: Filter) => void;
+    onSortAdded: (sort: Sort) => void;
+    onSortRemoved: (sort: Sort) => void;
 }
 
-function Summary({ title, objects, filters, sorts, onFilterAdded, onFilterRemoved }: SummaryProps) {
+function Summary({ title, objects, filters, sorts, onFilterAdded, onFilterRemoved, onSortAdded, onSortRemoved }: SummaryProps) {
     const { i18n } = useTranslation();
     const [selectedColumn, setSelectedColumn] = useState<number | null>(null);
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
@@ -98,7 +100,7 @@ function Summary({ title, objects, filters, sorts, onFilterAdded, onFilterRemove
         <>
             <div className="fixed left-10 right-10 top-16 bg-white dark:bg-gray-950 pt-10">
                 <h1 className="text-3xl mt-2 mb-2 font-bold cursor-default">{title}</h1>
-                <FilterSelection filters={filters} sorts={sorts} onAdded={onFilterAdded} onRemoved={onFilterRemoved}/>
+                <FilterSelection filters={filters} sorts={sorts} onAddedFilter={onFilterAdded} onRemovedFilter={onFilterRemoved} onAddedSort={onSortAdded} onRemovedSort={onSortRemoved} />
                 <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-t-0 border-b-gray-300 dark:border-b-gray-700 border-b-2 cursor-pointer">
                     <thead>
                     <tr>

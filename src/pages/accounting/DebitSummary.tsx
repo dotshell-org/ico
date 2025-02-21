@@ -13,6 +13,16 @@ function DebitSummary() {
     const handleFilterAdded = (filter: Filter) => {
         setFilters(prev => [...prev, filter]);
     }
+    const handleFilterRemoved = (filter: Filter) => {
+        setFilters(prev => prev.filter(f => f !== filter));
+    }
+
+    const handleSortAdded = (sort: Sort) => {
+        setSorts(prev => [...prev, sort]);
+    }
+    const handleSortRemoved = (sort: Sort) => {
+        setSorts(prev => prev.filter(s => s !== sort));
+    }
 
     useEffect(() => {
         setFilters([])
@@ -31,7 +41,7 @@ function DebitSummary() {
     }, [filters, sorts]);
 
     return (
-        <Summary title={t("debit")} objects={debits} filters={filters} sorts={sorts} onFilterAdded={handleFilterAdded} />
+        <Summary title={t("credit")} objects={debits} sorts={sorts} filters={filters} onFilterAdded={handleFilterAdded} onFilterRemoved={handleFilterRemoved} onSortAdded={handleSortAdded} onSortRemoved={handleSortRemoved} />
     );
 }
 

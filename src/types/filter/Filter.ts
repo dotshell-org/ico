@@ -1,8 +1,8 @@
 import { SummaryProperty } from "../summary/SummaryProperty.ts"
-import { FilterType } from "./FilterType.ts";
+import { Operator } from "./Operator.ts";
 
 export interface Filter {
     property: SummaryProperty,
-    type: FilterType,
+    operator: Operator,
     value: string | number;
 }
