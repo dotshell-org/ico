@@ -1,7 +1,14 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import {addCredit, addDebit, getCredits, getDebits} from "../src/db/database.ts";
+import {
+  addCredit,
+  addDebit,
+  getCredits,
+  getCreditsSumByCategory,
+  getDebits, getDebitsSumByCategory, getProfitByCategory,
+  getTransactionsByMonth
+} from "../src/db/database.ts";
 import { Filter } from "../src/types/filter/Filter.ts"
 import { Sort } from "../src/types/sort/Sort.ts"
 
@@ -19,17 +26,20 @@ let win: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC!, '../public/glome-icon.png'), // Path to your icon
+    icon: path.join(process.env.VITE_PUBLIC!, '../public/glome-icon.png'),
+    // Ajout des options de taille minimale
+    minWidth: 900,
+    minHeight: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
   })
 
-  // Hide the menu bar
+  // Masquer la barre de menu
   win.setMenuBarVisibility(false)
 
   win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', (new Date).toLocaleString())
+    win?.webContents.send('main-process-message', new Date().toLocaleString())
   })
 
   if (VITE_DEV_SERVER_URL) {
@@ -46,7 +56,6 @@ function createWindow() {
     })
   }
 }
-
 
 ipcMain.handle("getCredits", async (_event, filters: Filter[], sorts: Sort[]) => {
   try {
@@ -72,7 +81,7 @@ ipcMain.handle("getDebits", async (_event, filters: Filter[], sorts: Sort[]) => 
     console.error("Error when fetching debits", error);
     throw error;
   }
-})
+});
 ipcMain.handle("addDebit", async (_event, debit) => {
   try {
     const { date, title, amount, category } = debit;
@@ -80,20 +89,50 @@ ipcMain.handle("addDebit", async (_event, debit) => {
   } catch (error) {
     console.error("Error when adding debit", error);
   }
-})
+});
 
+ipcMain.handle("getTransactionsByMonth", async (_event) => {
+  try {
+    return getTransactionsByMonth();
+  } catch (error) {
+    console.error("Error when fetching transactions by month", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("getCreditsSumByCategory", async (_event) => {
+  try {
+    return getCreditsSumByCategory();
+  } catch (error) {
+    console.error("Error when fetching credits sum by category", error);
+  }
+})
+ipcMain.handle("getDebitsSumByCategory", async (_event) => {
+  try {
+    return getDebitsSumByCategory();
+  } catch (error) {
+    console.error("Error when fetching debits sum by category", error);
+  }
+})
+ipcMain.handle("getProfitByCategory", async (_event) => {
+  try {
+    return getProfitByCategory();
+  } catch (error) {
+    console.error("Error when fetching profit by category", error);
+  }
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
     win = null
   }
-})
+});
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
-})
+});
 
 app.whenReady().then(createWindow)

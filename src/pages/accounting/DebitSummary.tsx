@@ -4,10 +4,12 @@ import { Sort } from "../../types/sort/Sort.ts";
 import { SummaryObject } from "../../types/summary/SummaryObject.ts";
 import Summary from "../../components/summary/Summary.tsx";
 import {t} from "i18next";
+import {SummaryProperty} from "../../types/summary/SummaryProperty.ts";
+import {Orientation} from "../../types/sort/Orientation.ts";
 
 function DebitSummary() {
     const [filters, setFilters] = useState<Filter[]>([]);
-    const [sorts, setSorts] = useState<Sort[]>([]);
+    const [sorts, setSorts] = useState<Sort[]>([{property: SummaryProperty.Date, orientation: Orientation.Desc}]);
     const [debits, setDebits] = useState<SummaryObject[]>([]);
 
     const handleFilterAdded = (filter: Filter) => {
@@ -23,11 +25,6 @@ function DebitSummary() {
     const handleSortRemoved = (sort: Sort) => {
         setSorts(prev => prev.filter(s => s !== sort));
     }
-
-    useEffect(() => {
-        setFilters([])
-        setSorts([])
-    }, []);
 
     useEffect(() => {
         window.ipcRenderer

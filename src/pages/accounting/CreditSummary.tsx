@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import { Filter } from "../../types/filter/Filter.ts";
-import { Sort } from "../../types/sort/Sort.ts";
-import { SummaryObject } from "../../types/summary/SummaryObject.ts";
+import {useEffect, useState} from "react";
+import {Filter} from "../../types/filter/Filter.ts";
+import {Sort} from "../../types/sort/Sort.ts";
+import {SummaryObject} from "../../types/summary/SummaryObject.ts";
 import Summary from "../../components/summary/Summary.tsx";
 import {t} from "i18next";
+import {SummaryProperty} from "../../types/summary/SummaryProperty.ts";
+import {Orientation} from "../../types/sort/Orientation.ts";
 
 function CreditSummary() {
     const [filters, setFilters] = useState<Filter[]>([]);
-    const [sorts, setSorts] = useState<Sort[]>([]);
+    const [sorts, setSorts] = useState<Sort[]>([{property: SummaryProperty.Date, orientation: Orientation.Desc}]);
     const [credits, setCredits] = useState<SummaryObject[]>([]);
 
     const handleFilterAdded = (filter: Filter) => {

@@ -2,6 +2,8 @@
     "dashboard": "📊 Dashboard",
     "credit": "📈 Credit",
     "debit": "📉 Debit",
+    "profit": "⚖\uFE0F Profit",
+    "synthesis": "\uD83D\uDCDD Synthesis",
     "accounting": "💰 Accounting",
     "stock": "📦 Stock",
     "sales": "🛒 Sales",
@@ -14,6 +16,9 @@
     "sort": "🔀 Sort",
     "filter": "🔍 Filter",
 
+    "raw_credit": "Credit",
+    "raw_debit": "Debit",
+
     "raw_newFilter": "New filter",
     "raw_property": "Property",
     "raw_operator": "Operator",
@@ -24,6 +29,7 @@
     "raw_category": "Category",
 
     "raw_days": "days",
+    "raw_month": "Month",
 
     "selected_count": "🔢 Selected count",
     "sum": "➕ Sum",
@@ -45,6 +51,10 @@
     "raw_desc": "Descending",
     "raw_orientation": "Orientation",
     "raw_enter_value": "Enter Value",
-    "raw_add": "Add"
+    "raw_add": "Add",
+
+    "p_credit": "You currently have {categories} categories listed in your \uD83D\uDCC8<strong>Credits</strong> for the last 12 months, amounting to a total of {amount}.",
+    "p_debit": "You currently have {categories} categories listed in your \uD83D\uDCC9<strong>Debits</strong> for the last 12 months, amounting to a total of {amount}.",
+    "p_profit": "You have achieved a total ⚖\uFE0F<strong>Profit</strong> of {amount} for the last 12 months, distributed across {categories} categories."
 
 }

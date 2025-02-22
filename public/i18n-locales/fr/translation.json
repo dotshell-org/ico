@@ -2,6 +2,8 @@
     "dashboard": "📊 Tableau de bord",
     "credit": "📈 Crédit",
     "debit": "📉 Débit",
+    "profit": "⚖\uFE0F Bénéfice",
+    "synthesis": "\uD83D\uDCDD Synthèse",
     "accounting": "💰 Comptabilité",
     "stock": "📦 Stock",
     "sales": "🛒 Ventes",
@@ -14,6 +16,9 @@
     "sort": "🔀 Trier",
     "filter": "🔍 Filtrer",
 
+    "raw_credit": "Crédit",
+    "raw_debit": "Débit",
+
     "raw_newFilter": "Nouveau filtre",
     "raw_property": "Propriété",
     "raw_operator": "Opérateur",
@@ -24,6 +29,7 @@
     "raw_category": "Catégorie",
 
     "raw_days": "jours",
+    "raw_month": "Mois",
 
     "selected_count": "🔢 Compte",
     "sum": "➕ Somme",
@@ -45,6 +51,10 @@
     "raw_desc": "Descendant",
     "raw_orientation": "Orientation",
     "raw_enter_value": "Entrez une valeur",
-    "raw_add": "Ajouter"
+    "raw_add": "Ajouter",
+
+    "p_credit": "Vous avez actuellement {categories} catégories répertoriées dans vos \uD83D\uDCC8<strong>Crédits</strong> pour les 12 derniers mois, représentant un montant cumulé de {amount}.",
+    "p_debit": "Vous avez actuellement {categories} catégories répertoriées dans vos \uD83D\uDCC9<strong>Débits</strong> pour les 12 derniers mois, représentant un montant cumulé de {amount}",
+    "p_profit": "Vous avez réalisé un ⚖\uFE0F<strong>Bénéfice</strong> total de {amount} pour les 12 derniers mois, réparti sur {categories} catégories."
 
 }
