@@ -309,25 +309,44 @@ const DATABASE_PATH = "./local.db";
 const DB_OPTIONS = {};
 const CREATE_CREDITS_TABLE = `
     CREATE TABLE IF NOT EXISTS credits (
-                                           id BIGINT PRIMARY KEY AUTOINCREMENT,
-                                           date TEXT,
-                                           title TEXT,
-                                           amount REAL,
-                                           category TEXT
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT,
+        title TEXT,
+        amount REAL,
+        category TEXT
     );
 `;
 const CREATE_DEBITS_TABLE = `
     CREATE TABLE IF NOT EXISTS debits (
-                                          id BIGINT PRIMARY KEY AUTOINCREMENT,
-                                          date TEXT,
-                                          title TEXT,
-                                          amount REAL,
-                                          category TEXT
-    )
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT,
+        title TEXT,
+        amount REAL,
+        category TEXT
+    );
+`;
+const CREATE_CREDIT_DETAIL_TABLES_TABLE = `
+    CREATE TABLE IF NOT EXISTS credit_detail_tables (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        credit_id INTEGER,
+        type TINYINT, -- 0: other, 1: banknotes, 2: coins, 3: cheques
+        FOREIGN KEY (credit_id) REFERENCES credits(id)
+    );
+`;
+const CREATE_CREDIT_DETAIL_ROWS_TABLE = `
+    CREATE TABLE IF NOT EXISTS credit_detail_rows (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        table_id INTEGER,
+        value REAL,
+        quantity INTEGER,
+        FOREIGN KEY (table_id) REFERENCES credit_tables(id)
+    );
 `;
 const db = new Database(DATABASE_PATH, DB_OPTIONS);
 db.exec(CREATE_CREDITS_TABLE);
 db.exec(CREATE_DEBITS_TABLE);
+db.exec(CREATE_CREDIT_DETAIL_TABLES_TABLE);
+db.exec(CREATE_CREDIT_DETAIL_ROWS_TABLE);
 function addCredit(date, title, amount, category) {
   const INSERT_CREDIT_QUERY = `
         INSERT INTO credits (date, title, amount, category)
@@ -456,25 +475,29 @@ function getTransactionsByMonth() {
   return [creditSums, debitSums];
 }
 function getCreditsSumByCategory() {
+  const dateThreshold = dayjs().subtract(12, "month").toISOString();
   const query = `
         SELECT category, SUM(amount) as total
         FROM credits
+        WHERE date >= ?
         GROUP BY category
     `;
   const stmt = db.prepare(query);
-  const rows = stmt.all();
+  const rows = stmt.all(dateThreshold);
   const categories = rows.map((row) => row.category);
   const values = rows.map((row) => row.total);
   return { categories, values };
 }
 function getDebitsSumByCategory() {
+  const dateThreshold = dayjs().subtract(12, "month").toISOString();
   const query = `
         SELECT category, SUM(amount) as total
         FROM debits
+        WHERE date >= ?
         GROUP BY category
     `;
   const stmt = db.prepare(query);
-  const rows = stmt.all();
+  const rows = stmt.all(dateThreshold);
   const categories = rows.map((row) => row.category);
   const values = rows.map((row) => row.total);
   return { categories, values };

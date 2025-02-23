@@ -63,6 +63,12 @@ const DashboardPieChart: React.FC<CustomPieChartProps> = ({ type }) => {
                 value: data.values[i],
             });
         }
+        if (finalData.length === 0) {
+            finalData.push({
+                label: "",
+                value: 1,
+            });
+        }
         return finalData;
     }
 
