@@ -1,7 +1,6 @@
 import React from 'react';
 
 interface NavItemProps {
-    href: string;
     text: string;
     active?: boolean;
     onClick: () => void;

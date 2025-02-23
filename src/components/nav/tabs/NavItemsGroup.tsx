@@ -13,20 +13,21 @@ interface NavItemsGroupProps {
 export const NavItemsGroup: React.FC<NavItemsGroupProps> = ({ window, selectedTab, setSelectedTab }) => {
     const { t }: { t: (key: string) => string } = useTranslation();
 
-    let items: { href: string, text: string, tab: Tabs }[] = [];
+    let items: { text: string, tab: Tabs }[] = [];
     if (window === Window.Accounting) {
         items = [
-            { href: '/dashboard', text: t('dashboard'), tab: Tabs.AccountingDashboard },
-            { href: '/credit', text: t('credit'), tab: Tabs.AccountingCredit },
-            { href: '/debit', text: t('debit'), tab: Tabs.AccountingDebit },
+            { text: t('dashboard'), tab: Tabs.AccountingDashboard },
+            { text: t('credit'), tab: Tabs.AccountingCredit },
+            { text: t('debit'), tab: Tabs.AccountingDebit },
+            { text: t('detailed_credits'), tab: Tabs.AccountingDetailedCredits },
+            { text: t('invoices'), tab: Tabs.AccountingInvoices },
         ];
     }
 
     return (
-        <div className="nav-items-group">
+        <div className="flex p-1 overflow-x-auto whitespace-nowrap select-none">
             {items.map((item) => (
                 <NavItem
-                    href={item.href}
                     text={item.text}
                     active={selectedTab === item.tab}
                     onClick={() => setSelectedTab(item.tab)}

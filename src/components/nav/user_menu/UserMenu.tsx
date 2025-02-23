@@ -15,7 +15,7 @@ const UserMenu: React.FC = () => {
         <div className="relative ml-3" ref={menuRef}>
             <button
                 type="button"
-                className="relative flex max-w-xs items-center rounded-full bg-gray-100 dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-gray-200"
+                className="relative flex max-w-xs items-center rounded-full bg-gray-100 dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-gray-200 w-[66px] h-[64px]"
                 id="user-menu-button"
                 aria-expanded={isOpen}
                 aria-haspopup="true"
@@ -23,7 +23,7 @@ const UserMenu: React.FC = () => {
             >
                 <span className="absolute -inset-1.5"></span>
                 <span className="sr-only">Open user menu</span>
-                <img className="size-8 rounded-full shadow-md" src={noProfile} alt="" />
+                <img className="w-8 h-8 rounded-full shadow-md" src={noProfile} alt="" />
             </button>
             {isOpen && (
                 <UserMenuItemsGroup />

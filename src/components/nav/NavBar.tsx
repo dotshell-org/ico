@@ -17,15 +17,15 @@ const NavBar: React.FC<NavBarProps> = ({ selectedTab, setSelectedTab }) => {
     return (
         <nav className="fixed top-0 w-full bg-gray-100 dark:bg-gray-800 z-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex h-16 items-center justify-between">
-                    <div className="flex items-center">
-                        <img src={GlomeLogo} alt="Glome Logo" className="h-8 w-auto invert dark:invert-0" />
-                        <div className="ml-10 flex items-baseline space-x-4">
+                <div className="flex h-20 items-center justify-between">
+                    <div className="w-full flex items-center">
+                        <div className="ml-10 w-[calc(100%-10rem)] flex items-baseline space-x-4">
+                            <img src={GlomeLogo} alt="Glome Logo" className="relative top-2.5 h-8 w-auto invert dark:invert-0" />
                             <WindowSwitch window={Window.Accounting} selectedWindow={selectedWindow} setSelectedWindow={setSelectedWindow} />
                             <NavItemsGroup window={selectedWindow} selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
                         </div>
+                        <UserMenu />
                     </div>
-                    <UserMenu />
                 </div>
             </div>
         </nav>
