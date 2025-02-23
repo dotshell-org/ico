@@ -20,7 +20,7 @@ const NavBar: React.FC<NavBarProps> = ({ selectedTab, setSelectedTab }) => {
                 <div className="flex h-20 items-center justify-between">
                     <div className="w-full flex items-center">
                         <div className="ml-10 w-[calc(100%-10rem)] flex items-baseline space-x-4">
-                            <img src={GlomeLogo} alt="Glome Logo" className="relative top-2.5 h-8 w-auto invert dark:invert-0" />
+                            <img src={GlomeLogo} alt="Glome Logo" className="relative top-2.5 right-5 h-8 w-auto invert dark:invert-0" />
                             <WindowSwitch window={Window.Accounting} selectedWindow={selectedWindow} setSelectedWindow={setSelectedWindow} />
                             <NavItemsGroup window={selectedWindow} selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
                         </div>

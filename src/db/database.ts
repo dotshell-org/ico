@@ -16,7 +16,7 @@ const DB_OPTIONS = { };
 // SQL queries
 const CREATE_CREDITS_TABLE = `
     CREATE TABLE IF NOT EXISTS credits (
-                                           id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                           id BIGINT PRIMARY KEY AUTOINCREMENT,
                                            date TEXT,
                                            title TEXT,
                                            amount REAL,
@@ -25,7 +25,7 @@ const CREATE_CREDITS_TABLE = `
 `;
 const CREATE_DEBITS_TABLE = `
     CREATE TABLE IF NOT EXISTS debits (
-                                          id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                          id BIGINT PRIMARY KEY AUTOINCREMENT,
                                           date TEXT,
                                           title TEXT,
                                           amount REAL,

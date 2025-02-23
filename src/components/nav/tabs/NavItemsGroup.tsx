@@ -17,8 +17,8 @@ export const NavItemsGroup: React.FC<NavItemsGroupProps> = ({ window, selectedTa
     if (window === Window.Accounting) {
         items = [
             { text: t('dashboard'), tab: Tabs.AccountingDashboard },
-            { text: t('credit'), tab: Tabs.AccountingCredit },
             { text: t('debit'), tab: Tabs.AccountingDebit },
+            { text: t('credit'), tab: Tabs.AccountingCredit },
             { text: t('detailed_credits'), tab: Tabs.AccountingDetailedCredits },
             { text: t('invoices'), tab: Tabs.AccountingInvoices },
         ];

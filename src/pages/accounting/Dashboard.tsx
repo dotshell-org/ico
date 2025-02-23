@@ -102,24 +102,24 @@ function Dashboard() {
                     },
                 ]}
                 series={[
-                    { label: t("raw_credit"), data: seriesData[0], color: "#ef4444" },
                     { label: t("raw_debit"), data: seriesData[1], color: "#3b82f6" },
+                    { label: t("raw_credit"), data: seriesData[0], color: "#ef4444" },
                 ]}
                 height={400}
             />
 
-            <h2 className="mt-8 mb-2 text-2xl">{t("credit")}</h2>
-            <DashboardPieChart type={DashboardCharts.Credit} />
             <h2 className="mt-8 mb-2 text-2xl">{t("debit")}</h2>
             <DashboardPieChart type={DashboardCharts.Debit} />
+            <h2 className="mt-8 mb-2 text-2xl">{t("credit")}</h2>
+            <DashboardPieChart type={DashboardCharts.Credit} />
 
             <h2 className="mt-8 mb-2 text-2xl">{t("synthesis")}</h2>
             <table className="w-full mt-5 table-auto border-white dark:border-gray-950 border-2 border-t-0 border-b-gray-300 dark:border-b-gray-700 border-b-2">
                 <thead className="cursor-default select-none">
                     <tr className="border-b-gray-300 dark:border-b-gray-700 border-b-2">
                         <DashboardTH property={null} />
-                        <DashboardTH property={DashboardCharts.Credit} />
                         <DashboardTH property={DashboardCharts.Debit} />
+                        <DashboardTH property={DashboardCharts.Credit} />
                         <DashboardTH property={DashboardCharts.Profit} />
                     </tr>
                 </thead>
@@ -127,8 +127,8 @@ function Dashboard() {
                 {synthesizedData.map((row) => (
                     <tr>
                         <DashboardTR border={true} content={row.category} property={null} />
-                        <DashboardTR border={true} content={`€${row.credit.toFixed(2)}`} property={DashboardCharts.Credit} />
                         <DashboardTR border={true} content={`€${row.debit.toFixed(2)}`} property={DashboardCharts.Debit} />
+                        <DashboardTR border={true} content={`€${row.credit.toFixed(2)}`} property={DashboardCharts.Credit} />
                         <DashboardTR border={true} content={formatProfit(row.profit)} property={DashboardCharts.Profit} />
                     </tr>
                 ))}
@@ -138,8 +138,8 @@ function Dashboard() {
                 <tbody>
                     <tr>
                         <DashboardTR border={false} content={""} property={null} />
-                        <DashboardTR border={false} content={`€${credits.values.reduce((a: number, b: number) => a + b, 0).toFixed(2)}`} property={DashboardCharts.Credit} />
                         <DashboardTR border={false} content={`€${debits.values.reduce((a: number, b: number) => a + b, 0).toFixed(2)}`} property={DashboardCharts.Debit} />
+                        <DashboardTR border={false} content={`€${credits.values.reduce((a: number, b: number) => a + b, 0).toFixed(2)}`} property={DashboardCharts.Credit} />
                         <DashboardTR border={false} content={`${formatProfit(credits.values.reduce((a: number, b: number) => a + b, 0) - debits.values.reduce((a: number, b: number) => a + b, 0))}`} property={DashboardCharts.Profit} />
                     </tr>
                 </tbody>
