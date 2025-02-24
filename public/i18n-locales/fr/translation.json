@@ -57,6 +57,9 @@
 
     "p_credit": "Vous avez actuellement {categories} catégories répertoriées dans vos \uD83D\uDCC8<strong>Crédits</strong> pour les 12 derniers mois, représentant un montant cumulé de {amount}.",
     "p_debit": "Vous avez actuellement {categories} catégories répertoriées dans vos \uD83D\uDCC9<strong>Débits</strong> pour les 12 derniers mois, représentant un montant cumulé de {amount}",
-    "p_profit": "Vous avez réalisé un ⚖\uFE0F<strong>Bénéfice</strong> total de {amount} pour les 12 derniers mois, réparti sur {categories} catégories."
+    "p_profit": "Vous avez réalisé un ⚖\uFE0F<strong>Bénéfice</strong> total de {amount} pour les 12 derniers mois, réparti sur {categories} catégories.",
+
+    "raw_tables_types": "Types des Tableaux",
+    "raw_total_amount": "Montant total"
 
 }

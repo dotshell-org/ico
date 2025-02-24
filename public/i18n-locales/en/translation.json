@@ -57,6 +57,9 @@
 
     "p_credit": "You currently have {categories} categories listed in your \uD83D\uDCC8<strong>Credits</strong> for the last 12 months, amounting to a total of {amount}.",
     "p_debit": "You currently have {categories} categories listed in your \uD83D\uDCC9<strong>Debits</strong> for the last 12 months, amounting to a total of {amount}.",
-    "p_profit": "You have achieved a total ⚖\uFE0F<strong>Profit</strong> of {amount} for the last 12 months, distributed across {categories} categories."
+    "p_profit": "You have achieved a total ⚖\uFE0F<strong>Profit</strong> of {amount} for the last 12 months, distributed across {categories} categories.",
+
+    "raw_tables_types": "Tables Types",
+    "raw_total_amount": "Total Amount"
 
 }
