@@ -5,6 +5,8 @@ import { Tabs } from './types/Tabs';
 import Dashboard from './pages/accounting/Dashboard';
 import DebitSummary from './pages/accounting/DebitSummary';
 import CreditSummary from './pages/accounting/CreditSummary';
+import DetailedCredits from "./pages/accounting/DetailedCredits.tsx";
+import Invoices from "./pages/accounting/Invoices.tsx";
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
@@ -25,13 +27,17 @@ function App() {
 
   const renderContent = () => {
     switch (selectedTab) {
-      case Tabs.AccountingDashboard:
+    case Tabs.AccountingDashboard:
         return <Dashboard />;
-      case Tabs.AccountingCredit:
+    case Tabs.AccountingCredit:
         return <CreditSummary />;
-      case Tabs.AccountingDebit:
+    case Tabs.AccountingDebit:
         return <DebitSummary />;
-      default:
+    case Tabs.AccountingDetailedCredits:
+        return <DetailedCredits />;
+    case Tabs.AccountingInvoices:
+        return <Invoices />;
+    default:
         return null;
     }
   };
