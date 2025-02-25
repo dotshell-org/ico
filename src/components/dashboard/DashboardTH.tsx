@@ -1,6 +1,6 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {DashboardCharts} from "../../types/DashboardCharts.ts";
+import {DashboardCharts} from "../../types/dashboard/DashboardCharts.ts";
 
 interface SummaryTHProps {
     property: DashboardCharts | null;

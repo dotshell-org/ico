@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import UserMenu from './user_menu/UserMenu';
 import WindowSwitch from './tabs/WindowSwitch';
-import { Window } from '../../types/Window';
+import { Window } from '../../types/nav/Window.ts';
 import { NavItemsGroup } from './tabs/NavItemsGroup';
 import GlomeLogo from '/glome.svg';
-import { Tabs } from '../../types/Tabs';
+import { Tabs } from '../../types/nav/Tabs.ts';
 
 interface NavBarProps {
     selectedTab: Tabs;

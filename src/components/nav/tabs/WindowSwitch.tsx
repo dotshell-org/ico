@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Window } from '../../../types/Window';
+import { Window } from '../../../types/nav/Window.ts';
 import { useTranslation } from 'react-i18next';
 
 interface NavItemProps {

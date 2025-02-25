@@ -2,11 +2,9 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import {
-  addCredit,
-  addDebit,
-  getCredits,
+  getCredits, getCreditsList,
   getCreditsSumByCategory,
-  getDebits, getDebitsSumByCategory, getProfitByCategory,
+  getDebits, getDebitsSumByCategory,
   getTransactionsByMonth
 } from "../src/db/database.ts";
 import { Filter } from "../src/types/filter/Filter.ts"
@@ -65,29 +63,12 @@ ipcMain.handle("getCredits", async (_event, filters: Filter[], sorts: Sort[]) =>
     throw error;
   }
 });
-ipcMain.handle("addCredit", async (_event, credit) => {
-  try {
-    const { date, title, amount, category } = credit;
-    return addCredit(date, title, amount, category);
-  } catch (error) {
-    console.error("Error when adding credit", error);
-    throw error;
-  }
-});
 ipcMain.handle("getDebits", async (_event, filters: Filter[], sorts: Sort[]) => {
   try {
     return getDebits(filters, sorts);
   } catch (error) {
     console.error("Error when fetching debits", error);
     throw error;
-  }
-});
-ipcMain.handle("addDebit", async (_event, debit) => {
-  try {
-    const { date, title, amount, category } = debit;
-    return addDebit(date, title, amount, category);
-  } catch (error) {
-    console.error("Error when adding debit", error);
   }
 });
 
@@ -106,19 +87,20 @@ ipcMain.handle("getCreditsSumByCategory", async (_event) => {
   } catch (error) {
     console.error("Error when fetching credits sum by category", error);
   }
-})
+});
 ipcMain.handle("getDebitsSumByCategory", async (_event) => {
   try {
     return getDebitsSumByCategory();
   } catch (error) {
     console.error("Error when fetching debits sum by category", error);
   }
-})
-ipcMain.handle("getProfitByCategory", async (_event) => {
+});
+
+ipcMain.handle("getCreditsList", async (_event, filters: Filter[], sorts: Sort[]) => {
   try {
-    return getProfitByCategory();
+    return getCreditsList(filters, sorts);
   } catch (error) {
-    console.error("Error when fetching profit by category", error);
+    console.error("Error when fetching creditsList", error);
   }
 })
 

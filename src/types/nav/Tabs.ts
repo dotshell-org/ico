@@ -3,5 +3,6 @@ export enum Tabs {
     AccountingCredit = 'accounting_credit',
     AccountingDebit = 'accounting_debit',
     AccountingDetailedCredits = 'accounting_detailed_credits',
+    AccountingCreditEditor = 'accounting_credit_editor',
     AccountingInvoices = 'accounting_invoices',
 }

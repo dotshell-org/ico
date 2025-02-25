@@ -305,60 +305,74 @@ var dayjs_minExports = dayjs_min.exports;
 const dayjs = /* @__PURE__ */ getDefaultExportFromCjs(dayjs_minExports);
 const require2 = createRequire(import.meta.url);
 const Database = require2("better-sqlite3");
+function typeToOperator(type) {
+  if (type === Operator.Is) {
+    return "LIKE";
+  } else if (type === Operator.IsExactly) {
+    return "=";
+  } else if (type === Operator.MoreThan) {
+    return ">";
+  } else if (type === Operator.LessThan) {
+    return "<";
+  } else if (type === Orientation.Asc) {
+    return "ASC";
+  } else if (type === Orientation.Desc) {
+    return "DESC";
+  } else {
+    throw new Error(`Unsupported operator type: ${type}`);
+  }
+}
 const DATABASE_PATH = "./local.db";
 const DB_OPTIONS = {};
-const CREATE_CREDITS_TABLE = `
-    CREATE TABLE IF NOT EXISTS credits (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT,
-        title TEXT,
-        amount REAL,
-        category TEXT
-    );
-`;
-const CREATE_DEBITS_TABLE = `
-    CREATE TABLE IF NOT EXISTS debits (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT,
-        title TEXT,
-        amount REAL,
-        category TEXT
-    );
-`;
-const CREATE_CREDIT_DETAIL_TABLES_TABLE = `
-    CREATE TABLE IF NOT EXISTS credit_detail_tables (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        credit_id INTEGER,
-        type TINYINT, -- 0: other, 1: banknotes, 2: coins, 3: cheques
-        FOREIGN KEY (credit_id) REFERENCES credits(id)
-    );
-`;
-const CREATE_CREDIT_DETAIL_ROWS_TABLE = `
-    CREATE TABLE IF NOT EXISTS credit_detail_rows (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        table_id INTEGER,
-        value REAL,
-        quantity INTEGER,
-        FOREIGN KEY (table_id) REFERENCES credit_tables(id)
-    );
-`;
 const db = new Database(DATABASE_PATH, DB_OPTIONS);
-db.exec(CREATE_CREDITS_TABLE);
-db.exec(CREATE_DEBITS_TABLE);
-db.exec(CREATE_CREDIT_DETAIL_TABLES_TABLE);
-db.exec(CREATE_CREDIT_DETAIL_ROWS_TABLE);
-function addCredit(date, title, amount, category) {
-  const INSERT_CREDIT_QUERY = `
-        INSERT INTO credits (date, title, amount, category)
-        VALUES (?, ?, ?, ?)
-    `;
-  const stmt = db.prepare(INSERT_CREDIT_QUERY);
-  return stmt.run(date, title, amount, category);
-}
+db.exec(`
+    CREATE TABLE IF NOT EXISTS debits (
+        id INTEGER PRIMARY KEY,
+        date TEXT,
+        title TEXT,
+        amount REAL,
+        category TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS credits_groups (
+        id INTEGER PRIMARY KEY,
+        date TEXT,
+        title TEXT,
+        category TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS credits_tables (
+        id INTEGER PRIMARY KEY,
+        group_id INTEGER,
+        type TINYINT, -- 0: other, 1: banknotes, 2: coins, 3: cheques
+        FOREIGN KEY (group_id) REFERENCES credits_groups(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS credits_rows (
+        id INTEGER PRIMARY KEY,
+        table_id INTEGER,
+        quantity TINYINT,
+        amount REAL,
+        FOREIGN KEY (table_id) REFERENCES credits_tables(id)
+    );
+`);
 function getCredits(filters, sort) {
-  let query = "SELECT * FROM credits";
+  let query = `
+        SELECT
+            cr.id AS id,
+            cg.date,
+            cg.title,
+            SUM(cr.quantity * cr.amount) AS amount,
+            cg.category
+        FROM
+            credits_groups cg
+                JOIN
+            credits_tables ct ON cg.id = ct.group_id
+                JOIN
+            credits_rows cr ON ct.id = cr.table_id
+    `;
   const queryParams = [];
-  function typeToOperator(type) {
+  function typeToOperator2(type) {
     if (type === Operator.Is) {
       return "LIKE";
     } else if (type === Operator.IsExactly) {
@@ -382,45 +396,21 @@ function getCredits(filters, sort) {
       } else {
         queryParams.push(filter.value);
       }
-      return `${filter.property} ${typeToOperator(filter.operator)} ?`;
+      return `${filter.property} ${typeToOperator2(filter.operator)} ?`;
     });
     query += " WHERE " + conditions.join(" AND ");
   }
+  query += " GROUP BY cg.id, cg.date, cg.title, cg.category";
   if (sort.length > 0) {
-    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.orientation)}`);
+    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator2(s.orientation)}`);
     query += " ORDER BY " + sortConditions.join(", ");
   }
   const stmt = db.prepare(query);
   return stmt.all(...queryParams);
 }
-function addDebit(date, title, amount, category) {
-  const INSERT_CREDIT_QUERY = `
-        INSERT INTO debits (date, title, amount, category)
-        VALUES (?, ?, ?, ?)
-    `;
-  const stmt = db.prepare(INSERT_CREDIT_QUERY);
-  return stmt.run(date, title, amount, category);
-}
 function getDebits(filters, sort) {
   let query = "SELECT * FROM debits";
   const queryParams = [];
-  function typeToOperator(type) {
-    if (type === Operator.Is) {
-      return "LIKE";
-    } else if (type === Operator.IsExactly) {
-      return "=";
-    } else if (type === Operator.MoreThan) {
-      return ">";
-    } else if (type === Operator.LessThan) {
-      return "<";
-    } else if (type === Orientation.Asc) {
-      return "ASC";
-    } else if (type === Orientation.Desc) {
-      return "DESC";
-    } else {
-      throw new Error(`Unsupported operator type: ${type}`);
-    }
-  }
   if (filters.length > 0) {
     const conditions = filters.map((filter) => {
       if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
@@ -442,8 +432,12 @@ function getDebits(filters, sort) {
 function getTransactionsByMonth() {
   const startDate = dayjs().subtract(11, "month").startOf("month").format("YYYY-MM-DD");
   const creditStmt = db.prepare(`
-        SELECT date, amount FROM credits
-        WHERE date >= ?
+        SELECT cg.date, SUM(cr.quantity * cr.amount) AS amount
+        FROM credits_groups cg
+                 JOIN credits_tables ct ON cg.id = ct.group_id
+                 JOIN credits_rows cr ON ct.id = cr.table_id
+        WHERE cg.date >= ?
+        GROUP BY cg.date
     `);
   const creditRecords = creditStmt.all(startDate);
   const debitStmt = db.prepare(`
@@ -477,10 +471,12 @@ function getTransactionsByMonth() {
 function getCreditsSumByCategory() {
   const dateThreshold = dayjs().subtract(12, "month").toISOString();
   const query = `
-        SELECT category, SUM(amount) as total
-        FROM credits
-        WHERE date >= ?
-        GROUP BY category
+        SELECT cg.category, SUM(cr.quantity * cr.amount) as total
+        FROM credits_groups cg
+                 JOIN credits_tables ct ON cg.id = ct.group_id
+                 JOIN credits_rows cr ON ct.id = cr.table_id
+        WHERE cg.date > ?
+        GROUP BY cg.category
     `;
   const stmt = db.prepare(query);
   const rows = stmt.all(dateThreshold);
@@ -502,24 +498,45 @@ function getDebitsSumByCategory() {
   const values = rows.map((row) => row.total);
   return { categories, values };
 }
-function getProfitByCategory() {
-  const query = `
-        SELECT category, SUM(credits_amount - debits_amount) AS profit
-        FROM (
-                 SELECT category, amount AS credits_amount, 0 AS debits_amount
-                 FROM credits
-                 UNION ALL
-                 SELECT category, 0 AS credits_amount, amount AS debits_amount
-                 FROM debits
-             )
-        GROUP BY category
-        HAVING profit > 0
+function getCreditsList(filters, sorts) {
+  let query = `
+        SELECT
+            cg.id AS group_id,
+            cg.title AS group_title,
+            JSON_GROUP_ARRAY(ct.type) AS table_types,
+            SUM(cr.quantity * cr.amount) AS total_amount
+        FROM
+            credits_groups cg
+                JOIN
+            credits_tables ct ON cg.id = ct.group_id
+                JOIN
+            credits_rows cr ON ct.id = cr.table_id
     `;
+  const queryParams = [];
+  if (filters.length > 0) {
+    const conditions = filters.map((filter) => {
+      if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
+        queryParams.push(`%${filter.value}%`);
+      } else {
+        queryParams.push(filter.value);
+      }
+      return `${filter.property} ${typeToOperator(filter.operator)} ?`;
+    });
+    query += " WHERE " + conditions.join(" AND ");
+  }
+  query += " GROUP BY cg.id, cg.title";
+  if (sorts.length > 0) {
+    const sortConditions = sorts.map((s) => `${s.property} ${typeToOperator(s.orientation)}`);
+    query += " ORDER BY " + sortConditions.join(", ");
+  }
   const stmt = db.prepare(query);
-  const rows = stmt.all();
-  const categories = rows.map((row) => row.category);
-  const values = rows.map((row) => row.profit);
-  return { categories, values };
+  const rows = stmt.all(...queryParams);
+  return rows.map((row) => ({
+    id: row.group_id,
+    title: row.group_title,
+    types: JSON.parse(row.table_types).filter((_, index) => index % 2 === 0),
+    totalAmount: row.total_amount
+  }));
 }
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname, "..");
@@ -564,29 +581,12 @@ ipcMain.handle("getCredits", async (_event, filters, sorts) => {
     throw error;
   }
 });
-ipcMain.handle("addCredit", async (_event, credit) => {
-  try {
-    const { date, title, amount, category } = credit;
-    return addCredit(date, title, amount, category);
-  } catch (error) {
-    console.error("Error when adding credit", error);
-    throw error;
-  }
-});
 ipcMain.handle("getDebits", async (_event, filters, sorts) => {
   try {
     return getDebits(filters, sorts);
   } catch (error) {
     console.error("Error when fetching debits", error);
     throw error;
-  }
-});
-ipcMain.handle("addDebit", async (_event, debit) => {
-  try {
-    const { date, title, amount, category } = debit;
-    return addDebit(date, title, amount, category);
-  } catch (error) {
-    console.error("Error when adding debit", error);
   }
 });
 ipcMain.handle("getTransactionsByMonth", async (_event) => {
@@ -611,11 +611,11 @@ ipcMain.handle("getDebitsSumByCategory", async (_event) => {
     console.error("Error when fetching debits sum by category", error);
   }
 });
-ipcMain.handle("getProfitByCategory", async (_event) => {
+ipcMain.handle("getCreditsList", async (_event, filters, sorts) => {
   try {
-    return getProfitByCategory();
+    return getCreditsList(filters, sorts);
   } catch (error) {
-    console.error("Error when fetching profit by category", error);
+    console.error("Error when fetching creditsList", error);
   }
 });
 app.on("window-all-closed", () => {

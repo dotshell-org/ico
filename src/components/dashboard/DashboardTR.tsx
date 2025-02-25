@@ -1,5 +1,5 @@
 import React from "react";
-import {DashboardCharts} from "../../types/DashboardCharts.ts";
+import {DashboardCharts} from "../../types/dashboard/DashboardCharts.ts";
 
 interface CreditSummaryTRProps {
     property: DashboardCharts | null;

@@ -1,8 +1,8 @@
 import React from 'react';
 import NavItem from './NavItem';
 import { useTranslation } from 'react-i18next';
-import { Window } from '../../../types/Window';
-import { Tabs } from '../../../types/Tabs';
+import { Window } from '../../../types/nav/Window.ts';
+import { Tabs } from '../../../types/nav/Tabs.ts';
 
 interface NavItemsGroupProps {
     window: Window;

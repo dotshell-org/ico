@@ -1,13 +1,19 @@
 import FilterSelection from "../../components/filter-selection/FilterSelection.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Filter} from "../../types/filter/Filter.ts";
 import {Sort} from "../../types/sort/Sort.ts";
 import {t} from "i18next";
-import CreditMiniatureRow from "../../components/CreditMiniatureRow.tsx";
+import CreditMiniatureRow from "../../components/detailed-credits/CreditMiniatureRow.tsx";
+import {Credit} from "../../types/detailed-credits/Credit.ts";
 
-function DetailedCredits() {
+interface DetailedCreditsProps {
+    onCreditMiniatureRowClicked: (credit: Credit) => void;
+}
+
+const DetailedCredits: React.FC<DetailedCreditsProps> = ({ onCreditMiniatureRowClicked }) => {
     const [filters, setFilters] = useState<Filter[]>([]);
     const [sorts, setSorts] = useState<Sort[]>([]);
+    const [credits, setCredits] = useState<Credit[]>([]);
 
     const handleFilterAdded = (filter: Filter) => {
         setFilters(prev => [...prev, filter]);
@@ -22,6 +28,17 @@ function DetailedCredits() {
     const handleSortRemoved = (sort: Sort) => {
         setSorts(prev => prev.filter(s => s !== sort));
     }
+
+    useEffect(() => {
+        (window as any).ipcRenderer
+            .invoke("getCreditsList", filters, sorts)
+            .then((result: Credit[]) => {
+                setCredits(result);
+            })
+            .catch((error: any) => {
+                console.error("Error when fetching credits", error);
+            });
+    }, [filters, sorts]);
 
     return (
         <>
@@ -44,10 +61,8 @@ function DetailedCredits() {
             </div>
             <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-copy mt-36 ">
                 {
-                    Array.from({ length: 50 }, (_) => (
-                        <tr>
-                            <CreditMiniatureRow />
-                        </tr>
+                    credits.map((credit) => (
+                        <CreditMiniatureRow credit={credit} onClick={onCreditMiniatureRowClicked} />
                     ))
                 }
             </table>

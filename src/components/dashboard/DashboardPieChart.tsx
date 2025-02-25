@@ -1,7 +1,7 @@
 import { PieChart, useDrawingArea } from "@mui/x-charts";
 import { t } from "i18next";
 import { styled } from "@mui/material/styles";
-import { DashboardCharts } from "../../types/DashboardCharts";
+import { DashboardCharts } from "../../types/dashboard/DashboardCharts.ts";
 import React, { useEffect, useState } from "react";
 
 interface CustomPieChartProps {

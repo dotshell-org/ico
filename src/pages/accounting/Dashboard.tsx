@@ -1,6 +1,6 @@
 import { t } from "i18next";
 import DashboardPieChart from "../../components/dashboard/DashboardPieChart.tsx";
-import { DashboardCharts } from "../../types/DashboardCharts.ts";
+import { DashboardCharts } from "../../types/dashboard/DashboardCharts.ts";
 import { LineChart } from "@mui/x-charts";
 import dayjs from "dayjs";
 import { useEffect, useState, useMemo } from "react";

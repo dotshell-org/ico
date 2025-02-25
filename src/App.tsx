@@ -1,15 +1,18 @@
 import { useMemo, useState } from 'react';
 import { useMediaQuery, createTheme, ThemeProvider } from '@mui/material';
 import NavBar from "./components/nav/NavBar";
-import { Tabs } from './types/Tabs';
+import { Tabs } from './types/nav/Tabs.ts';
 import Dashboard from './pages/accounting/Dashboard';
 import DebitSummary from './pages/accounting/DebitSummary';
 import CreditSummary from './pages/accounting/CreditSummary';
 import DetailedCredits from "./pages/accounting/DetailedCredits.tsx";
 import Invoices from "./pages/accounting/Invoices.tsx";
+import CreditEditor from "./components/detailed-credits/CreditEditor.tsx";
+import {Credit} from "./types/detailed-credits/Credit.ts";
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
+  const [creditInEditor, setCreditInEditor] = useState<Credit>({id: 0, title: "", types: [], totalAmount: 0});
 
   // Vérifier si l'utilisateur préfère le mode sombre
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -27,20 +30,28 @@ function App() {
 
   const renderContent = () => {
     switch (selectedTab) {
-    case Tabs.AccountingDashboard:
-        return <Dashboard />;
-    case Tabs.AccountingCredit:
-        return <CreditSummary />;
-    case Tabs.AccountingDebit:
-        return <DebitSummary />;
-    case Tabs.AccountingDetailedCredits:
-        return <DetailedCredits />;
-    case Tabs.AccountingInvoices:
-        return <Invoices />;
-    default:
-        return null;
+        case Tabs.AccountingDashboard:
+            return <Dashboard />;
+        case Tabs.AccountingCredit:
+            return <CreditSummary />;
+        case Tabs.AccountingDebit:
+            return <DebitSummary />;
+        case Tabs.AccountingDetailedCredits:
+            return <DetailedCredits onCreditMiniatureRowClicked={(credit: Credit) => {
+                setCreditInEditor(credit);
+                setSelectedTab(Tabs.AccountingCreditEditor);
+            }} />;
+        case Tabs.AccountingCreditEditor:
+            return <CreditEditor credit={creditInEditor} />;
+        case Tabs.AccountingInvoices:
+            return <Invoices />;
+
+            default:
+            return null;
     }
   };
+
+
 
   return (
       <ThemeProvider theme={theme}>
