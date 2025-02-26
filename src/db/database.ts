@@ -6,6 +6,7 @@ import { Orientation } from "../types/sort/Orientation.ts";
 import { SummaryProperty } from "../types/summary/SummaryProperty.ts";
 import dayjs from "dayjs";
 import {Credit} from "../types/detailed-credits/Credit.ts";
+import {CreditTable} from "../types/detailed-credits/CreditTable.ts";
 import {MoneyType} from "../types/detailed-credits/MoneyType.ts";
 
 const require = createRequire(import.meta.url);
@@ -317,6 +318,7 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
         SELECT
             cg.id AS group_id,
             cg.title AS group_title,
+            JSON_GROUP_ARRAY(ct.id) AS table_ids,
             JSON_GROUP_ARRAY(ct.type) AS table_types,
             SUM(cr.quantity * cr.amount) AS total_amount
         FROM
@@ -326,7 +328,6 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
                 JOIN
             credits_rows cr ON ct.id = cr.table_id
     `;
-
     const queryParams: any[] = [];
 
     if (filters.length > 0) {
@@ -354,7 +355,32 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
     return rows.map((row: any) => ({
         id: row.group_id,
         title: row.group_title,
+        tableIds: JSON.parse(row.table_ids).filter((_: any, index: number) => index % 2 === 0) as number[],
         types: JSON.parse(row.table_types).filter((_: any, index: number) => index % 2 === 0) as MoneyType[],
         totalAmount: row.total_amount,
     }));
+}
+
+export function getCreditTableFromId(id: number): CreditTable {
+    const query = `
+        SELECT 
+            cr.id AS row_id, 
+            cr.quantity, 
+            cr.amount, 
+            ct.type AS table_type
+        FROM credits_rows cr
+        JOIN credits_tables ct ON cr.table_id = ct.id
+        WHERE ct.id = ?
+    `;
+    const stmt = db.prepare(query);
+    const rows = stmt.all(id);
+
+    return {
+        type: rows.length > 0 ? rows[0].table_type : "",
+        rows: rows.map((row: any) => ({
+            id: row.row_id,
+            quantity: row.quantity,
+            amount: row.amount,
+        }))
+    };
 }

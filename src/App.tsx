@@ -12,7 +12,7 @@ import {Credit} from "./types/detailed-credits/Credit.ts";
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
-  const [creditInEditor, setCreditInEditor] = useState<Credit>({id: 0, title: "", types: [], totalAmount: 0});
+  const [creditInEditor, setCreditInEditor] = useState<Credit>({id: 0, title: "", tableIds: [], types: [], totalAmount: 0});
 
   // Vérifier si l'utilisateur préfère le mode sombre
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');

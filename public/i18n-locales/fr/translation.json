@@ -60,6 +60,11 @@
     "p_profit": "Vous avez réalisé un ⚖\uFE0F<strong>Bénéfice</strong> total de {amount} pour les 12 derniers mois, réparti sur {categories} catégories.",
 
     "raw_tables_types": "Types des Tableaux",
-    "raw_total_amount": "Montant total"
+    "raw_total_amount": "Montant total",
+
+    "coins": "\uD83E\uDE99 Pièces",
+    "banknotes": "\uD83D\uDCB5 Billets",
+    "cheques": "\uD83D\uDD8B Chèques",
+    "money_other": "\uD83D\uDCB3\uFE0F Autre"
 
 }

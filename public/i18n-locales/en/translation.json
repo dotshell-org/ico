@@ -60,6 +60,11 @@
     "p_profit": "You have achieved a total ⚖\uFE0F<strong>Profit</strong> of {amount} for the last 12 months, distributed across {categories} categories.",
 
     "raw_tables_types": "Tables Types",
-    "raw_total_amount": "Total Amount"
+    "raw_total_amount": "Total Amount",
+
+    "coins": "\uD83E\uDE99 Coins",
+    "banknotes": "\uD83D\uDCB5 Banknotes",
+    "cheques": "\uD83D\uDD8B Cheques",
+    "money_other": "\uD83D\uDCB3\uFE0F Other"
 
 }

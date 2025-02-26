@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import {
   getCredits, getCreditsList,
-  getCreditsSumByCategory,
+  getCreditsSumByCategory, getCreditTableFromId,
   getDebits, getDebitsSumByCategory,
   getTransactionsByMonth
 } from "../src/db/database.ts";
@@ -101,6 +101,13 @@ ipcMain.handle("getCreditsList", async (_event, filters: Filter[], sorts: Sort[]
     return getCreditsList(filters, sorts);
   } catch (error) {
     console.error("Error when fetching creditsList", error);
+  }
+})
+ipcMain.handle("getCreditTableFromId", async (_event, id: number) => {
+  try {
+    return getCreditTableFromId(id);
+  } catch (error) {
+    console.error("Error when fetching creditTableFromId", error);
   }
 })
 

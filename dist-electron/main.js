@@ -503,6 +503,7 @@ function getCreditsList(filters, sorts) {
         SELECT
             cg.id AS group_id,
             cg.title AS group_title,
+            JSON_GROUP_ARRAY(ct.id) AS table_ids,
             JSON_GROUP_ARRAY(ct.type) AS table_types,
             SUM(cr.quantity * cr.amount) AS total_amount
         FROM
@@ -534,9 +535,32 @@ function getCreditsList(filters, sorts) {
   return rows.map((row) => ({
     id: row.group_id,
     title: row.group_title,
+    tableIds: JSON.parse(row.table_ids).filter((_, index) => index % 2 === 0),
     types: JSON.parse(row.table_types).filter((_, index) => index % 2 === 0),
     totalAmount: row.total_amount
   }));
+}
+function getCreditTableFromId(id) {
+  const query = `
+        SELECT 
+            cr.id AS row_id, 
+            cr.quantity, 
+            cr.amount, 
+            ct.type AS table_type
+        FROM credits_rows cr
+        JOIN credits_tables ct ON cr.table_id = ct.id
+        WHERE ct.id = ?
+    `;
+  const stmt = db.prepare(query);
+  const rows = stmt.all(id);
+  return {
+    type: rows.length > 0 ? rows[0].table_type : "",
+    rows: rows.map((row) => ({
+      id: row.row_id,
+      quantity: row.quantity,
+      amount: row.amount
+    }))
+  };
 }
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname, "..");
@@ -616,6 +640,13 @@ ipcMain.handle("getCreditsList", async (_event, filters, sorts) => {
     return getCreditsList(filters, sorts);
   } catch (error) {
     console.error("Error when fetching creditsList", error);
+  }
+});
+ipcMain.handle("getCreditTableFromId", async (_event, id) => {
+  try {
+    return getCreditTableFromId(id);
+  } catch (error) {
+    console.error("Error when fetching creditTableFromId", error);
   }
 });
 app.on("window-all-closed", () => {
