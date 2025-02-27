@@ -1,9 +1,9 @@
-import { createRequire } from 'module';
-import { Filter } from "../types/filter/Filter.ts";
-import { Sort } from "../types/sort/Sort.ts";
-import { Operator } from "../types/filter/Operator.ts";
-import { Orientation } from "../types/sort/Orientation.ts";
-import { SummaryProperty } from "../types/summary/SummaryProperty.ts";
+import {createRequire} from 'module';
+import {Filter} from "../types/filter/Filter.ts";
+import {Sort} from "../types/sort/Sort.ts";
+import {Operator} from "../types/filter/Operator.ts";
+import {Orientation} from "../types/sort/Orientation.ts";
+import {SummaryProperty} from "../types/summary/SummaryProperty.ts";
 import dayjs from "dayjs";
 import {Credit} from "../types/detailed-credits/Credit.ts";
 import {CreditTable} from "../types/detailed-credits/CreditTable.ts";
@@ -361,6 +361,12 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
     }));
 }
 
+/**
+ * Retrieves a credit table from the database based on the given table ID.
+ *
+ * @param {number} id - The unique identifier of the credit table to retrieve.
+ * @return {CreditTable} An object representing the credit table, including its type and rows.
+ */
 export function getCreditTableFromId(id: number): CreditTable {
     const query = `
         SELECT 
@@ -380,6 +386,33 @@ export function getCreditTableFromId(id: number): CreditTable {
         rows: rows.map((row: any) => ({
             id: row.row_id,
             quantity: row.quantity,
+            amount: row.amount,
+        }))
+    };
+}
+
+/**
+ * Retrieves other money credits associated with a given group ID.
+ *
+ * @param {number} id - The ID of the credits group to query.
+ * @return {CreditTable} An object containing the type of the credit table and an array of rows representing the credits.
+ */
+export function getOtherMoneyCreditsFromId(id: number): CreditTable {
+    const query = `
+        SELECT cr.id AS row_id, cr.amount
+        FROM credits_groups cg
+                 JOIN credits_tables ct ON cg.id = ct.group_id
+                 JOIN credits_rows cr ON ct.id = cr.table_id
+        WHERE cg.id = ? AND ct.type = 0;
+    `;
+    const stmt = db.prepare(query);
+    const rows = stmt.all(id);
+
+    return {
+        type: MoneyType.Other,
+        rows: rows.map((row: any) => ({
+            id: row.row_id,
+            quantity: 2,
             amount: row.amount,
         }))
     };

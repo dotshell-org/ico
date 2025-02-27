@@ -65,6 +65,8 @@
     "coins": "\uD83E\uDE99 Coins",
     "banknotes": "\uD83D\uDCB5 Banknotes",
     "cheques": "\uD83D\uDD8B Cheques",
-    "money_other": "\uD83D\uDCB3\uFE0F Other"
+    "money_other": "\uD83D\uDCB3\uFE0F Other",
+
+    "raw_new": "New"
 
 }

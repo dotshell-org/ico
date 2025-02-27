@@ -4,7 +4,7 @@ import path from 'node:path'
 import {
   getCredits, getCreditsList,
   getCreditsSumByCategory, getCreditTableFromId,
-  getDebits, getDebitsSumByCategory,
+  getDebits, getDebitsSumByCategory, getOtherMoneyCreditsFromId,
   getTransactionsByMonth
 } from "../src/db/database.ts";
 import { Filter } from "../src/types/filter/Filter.ts"
@@ -106,6 +106,13 @@ ipcMain.handle("getCreditsList", async (_event, filters: Filter[], sorts: Sort[]
 ipcMain.handle("getCreditTableFromId", async (_event, id: number) => {
   try {
     return getCreditTableFromId(id);
+  } catch (error) {
+    console.error("Error when fetching creditTableFromId", error);
+  }
+})
+ipcMain.handle("getOtherMoneyCreditsFromId", async (_event, id: number) => {
+  try {
+    return getOtherMoneyCreditsFromId(id);
   } catch (error) {
     console.error("Error when fetching creditTableFromId", error);
   }

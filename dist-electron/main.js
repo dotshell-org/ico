@@ -303,6 +303,13 @@ var dayjs_min = { exports: {} };
 })(dayjs_min);
 var dayjs_minExports = dayjs_min.exports;
 const dayjs = /* @__PURE__ */ getDefaultExportFromCjs(dayjs_minExports);
+var MoneyType = /* @__PURE__ */ ((MoneyType2) => {
+  MoneyType2[MoneyType2["Other"] = 0] = "Other";
+  MoneyType2[MoneyType2["Banknotes"] = 1] = "Banknotes";
+  MoneyType2[MoneyType2["Coins"] = 2] = "Coins";
+  MoneyType2[MoneyType2["Cheques"] = 3] = "Cheques";
+  return MoneyType2;
+})(MoneyType || {});
 const require2 = createRequire(import.meta.url);
 const Database = require2("better-sqlite3");
 function typeToOperator(type) {
@@ -562,6 +569,25 @@ function getCreditTableFromId(id) {
     }))
   };
 }
+function getOtherMoneyCreditsFromId(id) {
+  const query = `
+        SELECT cr.id AS row_id, cr.amount
+        FROM credits_groups cg
+                 JOIN credits_tables ct ON cg.id = ct.group_id
+                 JOIN credits_rows cr ON ct.id = cr.table_id
+        WHERE cg.id = ? AND ct.type = 0;
+    `;
+  const stmt = db.prepare(query);
+  const rows = stmt.all(id);
+  return {
+    type: MoneyType.Other,
+    rows: rows.map((row) => ({
+      id: row.row_id,
+      quantity: 2,
+      amount: row.amount
+    }))
+  };
+}
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -645,6 +671,13 @@ ipcMain.handle("getCreditsList", async (_event, filters, sorts) => {
 ipcMain.handle("getCreditTableFromId", async (_event, id) => {
   try {
     return getCreditTableFromId(id);
+  } catch (error) {
+    console.error("Error when fetching creditTableFromId", error);
+  }
+});
+ipcMain.handle("getOtherMoneyCreditsFromId", async (_event, id) => {
+  try {
+    return getOtherMoneyCreditsFromId(id);
   } catch (error) {
     console.error("Error when fetching creditTableFromId", error);
   }

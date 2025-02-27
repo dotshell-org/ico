@@ -3,6 +3,7 @@ import {MoneyType} from "../../../types/detailed-credits/MoneyType.ts";
 import CreditTH from "./CreditTH.tsx";
 import {t} from "i18next";
 import type {CreditTable, CreditTableRow} from "../../../types/detailed-credits/CreditTable.ts";
+import CreditTR from "./CreditTR.tsx";
 
 interface CreditTableProps {
     id: number;
@@ -19,10 +20,22 @@ const CreditTable: React.FC<CreditTableProps> = ({ id }) => {
             return "banknotes";
         } else if (type === MoneyType.Cheques) {
             return "cheques";
-        } else if (type === MoneyType.Other) {
-            return "money_other"
         }
         return ""
+    }
+
+    const computeWeight = (amount: number, quantity: number) => {
+        const weights: Record<string, number> = {
+            "2.00": 8.5,
+            "1.00": 7.5,
+            "0.50": 7.8,
+            "0.20": 5.7,
+            "0.10": 4.1,
+            "0.05": 3.9,
+            "0.02": 3.0,
+            "0.01": 2.3,
+        }
+        return (amount * quantity * weights[amount.toFixed(2)]).toFixed(2) + "g";
     }
 
     useEffect(() => {
@@ -31,6 +44,7 @@ const CreditTable: React.FC<CreditTableProps> = ({ id }) => {
             .then((result: CreditTable) => {
                 setRows(result.rows);
                 setType(result.type);
+                if (type === MoneyType.Other) return null;
             })
             .catch((error: any) => {
                 console.error("Error when fetching credits", error);
@@ -66,13 +80,42 @@ const CreditTable: React.FC<CreditTableProps> = ({ id }) => {
                     )}
                 </thead>
                 <tbody>
-                {rows.map((row) => (
-                    <>
-                        <p>Id: {row.id}</p>
-                        <p>Amount: {row.amount}</p>
-                        <p>Quantity: {row.quantity}</p>
-                    </>
-                ))}
+                    {rows.map((row) => {
+                        if (type === MoneyType.Coins) {
+                            return (
+                                <tr>
+                                    <CreditTR content={"€" + row.amount.toFixed(2).toString()} />
+                                    <CreditTR content={row.quantity.toString()} />
+                                    <CreditTR content={"€" + (row.amount * row.quantity).toFixed(2).toString()} />
+                                    <CreditTR content={computeWeight(row.amount, row.quantity).toString()} />
+                                </tr>
+                            );
+                        } else if (type === MoneyType.Banknotes) {
+                            return (
+                                <tr>
+                                    <CreditTR content={"€" + row.amount.toFixed(2).toString()} />
+                                    <CreditTR content={row.quantity.toString()} />
+                                    <CreditTR content={"€" + (row.amount * row.quantity).toFixed(2).toString()} />
+                                </tr>
+                            );
+                        } else if (type === MoneyType.Cheques) {
+                            return (
+                                <tr>
+                                    <CreditTR content={"€" + row.amount.toFixed(2).toString()} />
+                                    <CreditTR content={row.quantity.toString()} />
+                                    <CreditTR content={"€" + (row.amount * row.quantity).toFixed(2).toString()} />
+                                </tr>
+                            )
+                        }
+                        return null;
+                    })}
+                    {(type !== MoneyType.Other && <tr>
+                        <td
+                            colSpan={4}
+                            className="w-full border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900 border border-t-2 text-center text-gray-500 dark:text-gray-400 p-1.5 text-sm transition-all select-none cursor-pointer">
+                            {t("raw_new")}
+                        </td>
+                    </tr>)}
                 </tbody>
             </table>
         </>
