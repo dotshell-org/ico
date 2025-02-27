@@ -8,13 +8,13 @@ interface CreditEditorProps {
 
 const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
     return (
-        <>
-            <h1 className="text-3xl mt-2 mb-10 font-bold cursor-default">{credit.title}</h1>
+        <div className="p-2">
+            <h1 className="text-3xl mb-10 font-bold cursor-default">{credit.title}</h1>
             {credit.tableIds.map((id) => {
                 return <CreditTable id={id} />
             })}
             <OtherMoneyCreditTable id={credit.id} />
-        </>
+        </div>
     )
 }
 

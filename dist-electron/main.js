@@ -366,11 +366,12 @@ db.exec(`
 function getCredits(filters, sort) {
   let query = `
         SELECT
-            cr.id AS id,
+            ct.id AS id,
             cg.date,
             cg.title,
-            SUM(cr.quantity * cr.amount) AS amount,
-            cg.category
+            cg.category,
+            ct.type,
+            SUM(cr.quantity * cr.amount) AS amount
         FROM
             credits_groups cg
                 JOIN
@@ -379,23 +380,6 @@ function getCredits(filters, sort) {
             credits_rows cr ON ct.id = cr.table_id
     `;
   const queryParams = [];
-  function typeToOperator2(type) {
-    if (type === Operator.Is) {
-      return "LIKE";
-    } else if (type === Operator.IsExactly) {
-      return "=";
-    } else if (type === Operator.MoreThan) {
-      return ">";
-    } else if (type === Operator.LessThan) {
-      return "<";
-    } else if (type === Orientation.Asc) {
-      return "ASC";
-    } else if (type === Orientation.Desc) {
-      return "DESC";
-    } else {
-      throw new Error(`Unsupported operator type: ${type}`);
-    }
-  }
   if (filters.length > 0) {
     const conditions = filters.map((filter) => {
       if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
@@ -403,17 +387,38 @@ function getCredits(filters, sort) {
       } else {
         queryParams.push(filter.value);
       }
-      return `${filter.property} ${typeToOperator2(filter.operator)} ?`;
+      return `${filter.property} ${typeToOperator(filter.operator)} ?`;
     });
     query += " WHERE " + conditions.join(" AND ");
   }
-  query += " GROUP BY cg.id, cg.date, cg.title, cg.category";
+  query += " GROUP BY ct.id, cg.date, cg.title, cg.category";
   if (sort.length > 0) {
-    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator2(s.orientation)}`);
+    const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.orientation)}`);
     query += " ORDER BY " + sortConditions.join(", ");
   }
   const stmt = db.prepare(query);
-  return stmt.all(...queryParams);
+  const rows = stmt.all(...queryParams);
+  const typeToEmoji = (type) => {
+    if (type == MoneyType.Other) {
+      return "💳️";
+    } else if (type == MoneyType.Banknotes) {
+      return "💵";
+    } else if (type == MoneyType.Cheques) {
+      return "🖋";
+    } else if (type == MoneyType.Coins) {
+      return "🪙";
+    }
+    return "";
+  };
+  return rows.map((row) => {
+    return {
+      id: row.id,
+      date: row.date,
+      title: `${row.title} (${typeToEmoji(row.type)})`,
+      amount: row.amount,
+      category: row.category
+    };
+  });
 }
 function getDebits(filters, sort) {
   let query = "SELECT * FROM debits";
@@ -510,15 +515,13 @@ function getCreditsList(filters, sorts) {
         SELECT
             cg.id AS group_id,
             cg.title AS group_title,
-            JSON_GROUP_ARRAY(ct.id) AS table_ids,
-            JSON_GROUP_ARRAY(ct.type) AS table_types,
+            JSON_GROUP_ARRAY(DISTINCT ct.id) AS table_ids,
+            JSON_GROUP_ARRAY(DISTINCT ct.type) AS table_types,
             SUM(cr.quantity * cr.amount) AS total_amount
         FROM
             credits_groups cg
-                JOIN
-            credits_tables ct ON cg.id = ct.group_id
-                JOIN
-            credits_rows cr ON ct.id = cr.table_id
+                JOIN credits_tables ct ON cg.id = ct.group_id
+                JOIN credits_rows cr ON ct.id = cr.table_id
     `;
   const queryParams = [];
   if (filters.length > 0) {
@@ -542,8 +545,8 @@ function getCreditsList(filters, sorts) {
   return rows.map((row) => ({
     id: row.group_id,
     title: row.group_title,
-    tableIds: JSON.parse(row.table_ids).filter((_, index) => index % 2 === 0),
-    types: JSON.parse(row.table_types).filter((_, index) => index % 2 === 0),
+    tableIds: JSON.parse(row.table_ids),
+    types: JSON.parse(row.table_types),
     totalAmount: row.total_amount
   }));
 }

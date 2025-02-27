@@ -80,11 +80,12 @@ db.exec(`
 export function getCredits(filters: Filter[], sort: Sort[]) {
     let query = `
         SELECT
-            cr.id AS id,
+            ct.id AS id,
             cg.date,
             cg.title,
-            SUM(cr.quantity * cr.amount) AS amount,
-            cg.category
+            cg.category,
+            ct.type,
+            SUM(cr.quantity * cr.amount) AS amount
         FROM
             credits_groups cg
                 JOIN
@@ -92,27 +93,7 @@ export function getCredits(filters: Filter[], sort: Sort[]) {
                 JOIN
             credits_rows cr ON ct.id = cr.table_id
     `;
-
     const queryParams: any[] = [];
-
-    function typeToOperator(type: Operator | Orientation): string {
-        if (type === Operator.Is) {
-            return "LIKE";
-        } else if (type === Operator.IsExactly) {
-            return "=";
-        } else if (type === Operator.MoreThan) {
-            return ">";
-        } else if (type === Operator.LessThan) {
-            return "<";
-        } else if (type === Orientation.Asc) {
-            return "ASC";
-        } else if (type === Orientation.Desc) {
-            return "DESC";
-        } else {
-            throw new Error(`Unsupported operator type: ${type}`);
-        }
-    }
-
     if (filters.length > 0) {
         const conditions = filters.map((filter) => {
             if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
@@ -125,15 +106,37 @@ export function getCredits(filters: Filter[], sort: Sort[]) {
         query += " WHERE " + conditions.join(" AND ");
     }
 
-    query += " GROUP BY cg.id, cg.date, cg.title, cg.category";
+    query += " GROUP BY ct.id, cg.date, cg.title, cg.category";
 
     if (sort.length > 0) {
         const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.orientation)}`);
         query += " ORDER BY " + sortConditions.join(", ");
     }
-
     const stmt = db.prepare(query);
-    return stmt.all(...queryParams);
+    const rows = stmt.all(...queryParams);
+
+    const typeToEmoji = (type: MoneyType): string => {
+        if (type == MoneyType.Other) {
+            return "\uD83D\uDCB3\uFE0F";
+        } else if (type == MoneyType.Banknotes) {
+            return "\uD83D\uDCB5";
+        } else if (type == MoneyType.Cheques) {
+            return "\uD83D\uDD8B";
+        } else if (type == MoneyType.Coins) {
+            return "\uD83E\uDE99";
+        }
+        return ""
+    }
+
+    return rows.map((row: { id: any; date: any; title: any; category: any; type: MoneyType; amount: any; }) => {
+        return {
+            id: row.id,
+            date: row.date,
+            title: `${row.title} (${typeToEmoji(row.type)})`,
+            amount: row.amount,
+            category: row.category,
+        }
+    })
 }
 
 /**
@@ -318,15 +321,13 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
         SELECT
             cg.id AS group_id,
             cg.title AS group_title,
-            JSON_GROUP_ARRAY(ct.id) AS table_ids,
-            JSON_GROUP_ARRAY(ct.type) AS table_types,
+            JSON_GROUP_ARRAY(DISTINCT ct.id) AS table_ids,
+            JSON_GROUP_ARRAY(DISTINCT ct.type) AS table_types,
             SUM(cr.quantity * cr.amount) AS total_amount
         FROM
             credits_groups cg
-                JOIN
-            credits_tables ct ON cg.id = ct.group_id
-                JOIN
-            credits_rows cr ON ct.id = cr.table_id
+                JOIN credits_tables ct ON cg.id = ct.group_id
+                JOIN credits_rows cr ON ct.id = cr.table_id
     `;
     const queryParams: any[] = [];
 
@@ -355,8 +356,8 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
     return rows.map((row: any) => ({
         id: row.group_id,
         title: row.group_title,
-        tableIds: JSON.parse(row.table_ids).filter((_: any, index: number) => index % 2 === 0) as number[],
-        types: JSON.parse(row.table_types).filter((_: any, index: number) => index % 2 === 0) as MoneyType[],
+        tableIds: JSON.parse(row.table_ids) as number[],
+        types: JSON.parse(row.table_types) as MoneyType[],
         totalAmount: row.total_amount,
     }));
 }
