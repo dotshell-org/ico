@@ -67,6 +67,8 @@
     "cheques": "\uD83D\uDD8B Cheques",
     "money_other": "\uD83D\uDCB3\uFE0F Other",
 
-    "raw_new": "New"
+    "raw_new": "New",
+
+    "raw_confirm_delete_table": "Are you sure you want to delete this table?"
 
 }

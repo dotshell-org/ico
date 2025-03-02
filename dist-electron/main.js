@@ -515,13 +515,13 @@ function getCreditsList(filters, sorts) {
         SELECT
             cg.id AS group_id,
             cg.title AS group_title,
-            JSON_GROUP_ARRAY(DISTINCT ct.id) AS table_ids,
-            JSON_GROUP_ARRAY(DISTINCT ct.type) AS table_types,
-            SUM(cr.quantity * cr.amount) AS total_amount
+            JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.id, 0)) AS table_ids,
+            JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.type, 0)) AS table_types,
+            COALESCE(SUM(cr.quantity * cr.amount), 0) AS total_amount
         FROM
             credits_groups cg
-                JOIN credits_tables ct ON cg.id = ct.group_id
-                JOIN credits_rows cr ON ct.id = cr.table_id
+                LEFT JOIN credits_tables ct ON cg.id = ct.group_id
+                LEFT JOIN credits_rows cr ON ct.id = cr.table_id
     `;
   const queryParams = [];
   if (filters.length > 0) {
@@ -546,8 +546,8 @@ function getCreditsList(filters, sorts) {
     id: row.group_id,
     title: row.group_title,
     tableIds: JSON.parse(row.table_ids),
-    types: JSON.parse(row.table_types),
-    totalAmount: row.total_amount
+    types: [...JSON.parse(row.table_types).filter((type) => type !== MoneyType.Other), MoneyType.Other],
+    totalAmount: row.total_amount || 0
   }));
 }
 function getCreditTableFromId(id) {
@@ -561,16 +561,34 @@ function getCreditTableFromId(id) {
         JOIN credits_tables ct ON cr.table_id = ct.id
         WHERE ct.id = ?
     `;
-  const stmt = db.prepare(query);
-  const rows = stmt.all(id);
-  return {
-    type: rows.length > 0 ? rows[0].table_type : "",
-    rows: rows.map((row) => ({
-      id: row.row_id,
-      quantity: row.quantity,
-      amount: row.amount
-    }))
-  };
+  let stmt = db.prepare(query);
+  let rows = stmt.all(id);
+  if (rows.length === 0) {
+    const query2 = `
+            SELECT
+                ct.type AS table_type
+            FROM credits_tables ct
+            WHERE ct.id = ?
+        `;
+    stmt = db.prepare(query2);
+    rows = stmt.all(id);
+    if (rows.length === 0) {
+      throw new Error(`Credit table with ID ${id} not found`);
+    }
+    return {
+      type: rows[0].table_type,
+      rows: []
+    };
+  } else {
+    return {
+      type: rows[0].table_type,
+      rows: rows.map((row) => ({
+        id: row.row_id,
+        quantity: row.quantity,
+        amount: row.amount
+      }))
+    };
+  }
 }
 function getOtherMoneyCreditsFromId(id) {
   const query = `
@@ -591,6 +609,93 @@ function getOtherMoneyCreditsFromId(id) {
     }))
   };
 }
+function addCreditRow(tableId, amount, quantity) {
+  const checkStmt = db.prepare(`
+        SELECT id FROM credits_rows 
+        WHERE table_id = ? AND amount = ?
+    `);
+  const existing = checkStmt.get(tableId, amount);
+  if (existing) {
+    throw new Error(`A row with amount ${amount} already exists in this table`);
+  }
+  const stmt = db.prepare(`
+        INSERT INTO credits_rows (table_id, quantity, amount)
+        VALUES (?, ?, ?)
+    `);
+  const info = stmt.run(tableId, quantity, amount);
+  return {
+    id: info.lastInsertRowid,
+    amount,
+    quantity
+  };
+}
+function updateCreditRow(rowId, quantity) {
+  const stmt = db.prepare(`
+        UPDATE credits_rows
+        SET quantity = ?
+        WHERE id = ?
+    `);
+  const info = stmt.run(quantity, rowId);
+  return info.changes > 0;
+}
+function updateOtherCreditRow(rowId, amount) {
+  const stmt = db.prepare(`
+        UPDATE credits_rows
+        SET amount = ?
+        WHERE id = ?
+    `);
+  const info = stmt.run(amount, rowId);
+  return info.changes > 0;
+}
+function deleteCreditRow(rowId) {
+  const stmt = db.prepare(`
+        DELETE FROM credits_rows
+        WHERE id = ?
+    `);
+  const info = stmt.run(rowId);
+  return info.changes > 0;
+}
+function addOtherCreditRow(groupId, amount) {
+  const checkTableStmt = db.prepare(`
+        SELECT id FROM credits_tables 
+        WHERE group_id = ? AND type = ?
+    `);
+  let tableId;
+  const existingTable = checkTableStmt.get(groupId, MoneyType.Other);
+  if (existingTable) {
+    tableId = existingTable.id;
+  } else {
+    const createTableStmt = db.prepare(`
+            INSERT INTO credits_tables (group_id, type)
+            VALUES (?, ?)
+        `);
+    const tableInfo = createTableStmt.run(groupId, MoneyType.Other);
+    tableId = tableInfo.lastInsertRowid;
+  }
+  const stmt = db.prepare(`
+        INSERT INTO credits_rows (table_id, quantity, amount)
+        VALUES (?, ?, ?)
+    `);
+  const quantity = 1;
+  const info = stmt.run(tableId, quantity, amount);
+  return {
+    id: info.lastInsertRowid,
+    amount,
+    quantity
+  };
+}
+const deleteCreditTable = async (tableId) => {
+  db.prepare("BEGIN TRANSACTION").run();
+  try {
+    db.prepare("DELETE FROM credits_rows WHERE table_id = ?").run(tableId);
+    db.prepare("DELETE FROM credits_tables WHERE id = ?").run(tableId);
+    db.prepare("COMMIT").run();
+    return true;
+  } catch (error) {
+    db.prepare("ROLLBACK").run();
+    throw error;
+  }
+};
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -683,6 +788,54 @@ ipcMain.handle("getOtherMoneyCreditsFromId", async (_event, id) => {
     return getOtherMoneyCreditsFromId(id);
   } catch (error) {
     console.error("Error when fetching creditTableFromId", error);
+  }
+});
+ipcMain.handle("addCreditRow", async (_event, tableId, amount, quantity) => {
+  try {
+    return addCreditRow(tableId, amount, quantity);
+  } catch (error) {
+    console.error("Error when adding credit row", error);
+    throw error;
+  }
+});
+ipcMain.handle("updateCreditRow", async (_event, rowId, quantity) => {
+  try {
+    return updateCreditRow(rowId, quantity);
+  } catch (error) {
+    console.error("Error when updating credit row", error);
+    throw error;
+  }
+});
+ipcMain.handle("updateOtherCreditRow", async (_event, rowId, amount) => {
+  try {
+    return updateOtherCreditRow(rowId, amount);
+  } catch (error) {
+    console.error("Error when updating other credit row", error);
+    throw error;
+  }
+});
+ipcMain.handle("deleteCreditRow", async (_event, rowId) => {
+  try {
+    return deleteCreditRow(rowId);
+  } catch (error) {
+    console.error("Error when deleting credit row", error);
+    throw error;
+  }
+});
+ipcMain.handle("addOtherCreditRow", async (_event, groupId, amount) => {
+  try {
+    return addOtherCreditRow(groupId, amount);
+  } catch (error) {
+    console.error("Error when adding other credit row", error);
+    throw error;
+  }
+});
+ipcMain.handle("deleteCreditTable", async (_event, tableId) => {
+  try {
+    return deleteCreditTable(tableId);
+  } catch (error) {
+    console.error("Error when deleting credit table", error);
+    throw error;
   }
 });
 app.on("window-all-closed", () => {

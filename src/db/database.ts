@@ -6,7 +6,7 @@ import {Orientation} from "../types/sort/Orientation.ts";
 import {SummaryProperty} from "../types/summary/SummaryProperty.ts";
 import dayjs from "dayjs";
 import {Credit} from "../types/detailed-credits/Credit.ts";
-import {CreditTable} from "../types/detailed-credits/CreditTable.ts";
+import {CreditTable, CreditTableRow} from "../types/detailed-credits/CreditTable.ts";
 import {MoneyType} from "../types/detailed-credits/MoneyType.ts";
 
 const require = createRequire(import.meta.url);
@@ -321,13 +321,13 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
         SELECT
             cg.id AS group_id,
             cg.title AS group_title,
-            JSON_GROUP_ARRAY(DISTINCT ct.id) AS table_ids,
-            JSON_GROUP_ARRAY(DISTINCT ct.type) AS table_types,
-            SUM(cr.quantity * cr.amount) AS total_amount
+            JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.id, 0)) AS table_ids,
+            JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.type, 0)) AS table_types,
+            COALESCE(SUM(cr.quantity * cr.amount), 0) AS total_amount
         FROM
             credits_groups cg
-                JOIN credits_tables ct ON cg.id = ct.group_id
-                JOIN credits_rows cr ON ct.id = cr.table_id
+                LEFT JOIN credits_tables ct ON cg.id = ct.group_id
+                LEFT JOIN credits_rows cr ON ct.id = cr.table_id
     `;
     const queryParams: any[] = [];
 
@@ -357,8 +357,8 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
         id: row.group_id,
         title: row.group_title,
         tableIds: JSON.parse(row.table_ids) as number[],
-        types: JSON.parse(row.table_types) as MoneyType[],
-        totalAmount: row.total_amount,
+        types: [...(JSON.parse(row.table_types) as MoneyType[]).filter(type => type !== MoneyType.Other), MoneyType.Other],
+        totalAmount: row.total_amount || 0,
     }));
 }
 
@@ -379,17 +379,36 @@ export function getCreditTableFromId(id: number): CreditTable {
         JOIN credits_tables ct ON cr.table_id = ct.id
         WHERE ct.id = ?
     `;
-    const stmt = db.prepare(query);
-    const rows = stmt.all(id);
+    let stmt = db.prepare(query);
+    let rows = stmt.all(id);
 
-    return {
-        type: rows.length > 0 ? rows[0].table_type : "",
-        rows: rows.map((row: any) => ({
-            id: row.row_id,
-            quantity: row.quantity,
-            amount: row.amount,
-        }))
-    };
+    if (rows.length === 0) {
+        const query = `
+            SELECT
+                ct.type AS table_type
+            FROM credits_tables ct
+            WHERE ct.id = ?
+        `;
+        stmt = db.prepare(query);
+        rows = stmt.all(id);
+        if (rows.length === 0) {
+            throw new Error(`Credit table with ID ${id} not found`);
+        }
+
+        return {
+            type: rows[0].table_type,
+            rows: []
+        }
+    } else {
+        return {
+            type: rows[0].table_type,
+            rows: rows.map((row: any) => ({
+                id: row.row_id,
+                quantity: row.quantity,
+                amount: row.amount,
+            }))
+        };
+    }
 }
 
 /**
@@ -418,3 +437,148 @@ export function getOtherMoneyCreditsFromId(id: number): CreditTable {
         }))
     };
 }
+
+/**
+ * Adds a new row to a credit table.
+ * 
+ * @param {number} tableId - The ID of the credit table where the row should be added.
+ * @param {number} amount - The denomination amount to add.
+ * @param {number} quantity - The quantity of the denomination.
+ * @returns {CreditTableRow} The newly created row with its ID.
+ */
+export function addCreditRow(tableId: number, amount: number, quantity: number): CreditTableRow {
+    // Check if the amount already exists in this table
+    const checkStmt = db.prepare(`
+        SELECT id FROM credits_rows 
+        WHERE table_id = ? AND amount = ?
+    `);
+    const existing = checkStmt.get(tableId, amount);
+    
+    if (existing) {
+        throw new Error(`A row with amount ${amount} already exists in this table`);
+    }
+    
+    const stmt = db.prepare(`
+        INSERT INTO credits_rows (table_id, quantity, amount)
+        VALUES (?, ?, ?)
+    `);
+    
+    const info = stmt.run(tableId, quantity, amount);
+    
+    return {
+        id: info.lastInsertRowid as number,
+        amount,
+        quantity
+    };
+}
+
+/**
+ * Updates the quantity of an existing credit row.
+ * 
+ * @param {number} rowId - The ID of the credit row to update.
+ * @param {number} quantity - The new quantity value.
+ * @returns {boolean} True if the update was successful.
+ */
+export function updateCreditRow(rowId: number, quantity: number): boolean {
+    const stmt = db.prepare(`
+        UPDATE credits_rows
+        SET quantity = ?
+        WHERE id = ?
+    `);
+    
+    const info = stmt.run(quantity, rowId);
+    return info.changes > 0;
+}
+
+/**
+ * Updates the amount of an "other" credit row.
+ * 
+ * @param {number} rowId - The ID of the credit row to update.
+ * @param {number} amount - The new amount value.
+ * @returns {boolean} True if the update was successful.
+ */
+export function updateOtherCreditRow(rowId: number, amount: number): boolean {
+    const stmt = db.prepare(`
+        UPDATE credits_rows
+        SET amount = ?
+        WHERE id = ?
+    `);
+    
+    const info = stmt.run(amount, rowId);
+    return info.changes > 0;
+}
+
+/**
+ * Deletes a credit row from the database.
+ * 
+ * @param {number} rowId - The ID of the credit row to delete.
+ * @returns {boolean} True if the deletion was successful.
+ */
+export function deleteCreditRow(rowId: number): boolean {
+    const stmt = db.prepare(`
+        DELETE FROM credits_rows
+        WHERE id = ?
+    `);
+    
+    const info = stmt.run(rowId);
+    return info.changes > 0;
+}
+
+/**
+ * Adds a new row to the "other" credit table type.
+ * 
+ * @param {number} groupId - The ID of the credit group.
+ * @param {number} amount - The amount to add.
+ * @returns {CreditTableRow} The newly created row with its ID.
+ */
+export function addOtherCreditRow(groupId: number, amount: number): CreditTableRow {
+    // First, check if there's an "other" type table for this group, if not create one
+    const checkTableStmt = db.prepare(`
+        SELECT id FROM credits_tables 
+        WHERE group_id = ? AND type = ?
+    `);
+    
+    let tableId: number;
+    const existingTable = checkTableStmt.get(groupId, MoneyType.Other);
+    
+    if (existingTable) {
+        tableId = existingTable.id;
+    } else {
+        // Create new "other" table
+        const createTableStmt = db.prepare(`
+            INSERT INTO credits_tables (group_id, type)
+            VALUES (?, ?)
+        `);
+        const tableInfo = createTableStmt.run(groupId, MoneyType.Other);
+        tableId = tableInfo.lastInsertRowid as number;
+    }
+    
+    // Now add the row to the table
+    const stmt = db.prepare(`
+        INSERT INTO credits_rows (table_id, quantity, amount)
+        VALUES (?, ?, ?)
+    `);
+    
+    // For "other" type, quantity is always 1
+    const quantity = 1;
+    const info = stmt.run(tableId, quantity, amount);
+    
+    return {
+        id: info.lastInsertRowid as number,
+        amount,
+        quantity
+    };
+}
+
+export const deleteCreditTable = async (tableId: number) => {
+    db.prepare('BEGIN TRANSACTION').run();
+    try {
+        db.prepare('DELETE FROM credits_rows WHERE table_id = ?').run(tableId);
+        db.prepare('DELETE FROM credits_tables WHERE id = ?').run(tableId);
+        db.prepare('COMMIT').run();
+        return true;
+    } catch (error) {
+        db.prepare('ROLLBACK').run();
+        throw error;
+    }
+};

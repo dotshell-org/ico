@@ -2,10 +2,11 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import {
+  addCreditRow, addOtherCreditRow, deleteCreditRow, deleteCreditTable,
   getCredits, getCreditsList,
   getCreditsSumByCategory, getCreditTableFromId,
   getDebits, getDebitsSumByCategory, getOtherMoneyCreditsFromId,
-  getTransactionsByMonth
+  getTransactionsByMonth, updateCreditRow, updateOtherCreditRow
 } from "../src/db/database.ts";
 import { Filter } from "../src/types/filter/Filter.ts"
 import { Sort } from "../src/types/sort/Sort.ts"
@@ -117,6 +118,61 @@ ipcMain.handle("getOtherMoneyCreditsFromId", async (_event, id: number) => {
     console.error("Error when fetching creditTableFromId", error);
   }
 })
+
+ipcMain.handle("addCreditRow", async (_event, tableId: number, amount: number, quantity: number) => {
+  try {
+    return addCreditRow(tableId, amount, quantity);
+  } catch (error) {
+    console.error("Error when adding credit row", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("updateCreditRow", async (_event, rowId: number, quantity: number) => {
+  try {
+    return updateCreditRow(rowId, quantity);
+  } catch (error) {
+    console.error("Error when updating credit row", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("updateOtherCreditRow", async (_event, rowId: number, amount: number) => {
+  try {
+    return updateOtherCreditRow(rowId, amount);
+  } catch (error) {
+    console.error("Error when updating other credit row", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("deleteCreditRow", async (_event, rowId: number) => {
+  try {
+    return deleteCreditRow(rowId);
+  } catch (error) {
+    console.error("Error when deleting credit row", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("addOtherCreditRow", async (_event, groupId: number, amount: number) => {
+  try {
+    return addOtherCreditRow(groupId, amount);
+  } catch (error) {
+    console.error("Error when adding other credit row", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("deleteCreditTable", async (_event, tableId: number) => {
+  try {
+    return deleteCreditTable(tableId);
+  } catch (error) {
+    console.error("Error when deleting credit table", error);
+    throw error;
+  }
+});
+
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
