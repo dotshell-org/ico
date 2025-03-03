@@ -59,6 +59,7 @@
     "p_debit": "Vous avez actuellement {categories} catégories répertoriées dans vos \uD83D\uDCC9<strong>Débits</strong> pour les 12 derniers mois, représentant un montant cumulé de {amount}",
     "p_profit": "Vous avez réalisé un ⚖\uFE0F<strong>Bénéfice</strong> total de {amount} pour les 12 derniers mois, réparti sur {categories} catégories.",
 
+    "type": "\uD83D\uDDC3\uFE0F Type",
     "raw_tables_types": "Types des Tableaux",
     "raw_total_amount": "Montant total",
 
@@ -68,6 +69,7 @@
     "money_other": "\uD83D\uDCB3\uFE0F Autre",
 
     "raw_new": "Nouveau",
+    "raw_new_table": "Nouveau Tableau",
 
     "raw_confirm_delete_table": "Êtes-vous sûr de vouloir supprimer ce tableau ?"
 

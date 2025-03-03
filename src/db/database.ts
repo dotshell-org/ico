@@ -321,6 +321,7 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
         SELECT
             cg.id AS group_id,
             cg.title AS group_title,
+            cg.date AS group_date,
             JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.id, 0)) AS table_ids,
             JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.type, 0)) AS table_types,
             COALESCE(SUM(cr.quantity * cr.amount), 0) AS total_amount
@@ -356,6 +357,7 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
     return rows.map((row: any) => ({
         id: row.group_id,
         title: row.group_title,
+        date: row.group_date,
         tableIds: JSON.parse(row.table_ids) as number[],
         types: [...(JSON.parse(row.table_types) as MoneyType[]).filter(type => type !== MoneyType.Other), MoneyType.Other],
         totalAmount: row.total_amount || 0,
@@ -582,3 +584,33 @@ export const deleteCreditTable = async (tableId: number) => {
         throw error;
     }
 };
+
+/**
+ * Updates the credit date for a specific credit group in the database.
+ *
+ * @param {number} creditId - The unique identifier of the credit group to update.
+ * @param {string} newDate - The new date to be set for the credit group in ISO 8601 format.
+ * @return {object} An object containing the result of the database update operation.
+ */
+export function updateCreditDate(creditId: number, newDate: string) {
+    const stmt = db.prepare(`
+    UPDATE credits_groups
+    SET date = ?
+    WHERE id = ?
+  `);
+    return stmt.run(newDate, creditId);
+}
+
+/**
+ * Adds a credit table entry to the database for the specified group and money type.
+ *
+ * @param {number} groupId - The ID of the group to associate with the credit table entry.
+ * @param {MoneyType} type - The type of money associated with the credit table entry.
+ * @return {object} An object containing the ID of the last inserted row in the database.
+ */
+export function addCreditTable(groupId: number, type: MoneyType): number {
+    const stmt = db.prepare("INSERT INTO credits_tables (group_id, type) VALUES (?, ?)");
+    stmt.run(groupId, type);
+
+    return db.prepare("SELECT last_insert_rowid() AS id").get().id;
+}

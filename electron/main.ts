@@ -2,14 +2,15 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import {
-  addCreditRow, addOtherCreditRow, deleteCreditRow, deleteCreditTable,
+  addCreditRow, addCreditTable, addOtherCreditRow, deleteCreditRow, deleteCreditTable,
   getCredits, getCreditsList,
   getCreditsSumByCategory, getCreditTableFromId,
   getDebits, getDebitsSumByCategory, getOtherMoneyCreditsFromId,
-  getTransactionsByMonth, updateCreditRow, updateOtherCreditRow
+  getTransactionsByMonth, updateCreditDate, updateCreditRow, updateOtherCreditRow
 } from "../src/db/database.ts";
 import { Filter } from "../src/types/filter/Filter.ts"
 import { Sort } from "../src/types/sort/Sort.ts"
+import {MoneyType} from "../src/types/detailed-credits/MoneyType.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -173,6 +174,23 @@ ipcMain.handle("deleteCreditTable", async (_event, tableId: number) => {
   }
 });
 
+ipcMain.handle("updateCreditDate", async (_event, creditId: number, newDate: string) => {
+  try {
+    return updateCreditDate(creditId, newDate);
+  } catch (error) {
+    console.error("Error when updating credit date :", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("addCreditTable", async (_event, creditId: number, tableType: MoneyType) => {
+  try {
+    return addCreditTable(creditId, tableType);
+  } catch (error) {
+    console.error("Error when adding credit table", error);
+    throw error;
+  }
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

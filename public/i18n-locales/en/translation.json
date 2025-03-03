@@ -59,6 +59,7 @@
     "p_debit": "You currently have {categories} categories listed in your \uD83D\uDCC9<strong>Debits</strong> for the last 12 months, amounting to a total of {amount}.",
     "p_profit": "You have achieved a total ⚖\uFE0F<strong>Profit</strong> of {amount} for the last 12 months, distributed across {categories} categories.",
 
+    "type": "\uD83D\uDDC3\uFE0F Type",
     "raw_tables_types": "Tables Types",
     "raw_total_amount": "Total Amount",
 
@@ -68,6 +69,7 @@
     "money_other": "\uD83D\uDCB3\uFE0F Other",
 
     "raw_new": "New",
+    "raw_new_table": "New Table",
 
     "raw_confirm_delete_table": "Are you sure you want to delete this table?"
 

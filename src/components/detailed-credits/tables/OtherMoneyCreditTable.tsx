@@ -4,6 +4,7 @@ import { t } from "i18next";
 import type { CreditTable, CreditTableRow } from "../../../types/detailed-credits/CreditTable.ts";
 import CreditTR from "./CreditTR.tsx";
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import {CheckIcon} from "@heroicons/react/16/solid";
 
 interface CreditTableProps {
     id: number;
@@ -17,7 +18,7 @@ const OtherMoneyCreditTable: React.FC<CreditTableProps> = ({ id }) => {
     const [editAmount, setEditAmount] = useState<number>(0);
 
     useEffect(() => {
-        window.ipcRenderer
+        (window as any).ipcRenderer
             .invoke("getOtherMoneyCreditsFromId", id)
             .then((result: CreditTable) => {
                 setRows(result.rows);
@@ -44,7 +45,7 @@ const OtherMoneyCreditTable: React.FC<CreditTableProps> = ({ id }) => {
     const handleAddRow = () => {
         if (newAmount <= 0) return;
 
-        window.ipcRenderer
+        (window as any).ipcRenderer
             .invoke("addOtherCreditRow", id, newAmount)
             .then((newRow: CreditTableRow) => {
                 setRows([...rows, newRow]);
@@ -59,7 +60,7 @@ const OtherMoneyCreditTable: React.FC<CreditTableProps> = ({ id }) => {
     const handleUpdateRow = (rowId: number) => {
         if (editAmount <= 0) return;
 
-        window.ipcRenderer
+        (window as any).ipcRenderer
             .invoke("updateOtherCreditRow", rowId, editAmount)
             .then(() => {
                 setRows(rows.map(row =>
@@ -73,7 +74,7 @@ const OtherMoneyCreditTable: React.FC<CreditTableProps> = ({ id }) => {
     };
 
     const handleDeleteRow = (rowId: number) => {
-        window.ipcRenderer
+        (window as any).ipcRenderer
             .invoke("deleteCreditRow", rowId)
             .then(() => {
                 setRows(rows.filter(row => row.id !== rowId));
@@ -95,12 +96,12 @@ const OtherMoneyCreditTable: React.FC<CreditTableProps> = ({ id }) => {
                     {rows.map((row) => (
                         <tr key={row.id}>
                             {editingRow === row.id ? (
-                                <td className="w-1/2 border-gray-300 dark:border-gray-700 border text-center p-1.5 text-sm">
+                                <td className="w-1/2 border-gray-300 dark:border-gray-700 border text-center text-sm">
                                     <input
                                         type="number"
                                         step="0.01"
                                         min="0.01"
-                                        className="w-full p-1 border rounded dark:bg-gray-900 dark:border-gray-600"
+                                        className="w-full p-1 border rounded dark:bg-gray-900 dark:border-gray-600 text-center"
                                         value={editAmount}
                                         onChange={(e) => setEditAmount(parseFloat(e.target.value) || 0)}
                                     />
@@ -118,20 +119,12 @@ const OtherMoneyCreditTable: React.FC<CreditTableProps> = ({ id }) => {
                             )}
                             <td className="w-1/2 border-gray-300 dark:border-gray-700 border text-center text-sm">
                                 {editingRow === row.id ? (
-                                    <div className="flex justify-center space-x-2">
-                                        <button
-                                            className="bg-green-500 text-white p-1 rounded text-xs"
-                                            onClick={() => handleUpdateRow(row.id)}
-                                        >
-                                            Save
-                                        </button>
-                                        <button
-                                            className="bg-gray-500 text-white p-1 rounded text-xs"
-                                            onClick={() => setEditingRow(null)}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
+                                    <button
+                                        className="w-full h-full m-0 rounded-none group text-blue-500 bg-white hover:bg-blue-500 dark:bg-gray-950 border-0 hover:text-white transition-colors duration-200"
+                                        onClick={() => handleUpdateRow(row.id)}
+                                    >
+                                        <CheckIcon className="h-4 w-4 mx-auto" />
+                                    </button>
                                 ) : (
                                     <button
                                         className="w-full h-full m-0 rounded-none group text-red-500 bg-white hover:bg-red-500 dark:bg-gray-950 border-0 hover:text-white transition-colors duration-200"
@@ -151,7 +144,7 @@ const OtherMoneyCreditTable: React.FC<CreditTableProps> = ({ id }) => {
                                     type="number"
                                     step="0.01"
                                     min="0.01"
-                                    className="w-full p-1 border rounded dark:bg-gray-900 dark:border-gray-600"
+                                    className="w-full p-1 border rounded dark:bg-gray-900 dark:border-gray-600 text-center"
                                     value={newAmount || ""}
                                     onChange={(e) => setNewAmount(parseFloat(e.target.value) || 0)}
                                     placeholder="Enter amount"
