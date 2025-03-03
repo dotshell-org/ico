@@ -322,6 +322,7 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
             cg.id AS group_id,
             cg.title AS group_title,
             cg.date AS group_date,
+            cg.category AS group_category,
             JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.id, 0)) AS table_ids,
             JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.type, 0)) AS table_types,
             COALESCE(SUM(cr.quantity * cr.amount), 0) AS total_amount
@@ -355,6 +356,7 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
     const rows = stmt.all(...queryParams);
 
     return rows.map((row: any) => ({
+        category: row.group_category,
         id: row.group_id,
         title: row.group_title,
         date: row.group_date,
@@ -613,4 +615,51 @@ export function addCreditTable(groupId: number, type: MoneyType): number {
     stmt.run(groupId, type);
 
     return db.prepare("SELECT last_insert_rowid() AS id").get().id;
+}
+
+/**
+ * Updates the title of a credit group for a given credit ID.
+ *
+ * @param {number} creditId - The unique identifier of the credit group to update.
+ * @param {string} newTitle - The new title to set for the credit group.
+ * @return {number} The number of rows that were updated in the database.
+ */
+export function updateCreditTitle(creditId: number, newTitle: string) {
+    const stmt = db.prepare("UPDATE credits_groups SET title = ? WHERE id = ?");
+    const info = stmt.run(newTitle, creditId);
+    return info.changes;
+}
+
+/**
+ * Updates the category of a credit in the database.
+ *
+ * @param {number} creditId - The unique identifier of the credit to be updated.
+ * @param {string} newCategory - The new category to assign to the credit.
+ * @return {void} This function does not return any value.
+ */
+export function updateCreditCategory(creditId: number, newCategory: string): void {
+    const query = `
+    UPDATE credits_groups
+    SET category = ?
+    WHERE id = ?
+  `;
+    const stmt = db.prepare(query);
+    stmt.run(newCategory, creditId);
+}
+
+/**
+ * Retrieves all distinct categories from the credits_groups database table.
+ *
+ * @return {Array<Object>} An array of objects representing the distinct categories.
+ */
+export function getAllCategories(): string[] {
+    const stmt = db.prepare(`
+        SELECT DISTINCT category 
+        FROM (
+            SELECT category FROM credits_groups
+            UNION
+            SELECT category FROM debits
+        )
+    `);
+    return stmt.all().map((row: any) => row.category);
 }

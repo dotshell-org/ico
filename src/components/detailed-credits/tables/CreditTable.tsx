@@ -9,13 +9,14 @@ import {CheckIcon} from "@heroicons/react/16/solid";
 
 interface CreditTableProps {
     id: number;
+    handleRemoveTable: (id: number) => void;
 }
 
-const CreditTable: React.FC<CreditTableProps> = ({ id }) => {
+const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
     const [rows, setRows] = useState<CreditTableRow[]>([]);
     const [type, setType] = useState<MoneyType>(MoneyType.Other);
     const [isAdding, setIsAdding] = useState<boolean>(false);
-    const [newAmount, setNewAmount] = useState<number | null>(null);
+    const [newAmount, setNewAmount] = useState<number>(0);
     const [newQuantity, setNewQuantity] = useState<number>(1);
     const [editingRow, setEditingRow] = useState<number | null>(null);
 
@@ -101,7 +102,7 @@ const CreditTable: React.FC<CreditTableProps> = ({ id }) => {
             .then((newRow: CreditTableRow) => {
                 setRows([...rows, newRow].sort((a, b) => b.amount - a.amount));
                 setIsAdding(false);
-                setNewAmount(null);
+                setNewAmount(0);
                 setNewQuantity(1);
             })
             .catch((error: any) => {
@@ -136,17 +137,21 @@ const CreditTable: React.FC<CreditTableProps> = ({ id }) => {
 
     const handleDeleteTable = () => {
         if (window.confirm(t('raw_confirm_delete_table'))) {
-            (window as any).ipcRenderer
-                .invoke("deleteCreditTable", id)
-                .then(() => {
-                    setType(MoneyType.Other); // Hide current table
-                })
-                .catch((error: any) => {
-                    console.error("Error deleting table", error);
-                });
+          // First remove from UI to maintain responsiveness
+          handleRemoveTable(id);
+          
+          // Then delete from database
+          (window as any).ipcRenderer
+            .invoke("deleteCreditTable", id)
+            .then(() => {
+              console.log("Table deleted successfully!");
+            })
+            .catch((error: any) => {
+              console.error("Error deleting table", error);
+              // Could add logic to restore the table in UI if deletion fails
+            });
         }
     };
-
 
     return (
         type !== MoneyType.Other && <>
@@ -242,16 +247,30 @@ const CreditTable: React.FC<CreditTableProps> = ({ id }) => {
                     {isAdding && (
                         <tr>
                             <td className="border-gray-300 dark:border-gray-700 border text-center p-0 text-sm">
-                                <select
-                                    className="w-24 p-1 border rounded dark:bg-gray-800 dark:border-gray-600"
-                                    value={newAmount || ""}
-                                    onChange={(e) => setNewAmount(parseFloat(e.target.value))}
-                                >
-                                    <option value="">Select</option>
-                                    {availableDenominations.map((denom) => (
-                                        <option key={denom} value={denom}>€{denom.toFixed(2)}</option>
-                                    ))}
-                                </select>
+                                {
+                                    type === MoneyType.Cheques ? (
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            className="w-full p-1 pl-5 border rounded dark:bg-gray-900 dark:border-gray-600 text-center"
+                                            value={newAmount || 0}
+                                            onChange={(e) => {
+                                                setNewAmount(parseFloat(e.target.value));
+                                            }}
+                                        />
+                                    ) : (
+                                        <select
+                                                className="w-24 p-1 border rounded dark:bg-gray-800 dark:border-gray-600"
+                                                value={newAmount || ""}
+                                            onChange={(e) => setNewAmount(parseFloat(e.target.value))}
+                                        >
+                                            <option value="">Select</option>
+                                            {availableDenominations.map((denom) => (
+                                                <option key={denom} value={denom}>€{denom.toFixed(2)}</option>
+                                            ))}
+                                        </select>
+                                    )
+                                }
                             </td>
                             <td className="border-gray-300 dark:border-gray-700 border text-center p-0 text-sm">
                                 <input

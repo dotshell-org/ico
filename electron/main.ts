@@ -2,11 +2,24 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import {
-  addCreditRow, addCreditTable, addOtherCreditRow, deleteCreditRow, deleteCreditTable,
-  getCredits, getCreditsList,
-  getCreditsSumByCategory, getCreditTableFromId,
-  getDebits, getDebitsSumByCategory, getOtherMoneyCreditsFromId,
-  getTransactionsByMonth, updateCreditDate, updateCreditRow, updateOtherCreditRow
+  addCreditRow,
+  addCreditTable,
+  addOtherCreditRow,
+  deleteCreditRow,
+  deleteCreditTable, getAllCategories,
+  getCredits,
+  getCreditsList,
+  getCreditsSumByCategory,
+  getCreditTableFromId,
+  getDebits,
+  getDebitsSumByCategory,
+  getOtherMoneyCreditsFromId,
+  getTransactionsByMonth,
+  updateCreditCategory,
+  updateCreditDate,
+  updateCreditRow,
+  updateCreditTitle,
+  updateOtherCreditRow
 } from "../src/db/database.ts";
 import { Filter } from "../src/types/filter/Filter.ts"
 import { Sort } from "../src/types/sort/Sort.ts"
@@ -189,6 +202,32 @@ ipcMain.handle("addCreditTable", async (_event, creditId: number, tableType: Mon
   } catch (error) {
     console.error("Error when adding credit table", error);
     throw error;
+  }
+})
+
+ipcMain.handle("updateCreditTitle", async (_event, creditId: number, newTitle: string) => {
+  try {
+    return updateCreditTitle(creditId, newTitle);
+  } catch (error) {
+    console.error("Error when updating the title:", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("updateCreditCategory", async (_event, creditId: number, newCategory: string) => {
+  try {
+    return updateCreditCategory(creditId, newCategory);
+  } catch (error) {
+    console.error("Error when updating credit category", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("getAllCategories", async (_event) => {
+  try {
+    return getAllCategories();
+  } catch (error) {
+    console.error("Error when fetching all categories", error);
   }
 })
 

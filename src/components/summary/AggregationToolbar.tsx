@@ -92,7 +92,7 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
             <div className="px-3 overflow-x-auto">
                 {Object.entries(frequency).map(([category, count]) => (
                     <div key={category} className="inline-block mr-4">
-                        <strong>{category}:</strong> {count}
+                        <strong>{category == "" ? t("raw_other") : category}:</strong> {count}
                     </div>
                 ))}
             </div>

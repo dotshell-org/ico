@@ -8,6 +8,7 @@ import AggregationToolbar from "../../components/summary/AggregationToolbar";
 import { Filter } from "../../types/filter/Filter.ts";
 import { Sort } from "../../types/sort/Sort.ts";
 import { SummaryObject } from "../../types/summary/SummaryObject.ts";
+import {t} from "i18next";
 
 interface SummaryProps {
     title: string;
@@ -132,7 +133,7 @@ function Summary({ title, objects, filters, sorts, onFilterAdded, onFilterRemove
                             onClick={(event) => handleCellClick(event, SummaryPropertyIndex.Amount, index, credit.id)}
                         />
                         <SummaryTR
-                            content={credit.category}
+                            content={credit.category == "" ? t("raw_other") : credit.category}
                             isSelected={selectedColumn === SummaryPropertyIndex.Category && selectedRows.includes(credit.id)}
                             onClick={(event) => handleCellClick(event, SummaryPropertyIndex.Category, index, credit.id)}
                         />

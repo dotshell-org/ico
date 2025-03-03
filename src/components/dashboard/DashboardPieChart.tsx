@@ -59,7 +59,7 @@ const DashboardPieChart: React.FC<CustomPieChartProps> = ({ type }) => {
         const finalData = [];
         for (let i = 0; i < data.categories.length; i++) {
             finalData.push({
-                label: data.categories[i],
+                label: data.categories[i] == "" ? t("raw_other") : data.categories[i],
                 value: data.values[i],
             });
         }

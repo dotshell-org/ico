@@ -145,7 +145,7 @@ const OtherMoneyCreditTable: React.FC<CreditTableProps> = ({ id }) => {
                                     step="0.01"
                                     min="0.01"
                                     className="w-full p-1 border rounded dark:bg-gray-900 dark:border-gray-600 text-center"
-                                    value={newAmount || ""}
+                                    value={newAmount}
                                     onChange={(e) => setNewAmount(parseFloat(e.target.value) || 0)}
                                     placeholder="Enter amount"
                                 />
