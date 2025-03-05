@@ -29,6 +29,7 @@
     "raw_title": "Titre",
     "raw_amount": "Montant",
     "raw_category": "Catégorie",
+    "raw_quantity": "Quantité",
 
     "raw_days": "jours",
     "raw_month": "Mois",
@@ -62,6 +63,9 @@
     "type": "\uD83D\uDDC3\uFE0F Type",
     "raw_tables_types": "Types des Tableaux",
     "raw_total_amount": "Montant total",
+    "raw_total": "Total",
+    "raw_weight": "Poids",
+    "raw_actions": "Actions",
 
     "coins": "\uD83E\uDE99 Pièces",
     "banknotes": "\uD83D\uDCB5 Billets",

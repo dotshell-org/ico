@@ -136,21 +136,18 @@ const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
     };
 
     const handleDeleteTable = () => {
-        if (window.confirm(t('raw_confirm_delete_table'))) {
-          // First remove from UI to maintain responsiveness
-          handleRemoveTable(id);
-          
-          // Then delete from database
-          (window as any).ipcRenderer
+        // First remove from UI to maintain responsiveness
+        handleRemoveTable(id);
+
+        // Then delete from database
+        (window as any).ipcRenderer
             .invoke("deleteCreditTable", id)
             .then(() => {
-              console.log("Table deleted successfully!");
+                console.log("Table deleted successfully!");
             })
             .catch((error: any) => {
-              console.error("Error deleting table", error);
-              // Could add logic to restore the table in UI if deletion fails
+                console.error("Error deleting table", error);
             });
-        }
     };
 
     return (
@@ -168,19 +165,19 @@ const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
                 <thead>
                     {type === MoneyType.Coins && (
                         <tr>
-                            <CreditTH content="Amount" />
-                            <CreditTH content="Quantity" />
-                            <CreditTH content="Total" />
-                            <CreditTH content="Weight" />
-                            <CreditTH className="w-10" content="Actions" />
+                            <CreditTH content={t("raw_amount")} />
+                            <CreditTH content={t("raw_quantity")} />
+                            <CreditTH content={t("raw_total")} />
+                            <CreditTH content={t("raw_weight")} />
+                            <CreditTH className="w-10" content={t("raw_actions")} />
                         </tr>
                     )}
                     {(type === MoneyType.Banknotes || type === MoneyType.Cheques) && (
                         <tr>
-                            <CreditTH content="Amount" />
-                            <CreditTH content="Quantity" />
-                            <CreditTH content="Total" />
-                            <CreditTH className="w-10" content="Actions" />
+                            <CreditTH content={t("raw_amount")} />
+                            <CreditTH content={t("raw_quantity")} />
+                            <CreditTH content={t("raw_total")} />
+                            <CreditTH className="w-10" content={t("raw_actions")} />
                         </tr>
                     )}
                 </thead>

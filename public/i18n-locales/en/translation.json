@@ -29,6 +29,7 @@
     "raw_title": "Title",
     "raw_amount": "Amount",
     "raw_category": "Category",
+    "raw_quantity": "Quantity",
 
     "raw_days": "days",
     "raw_month": "Month",
@@ -62,6 +63,9 @@
     "type": "\uD83D\uDDC3\uFE0F Type",
     "raw_tables_types": "Tables Types",
     "raw_total_amount": "Total Amount",
+    "raw_total": "Total",
+    "raw_weight": "Weight",
+    "raw_actions": "Actions",
 
     "coins": "\uD83E\uDE99 Coins",
     "banknotes": "\uD83D\uDCB5 Banknotes",

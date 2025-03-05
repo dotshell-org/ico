@@ -15,7 +15,6 @@ function isValidDate(dateString: string): boolean {
 }
 
 const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
-    // States
     const [dateValue, setDateValue] = useState<string>(credit.date);
     const [titleValue, setTitleValue] = useState<string>(credit.title);
     const [tableIds, setTableIds] = useState<number[]>(credit.tableIds);
@@ -23,48 +22,42 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
     const [categoryValue, setCategoryValue] = useState<string>(credit.category);
     const [allCategories, setAllCategories] = useState<string[]>([]);
 
+    // Effect pour la mise à jour de la date
     useEffect(() => {
-        if (dateValue !== credit.date) {
-            const updateDate = async () => {
+        const updateDate = async () => {
+            if (dateValue !== credit.date) {
                 try {
-                    await (window as any).ipcRenderer.invoke("updateCreditDate", credit.id, dateValue);
+                    await window.ipcRenderer.invoke("updateCreditDate", credit.id, dateValue);
                     console.log("Date updated successfully!");
                 } catch (error) {
                     console.error("Error when updating the date:", error);
                 }
-            };
-
-            updateDate();
-        }
+            }
+        };
+        updateDate();
     }, [dateValue, credit.id, credit.date]);
 
+    // Effect pour la mise à jour du titre
     useEffect(() => {
-        if (titleValue !== credit.title) {
-            const updateTitle = async () => {
+        const updateTitle = async () => {
+            if (titleValue !== credit.title) {
                 try {
-                    await (window as any).ipcRenderer.invoke("updateCreditTitle", credit.id, titleValue);
+                    await window.ipcRenderer.invoke("updateCreditTitle", credit.id, titleValue);
                     console.log("Title updated successfully!");
                 } catch (error) {
                     console.error("Error when updating the title:", error);
                 }
-            };
-
-            updateTitle();
-        }
+            }
+        };
+        updateTitle();
     }, [titleValue, credit.id, credit.title]);
 
-    useEffect(() => {
-        setTableIds(credit.tableIds);
-    }, [credit.tableIds]);
+    // Effects de synchronisation avec les props
+    useEffect(() => setTableIds(credit.tableIds), [credit.tableIds]);
+    useEffect(() => setDateValue(credit.date), [credit.date]);
+    useEffect(() => setTitleValue(credit.title), [credit.title]);
 
-    useEffect(() => {
-        setDateValue(credit.date);
-    }, [credit.date]);
-
-    useEffect(() => {
-        setTitleValue(credit.title);
-    }, [credit.title]);
-
+    // Handlers
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newDate = e.target.value;
         if (isValidDate(newDate)) {
@@ -75,43 +68,46 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
         }
     };
 
-
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTitleValue(e.target.value);
     };
 
-    const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCategoryChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newCategory = e.target.value;
-        (window as any).ipcRenderer
-            .invoke("updateCreditCategory", credit.id, newCategory)
-            .then(() => {
-                console.log("Category updated successfully!");
-                setCategoryValue(newCategory);
-            })
-            .catch((error: any) => {
-                console.error("Error when updating the category:", error);
-            });
+        try {
+            await window.ipcRenderer.invoke("updateCreditCategory", credit.id, newCategory);
+            console.log("Category updated successfully!");
+            setCategoryValue(newCategory);
+        } catch (error) {
+            console.error("Error when updating the category:", error);
+        }
     };
 
     const handleAddNewTable = async () => {
         try {
-            const newTableId = await (window as any).ipcRenderer.invoke("addCreditTable", credit.id, selectedTableType);
+            const newTableId = await window.ipcRenderer.invoke(
+                "addCreditTable",
+                credit.id,
+                selectedTableType
+            );
             console.log("New table created with id:", newTableId);
-            setTableIds((prevTableIds) => [...prevTableIds, newTableId]);
+            setTableIds(prevTableIds => [...prevTableIds, newTableId]);
         } catch (error) {
             console.error("Error when creating a new table:", error);
         }
     };
 
+    // Effect pour charger les catégories
     useEffect(() => {
-        window.ipcRenderer
-            .invoke("getAllCategories")
-            .then((categories: string[]) => {
+        const loadCategories = async () => {
+            try {
+                const categories = await window.ipcRenderer.invoke("getAllCategories");
                 setAllCategories(categories);
-            })
-            .catch((error: any) => {
-                console.error("Error when getting categories", error);
-            });
+            } catch (error) {
+                console.error("Error loading categories:", error);
+            }
+        };
+        loadCategories();
     }, []);
 
     return (
@@ -176,7 +172,7 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
             <button
                 type="button"
                 onClick={handleAddNewTable}
-                className="mb-5 p-1 w-full text-sm bg-transparent hover:bg-blue-500 border border-blue-500 text-white rounded transition-all duration-300"
+                className="mb-5 p-1 w-full text-sm bg-transparent hover:bg-blue-500 border border-blue-500 text-blue-500 hover:text-white rounded transition-all duration-300"
             >
                 {t("raw_new_table")}
             </button>
