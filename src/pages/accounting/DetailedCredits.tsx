@@ -7,10 +7,10 @@ import CreditMiniatureRow from "../../components/detailed-credits/CreditMiniatur
 import {Credit} from "../../types/detailed-credits/Credit.ts";
 
 interface DetailedCreditsProps {
-    onCreditMiniatureRowClicked: (credit: Credit) => void;
+    handleCreditMiniatureRowClicked: (credit: Credit) => void;
 }
 
-const DetailedCredits: React.FC<DetailedCreditsProps> = ({ onCreditMiniatureRowClicked }) => {
+const DetailedCredits: React.FC<DetailedCreditsProps> = ({ handleCreditMiniatureRowClicked }) => {
     const [filters, setFilters] = useState<Filter[]>([]);
     const [sorts, setSorts] = useState<Sort[]>([]);
     const [credits, setCredits] = useState<Credit[]>([]);
@@ -40,6 +40,28 @@ const DetailedCredits: React.FC<DetailedCreditsProps> = ({ onCreditMiniatureRowC
             });
     }, [filters, sorts]);
 
+    const handleNewCredit = () => {
+        (window as any).ipcRenderer
+            .invoke("addCreditGroup", t("raw_new_credit"), t("raw_other"))
+            .then((result: Credit) => {
+                setCredits(prev => [...prev, result]);
+            })
+            .catch((error: any) => {
+                console.error("Error when fetching credits", error);
+            });
+    }
+
+    const handleCreditDeleted = (creditId: number) => {
+        (window as any).ipcRenderer
+            .invoke("deleteCreditGroup", creditId)
+            .then(() => {
+                setCredits(credits.filter(credit => credit.id !== creditId));
+            })
+            .catch((error: any) => {
+                console.error("Error when fetching credits", error);
+            })
+    }
+    
     return (
         <>
             <div className="fixed left-10 right-10 top-16 bg-white dark:bg-gray-950 pt-10">
@@ -57,15 +79,27 @@ const DetailedCredits: React.FC<DetailedCreditsProps> = ({ onCreditMiniatureRowC
                     <div className="w-[20%]">
                         {t("raw_total_amount")}
                     </div>
+                    <div className="w-10">
+
+                    </div>
                 </td>
             </div>
+
             <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-copy mt-36 ">
                 {
                     credits.map((credit) => (
-                        <CreditMiniatureRow credit={credit} onClick={onCreditMiniatureRowClicked} />
+                        <CreditMiniatureRow key={credit.id} credit={credit} onClick={handleCreditMiniatureRowClicked} onDelete={handleCreditDeleted} />
                     ))
                 }
             </table>
+
+            <button
+                type="button"
+                onClick={handleNewCredit}
+                className="mt-5 mb-16 p-1 w-full text-sm bg-transparent hover:bg-blue-500 border border-blue-500 text-blue-500 hover:text-white rounded transition-all duration-300"
+            >
+                {t("raw_new")}
+            </button>
         </>
     );
 }

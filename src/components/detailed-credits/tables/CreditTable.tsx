@@ -103,7 +103,7 @@ const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
                 setRows([...rows, newRow].sort((a, b) => b.amount - a.amount));
                 setIsAdding(false);
                 setNewAmount(0);
-                setNewQuantity(1);
+                setNewQuantity(0);
             })
             .catch((error: any) => {
                 console.error("Error adding new row", error);
@@ -276,7 +276,7 @@ const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
                                     className="w-full p-1 pl-5 border rounded dark:bg-gray-900 dark:border-gray-600 text-center"
                                     value={newQuantity}
                                     onChange={(e) => {
-                                        setNewQuantity(parseInt(e.target.value) || 1);
+                                        setNewQuantity(parseInt(e.target.value) || 0);
                                     }}
                                 />
                             </td>

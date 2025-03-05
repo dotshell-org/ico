@@ -663,3 +663,41 @@ export function getAllCategories(): string[] {
     `);
     return stmt.all().map((row: any) => row.category);
 }
+
+/**
+ * Adds a new credit group to the database with the specified title and category.
+ *
+ * @param {string} title - The title of the credit group to add.
+ * @param {string} category - The category of the credit group to associate with.
+ * @return {void} This method does not return a value.
+ */
+export function addCreditGroup(title: string, category: string): Credit {
+    const stmt = db.prepare(`
+        INSERT INTO credits_groups (title, date, category)
+        VALUES (?, ?, ?)
+    `);
+    stmt.run(title, dayjs().toISOString(), category);
+
+    return {
+        category,
+        id: db.prepare("SELECT last_insert_rowid() AS id").get().id,
+        title,
+        date: dayjs().toISOString(),
+        tableIds: [],
+        types: [MoneyType.Other],
+        totalAmount: 0,
+    };
+}
+
+export function deleteCreditGroup(creditId: number) {
+    db.prepare('BEGIN TRANSACTION').run();
+    try {
+        db.prepare('DELETE FROM credits_rows WHERE table_id IN (SELECT id FROM credits_tables WHERE group_id = ?)').run(creditId);
+        db.prepare('DELETE FROM credits_tables WHERE group_id = ?').run(creditId);
+        db.prepare('DELETE FROM credits_groups WHERE id = ?').run(creditId);
+        db.prepare('COMMIT').run();
+        return true;
+    } catch (error) {
+        db.prepare('ROLLBACK').run();
+    }
+}

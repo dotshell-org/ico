@@ -2,9 +2,10 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import {
+  addCreditGroup,
   addCreditRow,
   addCreditTable,
-  addOtherCreditRow,
+  addOtherCreditRow, deleteCreditGroup,
   deleteCreditRow,
   deleteCreditTable, getAllCategories,
   getCredits,
@@ -228,6 +229,21 @@ ipcMain.handle("getAllCategories", async (_event) => {
     return getAllCategories();
   } catch (error) {
     console.error("Error when fetching all categories", error);
+  }
+});
+
+ipcMain.handle("addCreditGroup", async (_event, title: string, category: string) => {
+  try {
+    return addCreditGroup(title, category);
+  } catch (error) {
+    console.error("Error when adding credit group", error);
+  }
+})
+ipcMain.handle("deleteCreditGroup", async (_event, groupId: number) => {
+  try {
+    return deleteCreditGroup(groupId);
+  } catch (error) {
+    console.error("Error when deleting credit group", error);
   }
 })
 

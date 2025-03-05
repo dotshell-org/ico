@@ -97,7 +97,6 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
         }
     };
 
-    // Effect pour charger les catégories
     useEffect(() => {
         const loadCategories = async () => {
             try {

@@ -12,7 +12,7 @@ import {Credit} from "./types/detailed-credits/Credit.ts";
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
-  const [creditInEditor, setCreditInEditor] = useState<Credit>({id: 0, title: "", date: "2000-00-00", tableIds: [], types: [], totalAmount: 0});
+  const [creditInEditor, setCreditInEditor] = useState<Credit>({id: 0, title: "", date: "2000-00-00", tableIds: [], types: [], totalAmount: 0, category: ""});
 
   // Vérifier si l'utilisateur préfère le mode sombre
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -37,7 +37,7 @@ function App() {
         case Tabs.AccountingDebit:
             return <DebitSummary />;
         case Tabs.AccountingDetailedCredits:
-            return <DetailedCredits onCreditMiniatureRowClicked={(credit: Credit) => {
+            return <DetailedCredits handleCreditMiniatureRowClicked={(credit: Credit) => {
                 setCreditInEditor(credit);
                 setSelectedTab(Tabs.AccountingCreditEditor);
             }} />;
