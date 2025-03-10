@@ -32,4 +32,7 @@ export default defineConfig({
     minify: 'esbuild',
   },
   assetsInclude: ['**/i18n-locales/**'],
+  server: {
+    host: '0.0.0.0'
+  },
 })
