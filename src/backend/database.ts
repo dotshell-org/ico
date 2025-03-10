@@ -33,7 +33,7 @@ function typeToOperator(type: Operator | Orientation): string {
 }
 
 // Database configuration
-const DATABASE_PATH = "./local.db";
+const DATABASE_PATH = "./local.backend";
 const DB_OPTIONS = { };
 
 // Create or open the database

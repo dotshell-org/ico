@@ -21,7 +21,7 @@ import {
   updateCreditRow,
   updateCreditTitle,
   updateOtherCreditRow
-} from "../src/db/database.ts";
+} from "../src/backend/database.ts";
 import { Filter } from "../src/types/filter/Filter.ts"
 import { Sort } from "../src/types/sort/Sort.ts"
 import {MoneyType} from "../src/types/detailed-credits/MoneyType.ts";
