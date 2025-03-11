@@ -13,7 +13,7 @@ import {
   getCreditsSumByCategory,
   getCreditTableFromId,
   getDebits,
-  getDebitsSumByCategory,
+  getDebitsSumByCategory, getInvoicesList,
   getOtherMoneyCreditsFromId,
   getTransactionsByMonth,
   updateCreditCategory,
@@ -244,6 +244,14 @@ ipcMain.handle("deleteCreditGroup", async (_event, groupId: number) => {
     return deleteCreditGroup(groupId);
   } catch (error) {
     console.error("Error when deleting credit group", error);
+  }
+})
+
+ipcMain.handle("getInvoicesList", async (_event, filters: Filter[], sorts: Sort[]) => {
+  try {
+    return getInvoicesList(filters, sorts);
+  } catch (error) {
+    console.error("Error when fetching creditsList", error);
   }
 })
 

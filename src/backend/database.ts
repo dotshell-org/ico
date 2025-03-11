@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import {Credit} from "../types/detailed-credits/Credit.ts";
 import {CreditTable, CreditTableRow} from "../types/detailed-credits/CreditTable.ts";
 import {MoneyType} from "../types/detailed-credits/MoneyType.ts";
+import {Invoice} from "../types/invoices/Invoice.ts";
 
 const require = createRequire(import.meta.url);
 const Database = require('better-sqlite3');
@@ -700,4 +701,15 @@ export function deleteCreditGroup(creditId: number) {
     } catch (error) {
         db.prepare('ROLLBACK').run();
     }
+}
+
+export function getInvoicesList(filters: Filter[], sorts?: Sort[]): Invoice[] {
+    // TODO
+    return [{
+        category: "Other",
+        id: 0,
+        title: "title",
+        date: "0000-00-00",
+        totalAmount: 0,
+    }]
 }
