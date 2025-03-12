@@ -1,10 +1,10 @@
 import React from "react";
 import {XMarkIcon} from "@heroicons/react/24/outline";
-import {Invoice} from "../../types/invoices/Invoice.ts";
+import {Debit} from "../../types/invoices/Debit.ts";
 
 interface InvoiceMiniatureRowProps {
-    invoice: Invoice;
-    onClick: (invoice: Invoice) => void;
+    invoice: Debit;
+    onClick: (invoice: Debit) => void;
     onDelete: (id: number) => void;
 }
 

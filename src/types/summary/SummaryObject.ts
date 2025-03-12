@@ -2,6 +2,6 @@ export interface SummaryObject {
     id: number;
     date: string;
     title: string;
-    amount: number;
+    totalAmount: number;
     category: string;
 }

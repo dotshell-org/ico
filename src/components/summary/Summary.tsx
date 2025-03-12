@@ -88,7 +88,7 @@ function Summary({ title, objects, filters, sorts, onFilterAdded, onFilterRemove
                         case 1:
                             return credit.title;
                         case 2:
-                            return credit.amount.toString();
+                            return credit.totalAmount.toString();
                         case 3:
                             return credit.category;
                         default:
@@ -128,7 +128,7 @@ function Summary({ title, objects, filters, sorts, onFilterAdded, onFilterRemove
                             onClick={(event) => handleCellClick(event, SummaryPropertyIndex.Title, index, credit.id)}
                         />
                         <SummaryTR
-                            content={"€" + credit.amount.toFixed(2)}
+                            content={"€" + credit.totalAmount.toFixed(2)}
                             isSelected={selectedColumn === SummaryPropertyIndex.Amount && selectedRows.includes(credit.id)}
                             onClick={(event) => handleCellClick(event, SummaryPropertyIndex.Amount, index, credit.id)}
                         />

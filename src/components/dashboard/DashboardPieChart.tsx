@@ -56,7 +56,7 @@ const DashboardPieChart: React.FC<CustomPieChartProps> = ({ type }) => {
 
     function generateData() {
         if (!data || !data.categories) return [];
-        const finalData = [];
+        let finalData = [];
         for (let i = 0; i < data.categories.length; i++) {
             finalData.push({
                 label: data.categories[i] == "" ? t("raw_other") : data.categories[i],
@@ -68,6 +68,12 @@ const DashboardPieChart: React.FC<CustomPieChartProps> = ({ type }) => {
                 label: "",
                 value: 1,
             });
+        }
+        if (finalData.reduce((acc, item) => acc + item.value, 0) === 0) {
+            finalData = [{
+                label: "",
+                value: 1,
+            }]
         }
         return finalData;
     }

@@ -1,4 +1,4 @@
-export interface Invoice {
+export interface Debit {
     category: string,
     id: number,
     title: string,

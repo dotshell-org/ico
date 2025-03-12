@@ -21,6 +21,7 @@
     "raw_credit": "Credit",
     "raw_new_credit": "New Credit",
     "raw_debit": "Debit",
+    "raw_new_invoice": "New Invoice",
 
     "raw_newFilter": "New filter",
     "raw_property": "Property",

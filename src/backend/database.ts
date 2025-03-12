@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import {Credit} from "../types/detailed-credits/Credit.ts";
 import {CreditTable, CreditTableRow} from "../types/detailed-credits/CreditTable.ts";
 import {MoneyType} from "../types/detailed-credits/MoneyType.ts";
-import {Invoice} from "../types/invoices/Invoice.ts";
+import {Debit} from "../types/invoices/Debit.ts";
 
 const require = createRequire(import.meta.url);
 const Database = require('better-sqlite3');
@@ -134,7 +134,7 @@ export function getCredits(filters: Filter[], sort: Sort[]) {
             id: row.id,
             date: row.date,
             title: `${row.title} (${typeToEmoji(row.type)})`,
-            amount: row.amount,
+            totalAmount: row.amount,
             category: row.category,
         }
     })
@@ -145,8 +145,8 @@ export function getCredits(filters: Filter[], sort: Sort[]) {
  *
  * @returns An array of debit records.
  */
-export function getDebits(filters: Filter[], sort: Sort[]) {
-    let query = "SELECT * FROM debits";
+export function getDebits(filters: Filter[], sort: Sort[]): Debit[] {
+    let query = "SELECT id, title, date, category, amount FROM debits";
     const queryParams: any[] = [];
 
     if (filters.length > 0) {
@@ -167,7 +167,15 @@ export function getDebits(filters: Filter[], sort: Sort[]) {
     }
 
     const stmt = db.prepare(query);
-    return stmt.all(...queryParams);
+    return stmt.all(...queryParams).map((row: { id: any; date: any; title: any; category: any; amount: any; }) => {
+        return {
+            id: row.id,
+            title: row.title,
+            date: row.date,
+            category: row.category,
+            totalAmount: row.amount,
+        }
+    })
 }
 
 /**
@@ -703,13 +711,42 @@ export function deleteCreditGroup(creditId: number) {
     }
 }
 
-export function getInvoicesList(filters: Filter[], sorts?: Sort[]): Invoice[] {
-    // TODO
-    return [{
-        category: "Other",
-        id: 0,
-        title: "title",
-        date: "0000-00-00",
+/**
+ * Adds a new debit entry into the debits table with the given title and category.
+ *
+ * @param {string} title - The title of the debit entry.
+ * @param {string} category - The category of the debit entry.
+ * @return {Debit} The newly added debit object, including its ID, title, total amount, category, and date.
+ */
+export function addDebit(title: string, category: string): Debit {
+    const stmt = db.prepare(`
+        INSERT INTO debits (title, amount, category, date)
+        VALUES (?, ?, ?, ?)
+    `);
+    stmt.run(title, 0, category, dayjs().toISOString());
+
+    return {
+        id: db.prepare("SELECT last_insert_rowid() AS id").get().id,
+        title,
         totalAmount: 0,
-    }]
+        category,
+        date: dayjs().toISOString(),
+    }
+}
+
+/**
+ * Deletes a debit record from the database based on the provided debit ID.
+ *
+ * @param {number} debitId - The unique identifier of the debit record to be deleted.
+ * @return {boolean} Returns true if the debit was successfully deleted; otherwise, no value is returned.
+ */
+export function deleteDebit(debitId: number) {
+    db.prepare('BEGIN TRANSACTION').run();
+    try {
+        db.prepare('DELETE FROM debits WHERE id = ?').run(debitId);
+        db.prepare('COMMIT').run();
+        return true;
+    } catch (error) {
+        db.prepare('ROLLBACK').run();
+    }
 }

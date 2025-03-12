@@ -4,16 +4,16 @@ import path from 'node:path'
 import {
   addCreditGroup,
   addCreditRow,
-  addCreditTable,
+  addCreditTable, addDebit,
   addOtherCreditRow, deleteCreditGroup,
   deleteCreditRow,
-  deleteCreditTable, getAllCategories,
+  deleteCreditTable, deleteDebit, getAllCategories,
   getCredits,
   getCreditsList,
   getCreditsSumByCategory,
   getCreditTableFromId,
   getDebits,
-  getDebitsSumByCategory, getInvoicesList,
+  getDebitsSumByCategory,
   getOtherMoneyCreditsFromId,
   getTransactionsByMonth,
   updateCreditCategory,
@@ -22,9 +22,6 @@ import {
   updateCreditTitle,
   updateOtherCreditRow
 } from "../src/backend/database.ts";
-import { Filter } from "../src/types/filter/Filter.ts"
-import { Sort } from "../src/types/sort/Sort.ts"
-import {MoneyType} from "../src/types/detailed-credits/MoneyType.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -71,189 +68,40 @@ function createWindow() {
   }
 }
 
-ipcMain.handle("getCredits", async (_event, filters: Filter[], sorts: Sort[]) => {
-  try {
-    return getCredits(filters, sorts);
-  } catch (error) {
-    console.error("Error when fetching credits", error);
-    throw error;
-  }
-});
-ipcMain.handle("getDebits", async (_event, filters: Filter[], sorts: Sort[]) => {
-  try {
-    return getDebits(filters, sorts);
-  } catch (error) {
-    console.error("Error when fetching debits", error);
-    throw error;
-  }
-});
+function handleIpc(name: string, handler: (...args: any[]) => any) {
+  ipcMain.handle(name, async (_event, ...args) => {
+    try {
+      return await handler(...args);
+    } catch (error) {
+      console.error(`Error in ${name}`, error);
+      throw error;
+    }
+  });
+}
 
-ipcMain.handle("getTransactionsByMonth", async (_event) => {
-  try {
-    return getTransactionsByMonth();
-  } catch (error) {
-    console.error("Error when fetching transactions by month", error);
-    throw error;
-  }
-});
-
-ipcMain.handle("getCreditsSumByCategory", async (_event) => {
-  try {
-    return getCreditsSumByCategory();
-  } catch (error) {
-    console.error("Error when fetching credits sum by category", error);
-  }
-});
-ipcMain.handle("getDebitsSumByCategory", async (_event) => {
-  try {
-    return getDebitsSumByCategory();
-  } catch (error) {
-    console.error("Error when fetching debits sum by category", error);
-  }
-});
-
-ipcMain.handle("getCreditsList", async (_event, filters: Filter[], sorts: Sort[]) => {
-  try {
-    return getCreditsList(filters, sorts);
-  } catch (error) {
-    console.error("Error when fetching creditsList", error);
-  }
-})
-ipcMain.handle("getCreditTableFromId", async (_event, id: number) => {
-  try {
-    return getCreditTableFromId(id);
-  } catch (error) {
-    console.error("Error when fetching creditTableFromId", error);
-  }
-})
-ipcMain.handle("getOtherMoneyCreditsFromId", async (_event, id: number) => {
-  try {
-    return getOtherMoneyCreditsFromId(id);
-  } catch (error) {
-    console.error("Error when fetching creditTableFromId", error);
-  }
-})
-
-ipcMain.handle("addCreditRow", async (_event, tableId: number, amount: number, quantity: number) => {
-  try {
-    return addCreditRow(tableId, amount, quantity);
-  } catch (error) {
-    console.error("Error when adding credit row", error);
-    throw error;
-  }
-});
-
-ipcMain.handle("updateCreditRow", async (_event, rowId: number, quantity: number) => {
-  try {
-    return updateCreditRow(rowId, quantity);
-  } catch (error) {
-    console.error("Error when updating credit row", error);
-    throw error;
-  }
-});
-
-ipcMain.handle("updateOtherCreditRow", async (_event, rowId: number, amount: number) => {
-  try {
-    return updateOtherCreditRow(rowId, amount);
-  } catch (error) {
-    console.error("Error when updating other credit row", error);
-    throw error;
-  }
-});
-
-ipcMain.handle("deleteCreditRow", async (_event, rowId: number) => {
-  try {
-    return deleteCreditRow(rowId);
-  } catch (error) {
-    console.error("Error when deleting credit row", error);
-    throw error;
-  }
-});
-
-ipcMain.handle("addOtherCreditRow", async (_event, groupId: number, amount: number) => {
-  try {
-    return addOtherCreditRow(groupId, amount);
-  } catch (error) {
-    console.error("Error when adding other credit row", error);
-    throw error;
-  }
-});
-
-ipcMain.handle("deleteCreditTable", async (_event, tableId: number) => {
-  try {
-    return deleteCreditTable(tableId);
-  } catch (error) {
-    console.error("Error when deleting credit table", error);
-    throw error;
-  }
-});
-
-ipcMain.handle("updateCreditDate", async (_event, creditId: number, newDate: string) => {
-  try {
-    return updateCreditDate(creditId, newDate);
-  } catch (error) {
-    console.error("Error when updating credit date :", error);
-    throw error;
-  }
-});
-
-ipcMain.handle("addCreditTable", async (_event, creditId: number, tableType: MoneyType) => {
-  try {
-    return addCreditTable(creditId, tableType);
-  } catch (error) {
-    console.error("Error when adding credit table", error);
-    throw error;
-  }
-})
-
-ipcMain.handle("updateCreditTitle", async (_event, creditId: number, newTitle: string) => {
-  try {
-    return updateCreditTitle(creditId, newTitle);
-  } catch (error) {
-    console.error("Error when updating the title:", error);
-    throw error;
-  }
-});
-
-ipcMain.handle("updateCreditCategory", async (_event, creditId: number, newCategory: string) => {
-  try {
-    return updateCreditCategory(creditId, newCategory);
-  } catch (error) {
-    console.error("Error when updating credit category", error);
-    throw error;
-  }
-});
-
-ipcMain.handle("getAllCategories", async (_event) => {
-  try {
-    return getAllCategories();
-  } catch (error) {
-    console.error("Error when fetching all categories", error);
-  }
-});
-
-ipcMain.handle("addCreditGroup", async (_event, title: string, category: string) => {
-  try {
-    return addCreditGroup(title, category);
-  } catch (error) {
-    console.error("Error when adding credit group", error);
-  }
-})
-ipcMain.handle("deleteCreditGroup", async (_event, groupId: number) => {
-  try {
-    return deleteCreditGroup(groupId);
-  } catch (error) {
-    console.error("Error when deleting credit group", error);
-  }
-})
-
-ipcMain.handle("getInvoicesList", async (_event, filters: Filter[], sorts: Sort[]) => {
-  try {
-    return getInvoicesList(filters, sorts);
-  } catch (error) {
-    console.error("Error when fetching creditsList", error);
-  }
-})
+handleIpc("getCredits", getCredits);
+handleIpc("getDebits", getDebits);
+handleIpc("getTransactionsByMonth", getTransactionsByMonth);
+handleIpc("getCreditsSumByCategory", getCreditsSumByCategory);
+handleIpc("getDebitsSumByCategory", getDebitsSumByCategory);
+handleIpc("getCreditsList", getCreditsList);
+handleIpc("getCreditTableFromId", getCreditTableFromId);
+handleIpc("getOtherMoneyCreditsFromId", getOtherMoneyCreditsFromId);
+handleIpc("addCreditRow", addCreditRow);
+handleIpc("updateCreditRow", updateCreditRow);
+handleIpc("updateOtherCreditRow", updateOtherCreditRow);
+handleIpc("deleteCreditRow", deleteCreditRow);
+handleIpc("addOtherCreditRow", addOtherCreditRow);
+handleIpc("deleteCreditTable", deleteCreditTable);
+handleIpc("updateCreditDate", updateCreditDate);
+handleIpc("addCreditTable", addCreditTable);
+handleIpc("updateCreditTitle", updateCreditTitle);
+handleIpc("updateCreditCategory", updateCreditCategory);
+handleIpc("getAllCategories", getAllCategories);
+handleIpc("addCreditGroup", addCreditGroup);
+handleIpc("deleteCreditGroup", deleteCreditGroup);
+handleIpc("addDebit", addDebit);
+handleIpc("deleteDebit", deleteDebit)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
