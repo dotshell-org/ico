@@ -72,10 +72,10 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
 
             <div className="w-[calc(100%-20rem)] mr-2">
                 <Container title={t("identification")}>
-                    <h3>Nom</h3>
+                    <h3>{t("raw_name")}</h3>
                     <InputField />
 
-                    <h3>Adresse</h3>
+                    <h3>{t("raw_address")}</h3>
                     <InputField />
 
                     <h3>SIRET/SIREN</h3>
@@ -84,24 +84,23 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
                     <h3>APE/NAF</h3>
                     <InputField />
 
-                    <h3>N° TVA Intercommunal</h3>
+                    <h3>{t("raw_vat_no")}</h3>
                     <InputField />
                 </Container>
                 <Container title={t("dates")}>
-                    <h3>Emission</h3>
+                    <h3>{t("raw_issue")}</h3>
                     <InputField />
 
-                    <h3>Vente/Prestation de service</h3>
+                    <h3>{t("raw_sale_or_service")}</h3>
                     <InputField />
                 </Container>
                 <Container title={t("products")}>
-                    <h3>Content</h3>
-                    <InputField />
+                    <></>
                 </Container>
             </div>
 
-            <div className="fixed right-0 top-0 h-full w-[20rem] border-l bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700">
-                Hello World
+            <div className="fixed right-0 top-0 h-full w-[20rem] border-l bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 flex items-center justify-center">
+                <p>Right Panel</p>
             </div>
 
         </div>

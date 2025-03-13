@@ -82,6 +82,13 @@
 
     "identification": "\uD83C\uDD94 Identification",
     "dates": "\uD83D\uDDD3\uFE0F Dates",
-    "products": "\uD83D\uDECD\uFE0F Produits"
+    "products": "\uD83D\uDECD\uFE0F Produits",
+
+    "raw_name": "Nom",
+    "raw_address": "Adresse",
+    "raw_vat_no": "N° TVA Intercommunal",
+    "raw_issue": "Emission",
+    "raw_sale_or_service": "Vente/Prestation de service",
+    "raw_invoice_number": "Numéro de Facture"
 
 }

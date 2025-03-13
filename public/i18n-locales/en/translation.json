@@ -82,6 +82,13 @@
 
     "identification": "\uD83C\uDD94 Identification",
     "dates": "\uD83D\uDDD3\uFE0F Dates",
-    "products": "\uD83D\uDECD\uFE0F Products"
+    "products": "\uD83D\uDECD\uFE0F Products",
+
+    "raw_name": "Name",
+    "raw_address": "Address",
+    "raw_vat_no": "VAT No.",
+    "raw_issue": "Issue",
+    "raw_sale_or_service": "Sale/Service",
+    "raw_invoice_number": "Invoice Number"
 
 }
