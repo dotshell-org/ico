@@ -6,6 +6,14 @@ import { t } from "i18next";
 import { MoneyType } from "../../types/detailed-credits/MoneyType";
 import dayjs from "dayjs";
 
+declare global {
+    interface Window {
+        ipcRenderer: {
+            invoke(channel: string, ...args: any[]): Promise<any>;
+        }
+    }
+}
+
 interface CreditEditorProps {
     credit: Credit;
 }

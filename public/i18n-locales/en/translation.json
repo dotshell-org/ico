@@ -78,6 +78,10 @@
     "raw_new_table": "New Table",
     "raw_other": "Other",
 
-    "raw_confirm_delete_table": "Are you sure you want to delete this table?"
+    "raw_confirm_delete_table": "Are you sure you want to delete this table?",
+
+    "identification": "\uD83C\uDD94 Identification",
+    "dates": "\uD83D\uDDD3\uFE0F Dates",
+    "products": "\uD83D\uDECD\uFE0F Products"
 
 }
