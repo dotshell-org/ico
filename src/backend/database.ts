@@ -718,7 +718,7 @@ export function deleteCreditGroup(creditId: number) {
  * @param {string} category - The category of the debit entry.
  * @return {Debit} The newly added debit object, including its ID, title, total amount, category, and date.
  */
-export function addDebit(title: string, category: string): Debit {
+export function addInvoice(title: string, category: string): Debit {
     const stmt = db.prepare(`
         INSERT INTO debits (title, amount, category, date)
         VALUES (?, ?, ?, ?)
@@ -740,13 +740,13 @@ export function addDebit(title: string, category: string): Debit {
  * @param {number} debitId - The unique identifier of the debit record to be deleted.
  * @return {boolean} Returns true if the debit was successfully deleted; otherwise, no value is returned.
  */
-export function deleteDebit(debitId: number) {
+export function deleteInvoice(debitId: number): void {
     db.prepare('BEGIN TRANSACTION').run();
     try {
         db.prepare('DELETE FROM debits WHERE id = ?').run(debitId);
         db.prepare('COMMIT').run();
-        return true;
     } catch (error) {
         db.prepare('ROLLBACK').run();
     }
 }
+

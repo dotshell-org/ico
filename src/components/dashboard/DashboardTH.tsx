@@ -9,14 +9,14 @@ interface SummaryTHProps {
 const DashboardTH: React.FC<SummaryTHProps> = ({ property }) => {
     const { t }: { t: (key: string) => string } = useTranslation();
     const textProperty: string = property === DashboardCharts.Credit
-        ? "credit"
+        ? "📈 " + t("credit")
         : property === DashboardCharts.Debit
-        ? "debit"
+        ? "📉 " + t("debit")
         : property === DashboardCharts.Profit
-        ? "profit"
+        ? "⚖\uFE0F " + t("profit")
         : "";
     return (
-        <th className="w-1/4 border-gray-300 dark:border-gray-700 border text-center p-4 text-sm font-normal text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-950 transition-all">{t(textProperty)}</th>
+        <th className="w-1/4 border-gray-300 dark:border-gray-700 border text-center p-4 text-sm font-normal text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-950 transition-all">{textProperty}</th>
     );
 };
 

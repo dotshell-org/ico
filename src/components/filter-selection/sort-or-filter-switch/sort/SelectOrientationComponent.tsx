@@ -20,8 +20,8 @@ const SelectOrientationComponent: React.FC<SelectOrientationProps> = ({ onChange
             value={selectedValue}
             onChange={handleSelectChange}
         >
-            <option value={Orientation.Asc}>{t("raw_desc")} ↓</option>
-            <option value={Orientation.Desc}>{t("raw_asc")} ↑</option>
+            <option value={Orientation.Asc}>{t("desc")} ↓</option>
+            <option value={Orientation.Desc}>{t("asc")} ↑</option>
         </select>
     );
 };

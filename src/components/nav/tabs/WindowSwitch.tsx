@@ -15,6 +15,13 @@ const windowColors: { [key in Window]: string } = {
     [Window.Cafeteria]: 'bg-yellow-500 hover:bg-yellow-400',
 };
 
+const windowEmojis: { [key in Window]: string } = {
+    [Window.Accounting]: '💰 ',
+    [Window.Stock]: '📦 ',
+    [Window.Sales]: '🛒 ',
+    [Window.Cafeteria]: '☕ ',
+}
+
 const windowStrings: { [key in Window]: string } = {
     [Window.Accounting]: 'accounting',
     [Window.Stock]: 'stock',
@@ -43,7 +50,7 @@ const NavItem: React.FC<NavItemProps> = ({ selectedWindow, setSelectedWindow }) 
                 onClick={handleButtonClick}
                 className={`${color} border-none text-white w-56 px-3 py-2 text-sm font-medium rounded-md transition-all flex items-center justify-between`}
             >
-                {t(windowStrings[selectedWindow])}
+                {windowEmojis[selectedWindow]} {t(windowStrings[selectedWindow])}
                 <svg
                     className="w-4 h-4 ml-2"
                     fill="none"
@@ -68,7 +75,7 @@ const NavItem: React.FC<NavItemProps> = ({ selectedWindow, setSelectedWindow }) 
                                 className="block p-3 text-sm text-gray-700 bg-white hover:bg-gray-100 w-full text-left border-none transition-all dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
                                 role="menuitem"
                             >
-                                {t(windowStrings[Window[key as keyof typeof Window]])}
+                                {windowEmojis[Window[key as keyof typeof Window]]} {t(windowStrings[Window[key as keyof typeof Window]])}
                             </button>
                         ))}
                     </div>

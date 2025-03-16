@@ -45,7 +45,7 @@ const FilterPlusButton: React.FC<FilterPlusButtonProps> = ({ onAddedFilter, onAd
     return (
         <>
             <div className='relative'>
-                <Tooltip text={t("raw_newFilter")}>
+                <Tooltip text={t("new_filter")}>
                     <button
                         className="w-6 h-6 m-0 mx-1 p-0 bg-none text-black dark:text-white rounded-full border-gray-400 transition-all flex items-center justify-center"
                         onClick={handleToggleSelect}

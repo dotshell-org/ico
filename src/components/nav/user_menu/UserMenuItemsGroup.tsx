@@ -16,7 +16,7 @@ const UserMenuItemsGroup: React.FC = () => {
                 </div>
                 
                 <Divider />
-                <UserMenuItem text={t("settings")} />
+                <UserMenuItem text={"⚙️ " + t("settings")} />
             </div>
         </div>
     );

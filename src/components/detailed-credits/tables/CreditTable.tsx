@@ -38,6 +38,21 @@ const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
         return [];
     }, [rows, type]);
 
+    const typeToEmoji = () => {
+        if (type == MoneyType.Coins) {
+            return "🪙"
+        }
+        else if (type == MoneyType.Banknotes) {
+            return "💵";
+        }
+        else if (type == MoneyType.Cheques) {
+            return "🖋";
+        }
+        else if (type == MoneyType.Other) {
+            return "💳️";
+        }
+    }
+
     const typeToTitle = () => {
         if (type === MoneyType.Coins) {
             return "coins";
@@ -153,7 +168,7 @@ const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
     return (
         type !== MoneyType.Other && <>
             <div className="flex items-center mt-2 mb-2">
-                <h2 className="text-2xl cursor-default">{t(typeToTitle())}</h2>
+                <h2 className="text-2xl cursor-default">{typeToEmoji()} {t(typeToTitle())}</h2>
                 <button
                     onClick={handleDeleteTable}
                     className="p-1 ml-2 bg-gray-50 dark:bg-gray-900 text-red-500 hover:border-red-500 rounded-full"
@@ -165,19 +180,19 @@ const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
                 <thead>
                     {type === MoneyType.Coins && (
                         <tr>
-                            <CreditTH content={t("raw_amount")} />
-                            <CreditTH content={t("raw_quantity")} />
-                            <CreditTH content={t("raw_total")} />
-                            <CreditTH content={t("raw_weight")} />
-                            <CreditTH className="w-10" content={t("raw_actions")} />
+                            <CreditTH content={t("amount")} />
+                            <CreditTH content={t("quantity")} />
+                            <CreditTH content={t("total")} />
+                            <CreditTH content={t("weight")} />
+                            <CreditTH className="w-10" content={t("actions")} />
                         </tr>
                     )}
                     {(type === MoneyType.Banknotes || type === MoneyType.Cheques) && (
                         <tr>
-                            <CreditTH content={t("raw_amount")} />
-                            <CreditTH content={t("raw_quantity")} />
-                            <CreditTH content={t("raw_total")} />
-                            <CreditTH className="w-10" content={t("raw_actions")} />
+                            <CreditTH content={t("amount")} />
+                            <CreditTH content={t("quantity")} />
+                            <CreditTH content={t("total")} />
+                            <CreditTH className="w-10" content={t("actions")} />
                         </tr>
                     )}
                 </thead>
@@ -310,7 +325,7 @@ const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
                         >
                             <div className="flex justify-center items-center pr-1">
                                 <PlusIcon className="h-8 w-4 mr-1" />
-                                {t("raw_new")}
+                                {t("new")}
                             </div>
                         </td>
                     </tr>

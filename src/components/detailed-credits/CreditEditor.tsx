@@ -6,14 +6,6 @@ import { t } from "i18next";
 import { MoneyType } from "../../types/detailed-credits/MoneyType";
 import dayjs from "dayjs";
 
-declare global {
-    interface Window {
-        ipcRenderer: {
-            invoke(channel: string, ...args: any[]): Promise<any>;
-        }
-    }
-}
-
 interface CreditEditorProps {
     credit: Credit;
 }
@@ -139,7 +131,7 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
                 id="categoryDatalist"
                 value={categoryValue}
                 onChange={handleCategoryChange}
-                placeholder={t("raw_category")}
+                placeholder={t("category")}
                 className="ml-8 bg-transparent border-none underline"
             />
             <datalist id="categoriesList">
@@ -162,7 +154,7 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
 
             <div className="mb-2">
                 <label htmlFor="tableType" className="mr-2">
-                    {t("type")}
+                    {"\uD83D\uDDC3\uFE0F " + t("type")}
                 </label>
                 <select
                     id="tableType"
@@ -170,9 +162,9 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
                     onChange={(e) => setSelectedTableType(Number(e.target.value))}
                     className="p-1 border rounded dark:bg-gray-900 dark:border-gray-600 cursor-pointer"
                 >
-                    <option value={MoneyType.Banknotes}>{t("banknotes")}</option>
-                    <option value={MoneyType.Coins}>{t("coins")}</option>
-                    <option value={MoneyType.Cheques}>{t("cheques")}</option>
+                    <option value={MoneyType.Banknotes}>{"\uD83D\uDCB5 " + t("banknotes")}</option>
+                    <option value={MoneyType.Coins}>{"\uD83E\uDE99 " + t("coins")}</option>
+                    <option value={MoneyType.Cheques}>{"\uD83D\uDD8B " + t("cheques")}</option>
                 </select>
             </div>
 
@@ -181,7 +173,7 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
                 onClick={handleAddNewTable}
                 className="mb-5 p-1 w-full text-sm bg-transparent hover:bg-blue-500 border border-blue-500 text-blue-500 hover:text-white rounded transition-all duration-300"
             >
-                {t("raw_new_table")}
+                {t("new_table")}
             </button>
 
             <OtherMoneyCreditTable id={credit.id} />

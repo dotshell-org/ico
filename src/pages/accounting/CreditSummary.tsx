@@ -39,7 +39,7 @@ function CreditSummary() {
     }, [filters, sorts]);
     
     return (
-        <Summary title={t("credit")} objects={credits} sorts={sorts} filters={filters} onFilterAdded={handleFilterAdded} onFilterRemoved={handleFilterRemoved} onSortAdded={handleSortAdded} onSortRemoved={handleSortRemoved} />
+        <Summary title={"📈 " + t("credit")} objects={credits} sorts={sorts} filters={filters} onFilterAdded={handleFilterAdded} onFilterRemoved={handleFilterRemoved} onSortAdded={handleSortAdded} onSortRemoved={handleSortRemoved} />
     );
 }
 

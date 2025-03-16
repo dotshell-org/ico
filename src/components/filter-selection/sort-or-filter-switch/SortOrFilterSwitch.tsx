@@ -21,14 +21,14 @@ const SortOrFilterSwitch: React.FC<SortOrFilterSwitchProps> = ({ onClose, onClic
                     role="menuitem"
                     onClick={onClickSort}
                 >
-                    {t("sort")}
+                    {"🔀 " + t("sort")}
                 </button>
                 <button
                     className="block w-full p-3 px-4 text-sm text-gray-700 bg-white hover:bg-gray-100 text-left border-none transition-all dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white whitespace-nowrap"
                     role="menuitem"
                     onClick={onClickFilter}
                 >
-                    {t("filter")}
+                    {"🔍 " + t("filter")}
                 </button>
             </div>
         </div>

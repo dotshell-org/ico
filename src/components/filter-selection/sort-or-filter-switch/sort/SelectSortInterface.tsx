@@ -40,19 +40,19 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
                 >
                     ✕
                 </button>
-                <h1 className="text-2xl font-bold">{t("sort")}</h1>
+                <h1 className="text-2xl font-bold">{"🔀 " + t("sort")}</h1>
 
-                <h2 className="mt-4">{t("raw_property")}</h2>
+                <h2 className="mt-4">{t("property")}</h2>
                 <SelectPropertyComponent onChange={handlePropertyChange} />
 
-                <h2 className="mt-4">{t("raw_orientation")}</h2>
+                <h2 className="mt-4">{t("orientation")}</h2>
                 <SelectOrientationComponent onChange={handleOrientationChange} />
 
                 <button
                     className="mt-6 dark:bg-gray-700"
                     onClick={handleClickAdd}
                 >
-                    {t("raw_add")}
+                    {t("add")}
                 </button>
             </div>
         </div>

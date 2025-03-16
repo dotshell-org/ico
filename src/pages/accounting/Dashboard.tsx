@@ -90,7 +90,7 @@ function Dashboard() {
 
     return (
         <div className="pb-20">
-            <h1 className="text-3xl mt-2 mb-2 font-bold cursor-default">{t("dashboard")}</h1>
+            <h1 className="text-3xl mt-2 mb-2 font-bold cursor-default">{"📊 " + t("dashboard")}</h1>
 
             <LineChart
                 xAxis={[
@@ -102,18 +102,18 @@ function Dashboard() {
                     },
                 ]}
                 series={[
-                    { label: t("raw_debit"), data: seriesData[1], color: "#3b82f6" },
-                    { label: t("raw_credit"), data: seriesData[0], color: "#ef4444" },
+                    { label: t("debit"), data: seriesData[1], color: "#3b82f6" },
+                    { label: t("credit"), data: seriesData[0], color: "#ef4444" },
                 ]}
                 height={400}
             />
 
-            <h2 className="mt-8 mb-2 text-2xl">{t("debit")}</h2>
+            <h2 className="mt-8 mb-2 text-2xl">{"📉 " + t("debit")}</h2>
             <DashboardPieChart type={DashboardCharts.Debit} />
-            <h2 className="mt-8 mb-2 text-2xl">{t("credit")}</h2>
+            <h2 className="mt-8 mb-2 text-2xl">{"📈 " + t("credit")}</h2>
             <DashboardPieChart type={DashboardCharts.Credit} />
 
-            <h2 className="mt-8 mb-2 text-2xl">{t("synthesis")}</h2>
+            <h2 className="mt-8 mb-2 text-2xl">{"\uD83D\uDCDD " + t("synthesis")}</h2>
             <table className="w-full mt-5 table-auto border-white dark:border-gray-950 border-2 border-t-0 border-b-gray-300 dark:border-b-gray-700 border-b-2">
                 <thead className="cursor-default select-none">
                     <tr className="border-b-gray-300 dark:border-b-gray-700 border-b-2">

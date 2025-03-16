@@ -4,10 +4,10 @@ import path from 'node:path'
 import {
   addCreditGroup,
   addCreditRow,
-  addCreditTable, addDebit,
+  addCreditTable, addInvoice,
   addOtherCreditRow, deleteCreditGroup,
   deleteCreditRow,
-  deleteCreditTable, deleteDebit, getAllCategories,
+  deleteCreditTable, deleteInvoice, getAllCategories,
   getCredits,
   getCreditsList,
   getCreditsSumByCategory,
@@ -100,8 +100,8 @@ handleIpc("updateCreditCategory", updateCreditCategory);
 handleIpc("getAllCategories", getAllCategories);
 handleIpc("addCreditGroup", addCreditGroup);
 handleIpc("deleteCreditGroup", deleteCreditGroup);
-handleIpc("addDebit", addDebit);
-handleIpc("deleteDebit", deleteDebit)
+handleIpc("addInvoice", addInvoice);
+handleIpc("deleteInvoice", deleteInvoice);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

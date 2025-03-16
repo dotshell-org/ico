@@ -11,7 +11,7 @@ const FilterLabel: React.FC<FilterLabelProps> = ({ filter, onRemove }) => {
     return (
         <div className="w-fit h-6 m-0 mx-1 py-1 pl-3 pr-2.5 text-sm border text-blue-500 dark:text-blue-300 rounded-full border-blue-500 hover:border-blue-500 dark:border-blue-600 dark:hover:border-blue-600 bg-blue-100 dark:bg-blue-950 transition-all flex items-center justify-center">
           <span className="mr-1 select-none">
-            {t("raw_"+filter.property)}{filter.operator.toString()}{filter.value}
+            {t(filter.property)}{filter.operator.toString()}{filter.value}
           </span>
             <button
                 onClick={() => onRemove(filter)}

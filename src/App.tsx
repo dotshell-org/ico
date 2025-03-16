@@ -10,7 +10,7 @@ import Invoices from "./pages/accounting/Invoices.tsx";
 import CreditEditor from "./components/detailed-credits/CreditEditor.tsx";
 import {Credit} from "./types/detailed-credits/Credit.ts";
 import { Debit } from './types/invoices/Debit.ts';
-import FranceInvoiceEditor from "./components/invoices/FranceInvoiceEditor.tsx";
+import FranceInvoiceEditor from "./components/invoices/invoice-editors/FranceInvoiceEditor.tsx";
 
 function App() {
     const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);

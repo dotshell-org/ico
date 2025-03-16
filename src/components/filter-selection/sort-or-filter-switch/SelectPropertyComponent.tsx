@@ -21,10 +21,10 @@ const SelectPropertyComponent: React.FC<SelectComponentProps> = ({ onChange }) =
             value={selectedValue}
             onChange={handleSelectChange}
         >
-            <option value={SummaryProperty.Date}>{t("date")}</option>
-            <option value={SummaryProperty.Title}>{t("title")}</option>
-            <option value={SummaryProperty.Amount}>{t("amount")}</option>
-            <option value={SummaryProperty.Category}>{t("category")}</option>
+            <option value={SummaryProperty.Date}>{"📅 " + t("date")}</option>
+            <option value={SummaryProperty.Title}>{"🏷️ " + t("title")}</option>
+            <option value={SummaryProperty.Amount}>{"\uD83D\uDCB0 " + t("amount")}</option>
+            <option value={SummaryProperty.Category}>{"📑 " + t("category")}</option>
         </select>
     );
 };

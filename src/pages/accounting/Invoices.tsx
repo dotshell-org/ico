@@ -5,6 +5,7 @@ import {Sort} from "../../types/sort/Sort.ts";
 import {t} from "i18next";
 import {Debit} from "../../types/invoices/Debit.ts";
 import InvoiceMiniatureRow from "../../components/invoices/InvoiceMiniatureRow.tsx";
+import {Country} from "../../types/Country.ts";
 
 interface InvoicesProps {
     handleInvoiceMiniatureRowClicked: (invoice: Debit) => void;
@@ -14,6 +15,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
     const [filters, setFilters] = useState<Filter[]>([]);
     const [sorts, setSorts] = useState<Sort[]>([]);
     const [invoices, setInvoices] = useState<Debit[]>([]);
+    const [selectedTableType, setSelectedTableType] = useState<Country>(Country.None);
 
     const handleFilterAdded = (filter: Filter) => {
         setFilters(prev => [...prev, filter]);
@@ -42,7 +44,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
 
     const handleNewDebit = () => {
         (window as any).ipcRenderer
-            .invoke("addDebit", t("raw_new_invoice"), t("raw_other"))
+            .invoke("addDebit", t("new_invoice"), t("other"))
             .then((result: Debit) => {
                 setInvoices(prev => [...prev, result]);
             })
@@ -65,16 +67,16 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
     return (
         <>
             <div className="fixed left-10 right-10 top-16 bg-white dark:bg-gray-950 pt-10">
-                <h1 className="text-3xl mt-2 mb-2 font-bold cursor-default">{t("invoices")}</h1>
+                <h1 className="text-3xl mt-2 mb-2 font-bold cursor-default">{"\uD83E\uDDFE " + t("invoices")}</h1>
                 <FilterSelection filters={filters} sorts={sorts} onAddedFilter={handleFilterAdded} onRemovedFilter={handleFilterRemoved} onAddedSort={handleSortAdded} onRemovedSort={handleSortRemoved} />
                 <td
                     className={`py-2 mx-0.5 flex align-middle border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 border-b text-left p-1.5 text-sm font-bold transition-all select-none`}
                 >
                     <div className="w-[80%]">
-                        {t("raw_title")}
+                        {t("title")}
                     </div>
                     <div className="w-[20%]">
-                        {t("raw_total_amount")}
+                        {t("total_amount")}
                     </div>
                     <div className="w-10">
 
@@ -90,12 +92,28 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
                 }
             </table>
 
+
+            <div className="mb-2">
+                <label htmlFor="tableType" className="mr-2">
+                    {"🌎 " + t("country")}
+                </label>
+                <select
+                    id="tableType"
+                    value={selectedTableType}
+                    onChange={(e) => setSelectedTableType(Number(e.target.value))}
+                    className="mt-5 p-1 border rounded dark:bg-gray-900 dark:border-gray-600 cursor-pointer"
+                >
+                    <option value={Country.None}>{"🚫 " + t("none")}</option>
+                    <option value={Country.France}>{"🇫🇷 " + t("france")}</option>
+                </select>
+            </div>
+
             <button
                 type="button"
                 onClick={handleNewDebit}
-                className="mt-5 mb-16 p-1 w-full text-sm bg-transparent hover:bg-blue-500 border border-blue-500 text-blue-500 hover:text-white rounded transition-all duration-300"
+                className="mt-2 mb-16 p-1 w-full text-sm bg-transparent hover:bg-blue-500 border border-blue-500 text-blue-500 hover:text-white rounded transition-all duration-300"
             >
-                {t("raw_new")}
+                {t("new")}
             </button>
         </>
     );

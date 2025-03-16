@@ -13,7 +13,7 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
     // Cell counter (displayed in all configurations)
     const selectedCountElement = (
         <div className="px-3">
-            <strong>{t("selected_count")}:</strong> {values.length}
+            <strong>{"🔢 " + t("selected_count")}:</strong> {values.length}
         </div>
     );
 
@@ -44,22 +44,22 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
         additionalElement = (
             <>
                 <div className="px-3">
-                    <strong>{t("sum")}:</strong> €{sum.toFixed(2)}
+                    <strong>{"➕ " + t("sum")}:</strong> €{sum.toFixed(2)}
                 </div>
                 <div className="px-3">
-                    <strong>{t("average")}:</strong> €{avg.toFixed(2)}
+                    <strong>{"📊 " + t("average")}:</strong> €{avg.toFixed(2)}
                 </div>
                 <div className="px-3">
-                    <strong>{t("median")}:</strong> €{median.toFixed(2)}
+                    <strong>{"📏 " + t("median")}:</strong> €{median.toFixed(2)}
                 </div>
                 <div className="px-3">
-                    <strong>{t("std_dev")}:</strong> €{stdDev.toFixed(2)}
+                    <strong>{"📉 " + t("std_dev")}:</strong> €{stdDev.toFixed(2)}
                 </div>
                 <div className="px-3">
-                    <strong>{t("min")}:</strong> €{min.toFixed(2)}
+                    <strong>{"🔻 " + t("min")}:</strong> €{min.toFixed(2)}
                 </div>
                 <div className="px-3">
-                    <strong>{t("max")}:</strong> €{max.toFixed(2)}
+                    <strong>{"🔺 " + t("max")}:</strong> €{max.toFixed(2)}
                 </div>
             </>
         );
@@ -78,8 +78,8 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
                 : 0;
         additionalElement = (
             <div className="px-3">
-                <strong>{t("date_range")}:</strong> {minDate ? minDate.toLocaleDateString() : "-"} → {" "}
-                {maxDate ? maxDate.toLocaleDateString() : "-"} ({dayDiff} {t("raw_days")})
+                <strong>{"\uD83D\uDCCF " + t("date_range")}:</strong> {minDate ? minDate.toLocaleDateString() : "-"} → {" "}
+                {maxDate ? maxDate.toLocaleDateString() : "-"} ({dayDiff} {t("days")})
             </div>
         );
     } else if (columnIndex === 3) {
@@ -92,7 +92,7 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
             <div className="px-3 overflow-x-auto">
                 {Object.entries(frequency).map(([category, count]) => (
                     <div key={category} className="inline-block mr-4">
-                        <strong>{category == "" ? t("raw_other") : category}:</strong> {count}
+                        <strong>{category == "" ? t("other") : category}:</strong> {count}
                     </div>
                 ))}
             </div>
@@ -102,7 +102,7 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({ columnIndex, va
         const uniqueValues = Array.from(new Set(values));
         additionalElement = (
             <div className="px-3">
-                <strong>{t("unique_count")}:</strong> {uniqueValues.length}
+                <strong>{"🔑 " + t("unique_count")}:</strong> {uniqueValues.length}
             </div>
         );
     }

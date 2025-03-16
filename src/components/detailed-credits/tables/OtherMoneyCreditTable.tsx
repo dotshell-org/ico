@@ -86,11 +86,11 @@ const OtherMoneyCreditTable: React.FC<CreditTableProps> = ({ id }) => {
 
     return (
         <>
-            <h2 className="text-2xl mt-2 mb-2 cursor-default">{t("money_other")}</h2>
+            <h2 className="text-2xl mt-2 mb-2 cursor-default">{"\uD83D\uDCB3\uFE0F " + t("other")}</h2>
             <table className="w-full table-fixed border-white dark:border-gray-950 border-2 border-y-0 mb-10">
                 <thead>
-                    <CreditTH content={t("raw_amount")} />
-                    <CreditTH content={t("raw_actions")} />
+                    <CreditTH content={t("amount")} />
+                    <CreditTH content={t("actions")} />
                 </thead>
                 <tbody>
                     {rows.map((row) => (
@@ -172,7 +172,7 @@ const OtherMoneyCreditTable: React.FC<CreditTableProps> = ({ id }) => {
                         >
                             <div className="flex justify-center items-center">
                                 <PlusIcon className="h-4 w-4 mr-1" />
-                                {t("raw_new")}
+                                {t("new")}
                             </div>
                         </td>
                     </tr>

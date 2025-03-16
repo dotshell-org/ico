@@ -133,7 +133,7 @@ function Summary({ title, objects, filters, sorts, onFilterAdded, onFilterRemove
                             onClick={(event) => handleCellClick(event, SummaryPropertyIndex.Amount, index, credit.id)}
                         />
                         <SummaryTR
-                            content={credit.category == "" ? t("raw_other") : credit.category}
+                            content={credit.category == "" ? t("other") : credit.category}
                             isSelected={selectedColumn === SummaryPropertyIndex.Category && selectedRows.includes(credit.id)}
                             onClick={(event) => handleCellClick(event, SummaryPropertyIndex.Category, index, credit.id)}
                         />

@@ -20,31 +20,31 @@ const SelectOperatorComponent: React.FC<SelectOperatorProps> = ({ onChange, prop
         if (property === SummaryProperty.Date) {
             return (
                 <>
-                    <option value={Operator.Is}>{t("raw_is")}</option>
-                    <option value={Operator.LessThan}>{t("raw_before")}</option>
-                    <option value={Operator.MoreThan}>{t("raw_after")}</option>
+                    <option value={Operator.Is}>{t("is")}</option>
+                    <option value={Operator.LessThan}>{t("before")}</option>
+                    <option value={Operator.MoreThan}>{t("after")}</option>
                 </>
             );
         } else if (property === SummaryProperty.Title) {
             return (
                 <>
-                    <option value={Operator.Is}>{t("raw_is")}</option>
-                    <option value={Operator.IsExactly}>{t("raw_is_exactly")}</option>
+                    <option value={Operator.Is}>{t("is")}</option>
+                    <option value={Operator.IsExactly}>{t("is_exactly")}</option>
                 </>
             );
         } else if (property === SummaryProperty.Amount) {
             return (
                 <>
-                    <option value={Operator.IsExactly}>{t("raw_is_exactly")}</option>
-                    <option value={Operator.MoreThan}>{t("raw_more_than")}</option>
-                    <option value={Operator.LessThan}>{t("raw_less_than")}</option>
+                    <option value={Operator.IsExactly}>{t("is_exactly")}</option>
+                    <option value={Operator.MoreThan}>{t("more_than")}</option>
+                    <option value={Operator.LessThan}>{t("less_than")}</option>
                 </>
             );
         } else if (property === SummaryProperty.Category) {
             return (
                 <>
-                    <option value={Operator.Is}>{t("raw_is")}</option>
-                    <option value={Operator.IsExactly}>{t("raw_is_exactly")}</option>
+                    <option value={Operator.Is}>{t("is")}</option>
+                    <option value={Operator.IsExactly}>{t("is_exactly")}</option>
                 </>
             );
         } else {

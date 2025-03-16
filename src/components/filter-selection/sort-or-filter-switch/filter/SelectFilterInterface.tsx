@@ -52,23 +52,23 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
                 >
                     ✕
                 </button>
-                <h1 className="text-2xl font-bold">{t("filter")}</h1>
-                <h2 className="mt-4">{t("raw_property")}</h2>
+                <h1 className="text-2xl font-bold">{"🔍 " + t("filter")}</h1>
+                <h2 className="mt-4">{t("property")}</h2>
 
                 <SelectPropertyComponent onChange={handlePropertyChange} />
 
-                <h2 className="mt-4">{t("raw_operator")}</h2>
+                <h2 className="mt-4">{t("operator")}</h2>
                 <SelectOperatorComponent
                     onChange={handleOperatorChange}
                     property={property}
                 />
 
-                <h2 className="mt-4">{t("raw_value")}</h2>
+                <h2 className="mt-4">{t("value")}</h2>
                 {property === SummaryProperty.Amount ? (
                     <input
                         type="number"
                         className="mt-2 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600"
-                        placeholder={t("raw_enter_value") as string}
+                        placeholder={t("enter_value") as string}
                         value={value}
                         onChange={handleValueChange}
                     />
@@ -76,7 +76,7 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
                     <input
                         type="date"
                         className="mt-2 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600 cursor-text"
-                        placeholder={t("raw_enter_value") as string}
+                        placeholder={t("enter_value") as string}
                         value={value}
                         onChange={handleValueChange}
                     />
@@ -84,7 +84,7 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
                     <input
                         type="text"
                         className="mt-2 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600"
-                        placeholder={t("raw_enter_value") as string}
+                        placeholder={t("enter_value") as string}
                         value={value}
                         onChange={handleValueChange}
                     />
@@ -95,7 +95,7 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
                     onClick={handleClickAdd}
                     disabled={value === ""}
                 >
-                    {t("raw_add")}
+                    {t("add")}
                 </button>
             </div>
         </div>
