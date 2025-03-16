@@ -4,24 +4,22 @@ import path from 'node:path'
 import {
   addCreditGroup,
   addCreditRow,
-  addCreditTable, addInvoice,
+  addCreditTable,
   addOtherCreditRow, deleteCreditGroup,
   deleteCreditRow,
-  deleteCreditTable, deleteInvoice, getAllCategories,
+  deleteCreditTable, getAllCategories,
   getCredits,
   getCreditsList,
-  getCreditsSumByCategory,
   getCreditTableFromId,
-  getDebits,
-  getDebitsSumByCategory,
   getOtherMoneyCreditsFromId,
-  getTransactionsByMonth,
   updateCreditCategory,
   updateCreditDate,
   updateCreditRow,
   updateCreditTitle,
   updateOtherCreditRow
-} from "../src/backend/database.ts";
+} from "../src/backend/db/credits.ts";
+import {getCreditsSumByCategory, getDebitsSumByCategory, getTransactionsByMonth} from "../src/backend/db/reports.ts";
+import {addInvoice, deleteInvoice, getDebits} from "../src/backend/db/debits.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

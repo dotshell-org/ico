@@ -44,7 +44,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
 
     const handleNewDebit = () => {
         (window as any).ipcRenderer
-            .invoke("addDebit", t("new_invoice"), t("other"))
+            .invoke("addInvoice", t("new_invoice"), t("other"))
             .then((result: Debit) => {
                 setInvoices(prev => [...prev, result]);
             })
@@ -53,11 +53,11 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
             });
     }
 
-    const handleDebitDeleted = (debitId: number) => {
+    const handleDebitDeleted = (invoiceId: number) => {
         (window as any).ipcRenderer
-            .invoke("deleteDebit", debitId)
+            .invoke("deleteInvoice", invoiceId)
             .then(() => {
-                setInvoices(invoices.filter(invoice => invoice.id !== debitId));
+                setInvoices(invoices.filter(invoice => invoice.id !== invoiceId));
             })
             .catch((error: any) => {
                 console.error("Error when deleting debit", error);
@@ -93,7 +93,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
             </table>
 
 
-            <div className="mb-2">
+            <div className="mt-5">
                 <label htmlFor="tableType" className="mr-2">
                     {"🌎 " + t("country")}
                 </label>

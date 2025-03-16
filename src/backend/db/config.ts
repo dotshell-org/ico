@@ -1,0 +1,32 @@
+import { createRequire } from 'module';
+import {Operator} from "../../types/filter/Operator.ts";
+import {Orientation} from "../../types/sort/Orientation.ts";
+
+const require = createRequire(import.meta.url);
+const Database = require('better-sqlite3');
+
+// Database configuration
+export const DATABASE_PATH = "./local.backend";
+export const DB_OPTIONS = { };
+
+// Create or open the database
+export const db = new Database(DATABASE_PATH, DB_OPTIONS);
+
+// Util function
+export function typeToOperator(type: Operator | Orientation): string {
+    if (type === Operator.Is) {
+        return "LIKE";
+    } else if (type === Operator.IsExactly) {
+        return "=";
+    } else if (type === Operator.MoreThan) {
+        return ">";
+    } else if (type === Operator.LessThan) {
+        return "<";
+    } else if (type === Orientation.Asc) {
+        return "ASC";
+    } else if (type === Orientation.Desc) {
+        return "DESC";
+    } else {
+        throw new Error(`Unsupported operator type: ${type}`);
+    }
+}

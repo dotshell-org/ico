@@ -98,7 +98,7 @@ const DetailedCredits: React.FC<DetailedCreditsProps> = ({ handleCreditMiniature
                 onClick={handleNewCredit}
                 className="mt-5 mb-16 p-1 w-full text-sm bg-transparent hover:bg-blue-500 border border-blue-500 text-blue-500 hover:text-white rounded transition-all duration-300"
             >
-                {t("raw_new")}
+                {t("new")}
             </button>
         </>
     );
