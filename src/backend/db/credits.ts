@@ -17,34 +17,40 @@ import dayjs from "dayjs";
  */
 export function getCredits(filters: Filter[], sort: Sort[]): object[] {
     let query = `
-        SELECT
-            ct.id AS id,
-            cg.date,
-            cg.title,
-            cg.category,
-            ct.type,
-            SUM(cr.quantity * cr.amount) AS amount
-        FROM
-            credits_groups cg
-                JOIN
-            credits_tables ct ON cg.id = ct.group_id
-                JOIN
-            credits_rows cr ON ct.id = cr.table_id
+        WITH GroupTotals AS (
+            SELECT
+                ct.id AS id,
+                cg.date,
+                cg.title,
+                cg.category,
+                ct.type,
+                SUM(cr.quantity * cr.amount) AS total_amount
+            FROM
+                credits_groups cg
+                    JOIN
+                credits_tables ct ON cg.id = ct.group_id
+                    JOIN
+                credits_rows cr ON ct.id = cr.table_id
+            GROUP BY ct.id, cg.date, cg.title, cg.category, ct.type
+        )
+        SELECT * FROM GroupTotals
     `;
     const queryParams: any[] = [];
     if (filters.length > 0) {
         const conditions = filters.map((filter) => {
-            if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
+            if (filter.property === SummaryProperty.Amount) {
+                queryParams.push(filter.value);
+                return `total_amount ${typeToOperator(filter.operator)} ?`;
+            } else if (filter.operator === Operator.Is) {
                 queryParams.push(`%${filter.value}%`);
+                return `${filter.property} ${typeToOperator(filter.operator)} ?`;
             } else {
                 queryParams.push(filter.value);
+                return `${filter.property} ${typeToOperator(filter.operator)} ?`;
             }
-            return `${filter.property} ${typeToOperator(filter.operator)} ?`;
         });
         query += " WHERE " + conditions.join(" AND ");
     }
-
-    query += " GROUP BY ct.id, cg.date, cg.title, cg.category";
 
     if (sort.length > 0) {
         const sortConditions = sort.map((s) => `${s.property} ${typeToOperator(s.orientation)}`);
@@ -66,12 +72,12 @@ export function getCredits(filters: Filter[], sort: Sort[]): object[] {
         return ""
     }
 
-    return rows.map((row: { id: any; date: any; title: any; category: any; type: MoneyType; amount: any; }) => {
+    return rows.map((row: { id: any; date: any; title: any; category: any; type: MoneyType; total_amount: any; }) => {
         return {
             id: row.id,
             date: row.date,
             title: `${row.title} (${typeToEmoji(row.type)})`,
-            totalAmount: row.amount,
+            totalAmount: row.total_amount,
             category: row.category,
         }
     })
@@ -86,34 +92,48 @@ export function getCredits(filters: Filter[], sort: Sort[]): object[] {
  */
 export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
     let query = `
-        SELECT
-            cg.id AS group_id,
-            cg.title AS group_title,
-            cg.date AS group_date,
-            cg.category AS group_category,
-            JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.id, 0)) AS table_ids,
-            JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.type, 0)) AS table_types,
-            COALESCE(SUM(cr.quantity * cr.amount), 0) AS total_amount
-        FROM
-            credits_groups cg
-                LEFT JOIN credits_tables ct ON cg.id = ct.group_id
-                LEFT JOIN credits_rows cr ON ct.id = cr.table_id
+        WITH GroupTotals AS (
+            SELECT
+                cg.id AS group_id,
+                cg.title AS group_title,
+                cg.date AS group_date,
+                cg.category AS group_category,
+                JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.id, 0)) AS table_ids,
+                JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.type, 0)) AS table_types,
+                COALESCE(SUM(cr.quantity * cr.amount), 0) AS total_amount
+            FROM credits_groups cg
+                     LEFT JOIN credits_tables ct ON cg.id = ct.group_id
+                     LEFT JOIN credits_rows cr ON ct.id = cr.table_id
+            GROUP BY cg.id, cg.title, cg.date, cg.category
+        )
+        SELECT * FROM GroupTotals
     `;
+
     const queryParams: any[] = [];
+    const conditions: string[] = [];
 
     if (filters.length > 0) {
-        const conditions = filters.map((filter) => {
-            if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
-                queryParams.push(`%${filter.value}%`);
+        filters.forEach((filter) => {
+            if (filter.property === SummaryProperty.Amount) {
+                conditions.push(`total_amount ${typeToOperator(filter.operator)} ?`);
             } else {
+                if (filter.operator === Operator.Is) {
+                    conditions.push(`${filter.property} ${typeToOperator(filter.operator)} ?`);
+                    queryParams.push(`%${filter.value}%`);
+                } else {
+                    conditions.push(`${filter.property} ${typeToOperator(filter.operator)} ?`);
+                    queryParams.push(filter.value);
+                }
+            }
+            if (filter.property === SummaryProperty.Amount) {
                 queryParams.push(filter.value);
             }
-            return `${filter.property} ${typeToOperator(filter.operator)} ?`;
         });
-        query += " WHERE " + conditions.join(" AND ");
     }
 
-    query += " GROUP BY cg.id, cg.title";
+    if (conditions.length > 0) {
+        query += " WHERE " + conditions.join(" AND ");
+    }
 
     if (sorts.length > 0) {
         const sortConditions = sorts.map((s) => `${s.property} ${typeToOperator(s.orientation)}`);
@@ -438,10 +458,10 @@ export function getAllCategories(): string[] {
     const stmt = db.prepare(`
         SELECT DISTINCT category
         FROM (
-            SELECT category FROM credits_groups
-            UNION
-            SELECT category FROM debits
-        )
+                 SELECT category FROM credits_groups
+                 UNION
+                 SELECT category FROM invoices
+             )
     `);
     return stmt.all().map((row: any) => row.category);
 }

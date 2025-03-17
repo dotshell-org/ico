@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import "../src/backend/db/database.ts"
 import {
   addCreditGroup,
   addCreditRow,
@@ -19,7 +20,7 @@ import {
   updateOtherCreditRow
 } from "../src/backend/db/credits.ts";
 import {getCreditsSumByCategory, getDebitsSumByCategory, getTransactionsByMonth} from "../src/backend/db/reports.ts";
-import {addInvoice, deleteInvoice, getDebits} from "../src/backend/db/debits.ts";
+import {addInvoice, deleteInvoice, getInvoices} from "../src/backend/db/debits.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -78,7 +79,7 @@ function handleIpc(name: string, handler: (...args: any[]) => any) {
 }
 
 handleIpc("getCredits", getCredits);
-handleIpc("getDebits", getDebits);
+handleIpc("getDebits", getInvoices);
 handleIpc("getTransactionsByMonth", getTransactionsByMonth);
 handleIpc("getCreditsSumByCategory", getCreditsSumByCategory);
 handleIpc("getDebitsSumByCategory", getDebitsSumByCategory);

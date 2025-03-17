@@ -3,18 +3,18 @@ import {useEffect, useState} from "react";
 import {Filter} from "../../types/filter/Filter.ts";
 import {Sort} from "../../types/sort/Sort.ts";
 import {t} from "i18next";
-import {Debit} from "../../types/invoices/Debit.ts";
 import InvoiceMiniatureRow from "../../components/invoices/InvoiceMiniatureRow.tsx";
 import {Country} from "../../types/Country.ts";
+import {Invoice} from "../../types/invoices/Invoice.ts";
 
 interface InvoicesProps {
-    handleInvoiceMiniatureRowClicked: (invoice: Debit) => void;
+    handleInvoiceMiniatureRowClicked: (invoice: Invoice) => void;
 }
 
 const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked }) => {
     const [filters, setFilters] = useState<Filter[]>([]);
     const [sorts, setSorts] = useState<Sort[]>([]);
-    const [invoices, setInvoices] = useState<Debit[]>([]);
+    const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [selectedTableType, setSelectedTableType] = useState<Country>(Country.None);
 
     const handleFilterAdded = (filter: Filter) => {
@@ -34,7 +34,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
     useEffect(() => {
         (window as any).ipcRenderer
             .invoke("getDebits", filters, sorts)
-            .then((result: Debit[]) => {
+            .then((result: Invoice[]) => {
                 setInvoices(result);
             })
             .catch((error: any) => {
@@ -45,7 +45,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
     const handleNewDebit = () => {
         (window as any).ipcRenderer
             .invoke("addInvoice", t("new_invoice"), t("other"))
-            .then((result: Debit) => {
+            .then((result: Invoice) => {
                 setInvoices(prev => [...prev, result]);
             })
             .catch((error: any) => {
@@ -93,8 +93,8 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
             </table>
 
 
-            <div className="mt-5">
-                <label htmlFor="tableType" className="mr-2">
+            <div className="">
+                <label htmlFor="tableType" className="mr-2 mt-0">
                     {"🌎 " + t("country")}
                 </label>
                 <select

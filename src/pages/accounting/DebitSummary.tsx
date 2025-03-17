@@ -6,6 +6,7 @@ import Summary from "../../components/summary/Summary.tsx";
 import {t} from "i18next";
 import {SummaryProperty} from "../../types/summary/SummaryProperty.ts";
 import {Orientation} from "../../types/sort/Orientation.ts";
+import {Invoice} from "../../types/invoices/Invoice.ts";
 
 function DebitSummary() {
     const [filters, setFilters] = useState<Filter[]>([]);
@@ -29,11 +30,19 @@ function DebitSummary() {
     useEffect(() => {
         window.ipcRenderer
             .invoke("getDebits", filters, sorts)
-            .then((result: SummaryObject[]) => {
-                setDebits(result);
+            .then((result: Invoice[]) => {
+                setDebits(result.map(e => {
+                    return {
+                        id: e.id,
+                        date: e.issueDate,
+                        title: e.title || "",
+                        totalAmount: e.totalAmount,
+                        category: e.category
+                    } as SummaryObject;
+                }));
             })
             .catch((error: any) => {
-                console.error("Erreur lors de la récupération des crédits", error);
+                console.error("Error when fetching credits", error);
             });
     }, [filters, sorts]);
 
