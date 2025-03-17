@@ -8,7 +8,7 @@ db.exec(`
         category TEXT,
         issue_date TEXT,
         sale_service_date TEXT,
-        country_code TEXT
+        country_code INTEGER
     );
     CREATE TABLE IF NOT EXISTS invoice_products (
         id INTEGER PRIMARY KEY,

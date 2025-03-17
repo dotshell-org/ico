@@ -9,8 +9,10 @@ import DetailedCredits from "./pages/accounting/DetailedCredits.tsx";
 import Invoices from "./pages/accounting/Invoices.tsx";
 import CreditEditor from "./components/detailed-credits/CreditEditor.tsx";
 import {Credit} from "./types/detailed-credits/Credit.ts";
-import { Debit } from './types/invoices/Debit.ts';
 import FranceInvoiceEditor from "./components/invoices/invoice-editors/FranceInvoiceEditor.tsx";
+import {Invoice} from "./types/invoices/Invoice.ts";
+import {Country} from "./types/Country.ts";
+import DefaultInvoiceEditor from "./components/invoices/invoice-editors/DefaultInvoiceEditor.tsx";
 
 function App() {
     const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
@@ -23,12 +25,14 @@ function App() {
         totalAmount: 0,
         category: ""
     });
-    const [invoiceInEditor, setInvoiceInEditor] = useState<Debit>({
+    const [invoiceInEditor, setInvoiceInEditor] = useState<Invoice>({
         id: 0,
         title: "",
-        date: "2000-00-00",
+        issueDate: "2000-00-00",
+        saleServiceDate: "2000-00-00",
         totalAmount: 0,
-        category: ""
+        category: "",
+        countryCode: 0,
     });
 
     // Vérifier si l'utilisateur préfère le mode sombre
@@ -61,15 +65,20 @@ function App() {
             case Tabs.AccountingCreditEditor:
                 return <CreditEditor credit={creditInEditor}/>;
             case Tabs.AccountingInvoices:
-                return <Invoices handleInvoiceMiniatureRowClicked={(invoice: Debit) => {
+                return <Invoices handleInvoiceMiniatureRowClicked={(invoice: Invoice) => {
                     setInvoiceInEditor(invoice);
                     setSelectedTab(Tabs.AccountingInvoiceEditor);
                 }}/>;
             case Tabs.AccountingInvoiceEditor:
-                return <FranceInvoiceEditor invoice={invoiceInEditor}/>;
+                if (invoiceInEditor.countryCode == Country.None) {
+                    return <DefaultInvoiceEditor invoice={invoiceInEditor}/>;
+                } else if (invoiceInEditor.countryCode == Country.France) {
+                    return <FranceInvoiceEditor invoice={invoiceInEditor}/>;
+                }
+                return <h1>{invoiceInEditor.countryCode}</h1>;
 
             default:
-            return null;
+                return null;
     }
   };
 

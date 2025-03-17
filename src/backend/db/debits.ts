@@ -5,7 +5,18 @@ import { Invoice } from "../../types/invoices/Invoice";  // Vous devrez créer c
 import dayjs from "dayjs";
 import { Operator } from "../../types/filter/Operator";
 import { SummaryProperty } from "../../types/summary/SummaryProperty";
+import {Country} from "../../types/Country.ts";
 
+/**
+ * Retrieves a list of invoices based on the provided filters and sorting options.
+ *
+ * @param {Filter[]} filters - An array of filter objects used to filter the invoices.
+ * Each filter should specify a property, an operator, and a value to match.
+ * @param {Sort[]} sort - An array of sort objects used to determine the order of the results.
+ * Each sort should specify a property and an orientation (ascending or descending).
+ * @return {Invoice[]} An array of invoice objects, each containing details such as
+ * ID, title, category, issue date, sale service date, country code, and total amount.
+ */
 export function getInvoices(filters: Filter[], sort: Sort[]): Invoice[] {
     let query = `
         SELECT i.id,
@@ -72,7 +83,15 @@ export function getInvoices(filters: Filter[], sort: Sort[]): Invoice[] {
     }));
 }
 
-export function addInvoice(title: string, category: string): Invoice {
+/**
+ * Adds a new invoice to the database with the specified title and category.
+ *
+ * @param {string} title - The title of the invoice.
+ * @param {string} category - The category of the invoice.
+ * @param {Country} country - The country of the invoice.
+ * @return {Invoice} The newly created invoice object, which includes the invoice ID, title, category, issue date, sale/service date, country code, and total amount.
+ */
+export function addInvoice(title: string, category: string, country: Country): Invoice {
     db.prepare('BEGIN TRANSACTION').run();
     try {
         const stmt = db.prepare(`
@@ -81,7 +100,7 @@ export function addInvoice(title: string, category: string): Invoice {
         `);
 
         const currentDate = dayjs().toISOString();
-        stmt.run(title, category, currentDate, currentDate, 'FR'); // FR par défaut
+        stmt.run(title, category, currentDate, currentDate, country);
 
         const invoiceId = db.prepare("SELECT last_insert_rowid() AS id").get().id;
 
@@ -93,7 +112,7 @@ export function addInvoice(title: string, category: string): Invoice {
             category,
             issueDate: currentDate,
             saleServiceDate: currentDate,
-            countryCode: 'FR',
+            countryCode: country,
             totalAmount: 0
         };
     } catch (error) {
@@ -102,6 +121,13 @@ export function addInvoice(title: string, category: string): Invoice {
     }
 }
 
+/**
+ * Deletes an invoice and all its associated data from the database.
+ * Removes associated products and country-specific specifications before deleting the invoice.
+ *
+ * @param {number} invoiceId - The ID of the invoice to be deleted.
+ * @return {void} This function does not return a value.
+ */
 export function deleteInvoice(invoiceId: number): void {
     db.prepare('BEGIN TRANSACTION').run();
     try {
@@ -117,4 +143,4 @@ export function deleteInvoice(invoiceId: number): void {
         db.prepare('ROLLBACK').run();
         throw error;
     }
-}
+} 

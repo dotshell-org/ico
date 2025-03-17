@@ -4,6 +4,6 @@ export interface Invoice {
     category: string;
     issueDate: string;
     saleServiceDate: string;
-    countryCode: string;
+    countryCode: number;
     totalAmount: number;
 }

@@ -1,11 +1,11 @@
 import {t} from "i18next";
 import Container from "../Container.tsx";
-import {Debit} from "../../../types/invoices/Debit.ts";
 import React, {useState, useEffect} from "react";
 import InputField from "../InputField.tsx";
+import {Invoice} from "../../../types/invoices/Invoice.ts";
 
 interface FranceEditorProps {
-    invoice: Debit
+    invoice: Invoice
 }
 
 const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEditorProps) => {

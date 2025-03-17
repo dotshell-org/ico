@@ -42,9 +42,9 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
             });
     }, [filters, sorts]);
 
-    const handleNewDebit = () => {
+    const handleNewInvoice = () => {
         (window as any).ipcRenderer
-            .invoke("addInvoice", t("new_invoice"), t("other"))
+            .invoke("addInvoice", t("new_invoice"), t("other"), selectedTableType)
             .then((result: Invoice) => {
                 setInvoices(prev => [...prev, result]);
             })
@@ -53,7 +53,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
             });
     }
 
-    const handleDebitDeleted = (invoiceId: number) => {
+    const handleInvoiceDeleted = (invoiceId: number) => {
         (window as any).ipcRenderer
             .invoke("deleteInvoice", invoiceId)
             .then(() => {
@@ -87,7 +87,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
             <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-y-0 cursor-copy mt-36 ">
                 {
                     invoices.map((invoice) => (
-                        <InvoiceMiniatureRow key={invoice.id} invoice={invoice} onClick={handleInvoiceMiniatureRowClicked} onDelete={handleDebitDeleted} />
+                        <InvoiceMiniatureRow key={invoice.id} invoice={invoice} onClick={handleInvoiceMiniatureRowClicked} onDelete={handleInvoiceDeleted} />
                     ))
                 }
             </table>
@@ -110,7 +110,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
 
             <button
                 type="button"
-                onClick={handleNewDebit}
+                onClick={handleNewInvoice}
                 className="mt-2 mb-16 p-1 w-full text-sm bg-transparent hover:bg-blue-500 border border-blue-500 text-blue-500 hover:text-white rounded transition-all duration-300"
             >
                 {t("new")}
