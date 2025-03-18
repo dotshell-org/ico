@@ -20,7 +20,13 @@ import {
   updateOtherCreditRow
 } from "../src/backend/db/credits.ts";
 import {getCreditsSumByCategory, getDebitsSumByCategory, getTransactionsByMonth} from "../src/backend/db/reports.ts";
-import {addInvoice, deleteInvoice, getInvoices} from "../src/backend/db/debits.ts";
+import {
+  addInvoice,
+  deleteInvoice,
+  getInvoices, updateInvoiceCategory,
+  updateInvoiceIssueDate,
+  updateInvoiceSaleServiceDate, updateInvoiceTitle
+} from "../src/backend/db/debits.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -86,21 +92,32 @@ handleIpc("getDebitsSumByCategory", getDebitsSumByCategory);
 handleIpc("getCreditsList", getCreditsList);
 handleIpc("getCreditTableFromId", getCreditTableFromId);
 handleIpc("getOtherMoneyCreditsFromId", getOtherMoneyCreditsFromId);
+
 handleIpc("addCreditRow", addCreditRow);
 handleIpc("updateCreditRow", updateCreditRow);
 handleIpc("updateOtherCreditRow", updateOtherCreditRow);
 handleIpc("deleteCreditRow", deleteCreditRow);
 handleIpc("addOtherCreditRow", addOtherCreditRow);
+
 handleIpc("deleteCreditTable", deleteCreditTable);
 handleIpc("updateCreditDate", updateCreditDate);
 handleIpc("addCreditTable", addCreditTable);
+
 handleIpc("updateCreditTitle", updateCreditTitle);
 handleIpc("updateCreditCategory", updateCreditCategory);
+
 handleIpc("getAllCategories", getAllCategories);
+
 handleIpc("addCreditGroup", addCreditGroup);
 handleIpc("deleteCreditGroup", deleteCreditGroup);
+
 handleIpc("addInvoice", addInvoice);
 handleIpc("deleteInvoice", deleteInvoice);
+
+handleIpc("updateInvoiceIssueDate", updateInvoiceIssueDate);
+handleIpc("updateInvoiceSaleServiceDate", updateInvoiceSaleServiceDate);
+handleIpc("updateInvoiceCategory", updateInvoiceCategory);
+handleIpc("updateInvoiceTitle", updateInvoiceTitle);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

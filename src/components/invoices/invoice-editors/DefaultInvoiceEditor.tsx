@@ -12,8 +12,8 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
     const [titleValue, setTitleValue] = useState<string>(invoice.title);
     const [categoryValue, setCategoryValue] = useState<string>(invoice.category);
     const [allCategories, setAllCategories] = useState<string[]>([]);
-    const [issueDate, setIssueDate] = useState<string>('');
-    const [serviceDate, setServiceDate] = useState<string>('');
+    const [issueDate, setIssueDate] = useState<string>(invoice.issueDate);
+    const [serviceDate, setServiceDate] = useState<string>(invoice.saleServiceDate);
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -27,20 +27,53 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
         loadCategories();
     }, []);
 
-    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTitleValue(e.target.value);
+    const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newTitle = e.target.value;
+        try {
+            await window.ipcRenderer.invoke("updateInvoiceTitle", invoice.id, newTitle);
+            console.log("Title updated successfully!");
+            setTitleValue(newTitle);
+        } catch (error) {
+            console.error("Error when updating title:", error);
+        }
     };
 
     const handleCategoryChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newCategory = e.target.value;
         try {
-            await window.ipcRenderer.invoke("updateCreditCategory", invoice.id, newCategory);
+            await window.ipcRenderer.invoke("updateInvoiceCategory", invoice.id, newCategory);
             console.log("Category updated successfully!");
             setCategoryValue(newCategory);
         } catch (error) {
             console.error("Error when updating category:", error);
         }
     };
+
+    const handleIssueDateChange = async (value: string) => {
+        try {
+            if (value == "") {
+                return
+            }
+            await window.ipcRenderer.invoke("updateInvoiceIssueDate", invoice.id, value);
+            console.log("Issue date updated successfully!");
+            setIssueDate(value);
+        } catch (error) {
+            console.error("Error when updating issue date:", error);
+        }
+    }
+
+    const handleSaleServiceDateChange = async (value: string) => {
+        try {
+            if (value == "") {
+                return
+            }
+            await window.ipcRenderer.invoke("updateInvoiceSaleServiceDate", invoice.id, value);
+            console.log("Sale/service date updated successfully!");
+            setServiceDate(value);
+        } catch (error) {
+            console.error("Error when updating sale/service date:", error);
+        }
+    }
 
     return (
         <div className="pb-6">
@@ -70,14 +103,14 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
                     <InputField
                         value={issueDate}
                         type="date"
-                        onChange={setIssueDate}
+                        onChange={handleIssueDateChange}
                     />
 
                     <h3>{t("sale_or_service")}</h3>
                     <InputField
                         value={serviceDate}
                         type="date"
-                        onChange={setServiceDate}
+                        onChange={handleSaleServiceDateChange}
                     />
                 </Container>
 

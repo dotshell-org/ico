@@ -72,8 +72,11 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
                 <td
                     className={`py-2 mx-0.5 flex align-middle border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 border-b text-left p-1.5 text-sm font-bold transition-all select-none`}
                 >
-                    <div className="w-[80%]">
+                    <div className="w-[60%]">
                         {t("title")}
+                    </div>
+                    <div className="w-[20%]">
+                        {t("country")}
                     </div>
                     <div className="w-[20%]">
                         {t("total_amount")}

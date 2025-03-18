@@ -143,4 +143,68 @@ export function deleteInvoice(invoiceId: number): void {
         db.prepare('ROLLBACK').run();
         throw error;
     }
-} 
+}
+
+/**
+ * Updates the issue date of an invoice with the specified invoice ID.
+ *
+ * @param {number} invoiceId - The unique identifier of the invoice to be updated.
+ * @param {string} date - The new issue date to be set for the invoice in ISO format (YYYY-MM-DD).
+ * @return {object} The result of the database operation, including the number of rows affected.
+ */
+export function updateInvoiceIssueDate(invoiceId: number, date: string): void {
+    const stmt = db.prepare(`
+        UPDATE invoices
+        SET issue_date = ?
+        WHERE id = ?
+    `);
+    stmt.run(date, invoiceId);
+}
+
+/**
+ * Updates the sale service date for a specific invoice.
+ *
+ * @param {number} invoiceId - The unique identifier of the invoice to be updated.
+ * @param {string} date - The new sale service date to be set in the invoice.
+ * @return {void} No return value.
+ */
+export function updateInvoiceSaleServiceDate(invoiceId: number, date: string): void {
+    const stmt = db.prepare(`
+        UPDATE invoices
+        SET sale_service_date = ?
+        WHERE id = ?
+    `);
+    stmt.run(date, invoiceId);
+}
+
+/**
+ * Updates the category of a specified invoice in the database.
+ *
+ * @param {number} invoiceId - The unique identifier of the invoice to be updated.
+ * @param {string} category - The new category to assign to the invoice.
+ * @return {void}
+ */
+export function updateInvoiceCategory(invoiceId: number, category: string): void {
+    const stmt = db.prepare(`
+        UPDATE invoices
+        SET category = ?
+        WHERE id = ?
+    `);
+    stmt.run(category, invoiceId);
+}
+
+/**
+ * Updates the title of an invoice identified by its ID.
+ *
+ * @param {number} invoiceId - The unique identifier of the invoice to be updated.
+ * @param {string} newTitle - The new title to assign to the invoice.
+ * @return {void} This function does not return a value.
+ */
+export function updateInvoiceTitle(invoiceId: number, newTitle: string): void {
+    const stmt = db.prepare(`
+        UPDATE invoices 
+        SET title = ? 
+        WHERE id = ?
+    `);
+    stmt.run(newTitle, invoiceId);
+}

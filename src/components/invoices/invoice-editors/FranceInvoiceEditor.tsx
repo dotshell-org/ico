@@ -17,8 +17,8 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
     const [siretValue, setSiretValue] = useState<string>('');
     const [apeValue, setApeValue] = useState<string>('');
     const [vatValue, setVatValue] = useState<string>('');
-    const [issueDate, setIssueDate] = useState<string>('');
-    const [serviceDate, setServiceDate] = useState<string>('');
+    const [issueDate, setIssueDate] = useState<string>(invoice.issueDate);
+    const [serviceDate, setServiceDate] = useState<string>(invoice.saleServiceDate);
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -32,20 +32,52 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
         loadCategories();
     }, []);
 
-    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTitleValue(e.target.value);
+    const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newTitle = e.target.value;
+        try {
+            if (newTitle == "") {
+                return
+            }
+            await window.ipcRenderer.invoke("updateInvoiceTitle", invoice.id, newTitle);
+            console.log("Title updated successfully!");
+            setTitleValue(newTitle);
+        } catch (error) {
+            console.error("Error when updating title:", error);
+        }
     };
 
-    const handleCategoryChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newCategory = e.target.value;
+    const handleCategoryChange = async (value: string) => {
         try {
-            await window.ipcRenderer.invoke("updateCreditCategory", invoice.id, newCategory);
+            if (value == "") {
+                return
+            }
+            await window.ipcRenderer.invoke("updateInvoiceCategory", invoice.id, value);
             console.log("Category updated successfully!");
-            setCategoryValue(newCategory);
+            setCategoryValue(value);
         } catch (error) {
             console.error("Error when updating category:", error);
         }
     };
+
+    const handleIssueDateChange = async (value: string) => {
+        try {
+            await window.ipcRenderer.invoke("updateInvoiceIssueDate", invoice.id, value);
+            console.log("Issue date updated successfully!");
+            setIssueDate(value);
+        } catch (error) {
+            console.error("Error when updating issue date:", error);
+        }
+    }
+
+    const handleSaleServiceDateChange = async (value: string) => {
+        try {
+            await window.ipcRenderer.invoke("updateInvoiceSaleServiceDate", invoice.id, value);
+            console.log("Sale/service date updated successfully!");
+            setServiceDate(value);
+        } catch (error) {
+            console.error("Error when updating sale/service date:", error);
+        }
+    }
 
     return (
         <div className="pb-6">
@@ -59,7 +91,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
                 list="categoriesList"
                 id="categoryDatalist"
                 value={categoryValue}
-                onChange={handleCategoryChange}
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 placeholder={t("category")}
                 className="mb-8 bg-transparent border-none underline"
             />
@@ -112,14 +144,14 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
                         <InputField
                             value={issueDate}
                             type="date"
-                            onChange={setIssueDate}
+                            onChange={handleIssueDateChange}
                         />
 
                         <h3>{t("sale_or_service")}</h3>
                         <InputField
                             value={serviceDate}
                             type="date"
-                            onChange={setServiceDate}
+                            onChange={handleSaleServiceDateChange}
                         />
                     </Container>
 

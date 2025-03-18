@@ -1,12 +1,22 @@
 import React from "react";
 import {XMarkIcon} from "@heroicons/react/24/outline";
 import {Invoice} from "../../types/invoices/Invoice.ts";
+import {Country} from "../../types/Country.ts";
 
 interface InvoiceMiniatureRowProps {
     invoice: Invoice;
     onClick: (invoice: Invoice) => void;
     onDelete: (id: number) => void;
 }
+
+const countryCodeToEmoji = (code: Country) => {
+    const emojis: Record<Country, string> = {
+        [Country.None]: "🚫",
+        [Country.France]: "🇫🇷"
+    };
+
+    return emojis[code] || "❓";
+};
 
 const InvoiceMiniatureRow: React.FC<InvoiceMiniatureRowProps> = ({ invoice, onClick, onDelete }) => {
     return (
@@ -15,9 +25,15 @@ const InvoiceMiniatureRow: React.FC<InvoiceMiniatureRowProps> = ({ invoice, onCl
         >
             <div
                 onClick={() => onClick(invoice)}
-                className="w-[80%] pl-1.5 pt-3"
+                className="w-[60%] pl-1.5 pt-3"
             >
                 {invoice.title}
+            </div>
+            <div
+                onClick={() => onClick(invoice)}
+                className="w-[20%] pl-1.5 pt-3"
+            >
+                {countryCodeToEmoji(invoice.countryCode)}
             </div>
             <div
                 onClick={() => onClick(invoice)}
