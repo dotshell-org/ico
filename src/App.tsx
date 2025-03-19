@@ -13,6 +13,7 @@ import FranceInvoiceEditor from "./components/invoices/invoice-editors/FranceInv
 import {Invoice} from "./types/invoices/Invoice.ts";
 import {Country} from "./types/Country.ts";
 import DefaultInvoiceEditor from "./components/invoices/invoice-editors/DefaultInvoiceEditor.tsx";
+import {TaxType} from "./types/invoices/TaxType.ts";
 
 function App() {
     const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
@@ -71,9 +72,9 @@ function App() {
                 }}/>;
             case Tabs.AccountingInvoiceEditor:
                 if (invoiceInEditor.countryCode == Country.None) {
-                    return <DefaultInvoiceEditor invoice={invoiceInEditor}/>;
+                    return <DefaultInvoiceEditor invoice={invoiceInEditor} taxType={TaxType.None} />;
                 } else if (invoiceInEditor.countryCode == Country.France) {
-                    return <FranceInvoiceEditor invoice={invoiceInEditor}/>;
+                    return <FranceInvoiceEditor invoice={invoiceInEditor }/>;
                 }
                 return <h1>{invoiceInEditor.countryCode}</h1>;
 

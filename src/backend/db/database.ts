@@ -18,6 +18,7 @@ db.exec(`
         quantity INTEGER,
         tax_rate REAL,
         
+        
         FOREIGN KEY (invoice_id) REFERENCES invoices(id)
     );
     CREATE TABLE IF NOT EXISTS invoice_country_specifications (

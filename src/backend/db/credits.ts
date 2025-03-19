@@ -1,11 +1,11 @@
-import { db, typeToOperator } from './config';
-import { Filter } from "../../types/filter/Filter";
-import { Sort } from "../../types/sort/Sort";
-import { Operator } from "../../types/filter/Operator";
-import { SummaryProperty } from "../../types/summary/SummaryProperty";
-import { Credit } from "../../types/detailed-credits/Credit";
-import { CreditTable, CreditTableRow } from "../../types/detailed-credits/CreditTable";
-import { MoneyType } from "../../types/detailed-credits/MoneyType";
+import {db, typeToOperator} from './config';
+import {Filter} from "../../types/filter/Filter";
+import {Sort} from "../../types/sort/Sort";
+import {Operator} from "../../types/filter/Operator";
+import {SummaryProperty} from "../../types/summary/SummaryProperty";
+import {Credit} from "../../types/detailed-credits/Credit";
+import {CreditTable, CreditTableRow} from "../../types/detailed-credits/CreditTable";
+import {MoneyType} from "../../types/detailed-credits/MoneyType";
 import dayjs from "dayjs";
 
 /**
@@ -96,7 +96,7 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
             SELECT
                 cg.id AS group_id,
                 cg.title AS group_title,
-                cg.date AS group_date,
+                cg.date AS date,
                 cg.category AS group_category,
                 JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.id, 0)) AS table_ids,
                 JSON_GROUP_ARRAY(DISTINCT COALESCE(ct.type, 0)) AS table_types,
@@ -147,7 +147,7 @@ export function getCreditsList(filters: Filter[], sorts: Sort[]): Credit[] {
         category: row.group_category,
         id: row.group_id,
         title: row.group_title,
-        date: row.group_date,
+        date: row.date,
         tableIds: JSON.parse(row.table_ids) as number[],
         types: [...(JSON.parse(row.table_types) as MoneyType[]).filter(type => type !== MoneyType.Other), MoneyType.Other],
         totalAmount: row.total_amount || 0,
@@ -187,7 +187,10 @@ export function getCreditTableFromId(id: number): CreditTable {
         stmt = db.prepare(query);
         rows = stmt.all(id);
         if (rows.length === 0) {
-            throw new Error(`Credit table with ID ${id} not found`);
+            return {
+                type: MoneyType.Other,
+                rows: []
+            }
         }
 
         return {
@@ -373,7 +376,7 @@ export function addOtherCreditRow(groupId: number, amount: number): CreditTableR
  * @return {boolean} Returns true if the operation is successful.
  * @throws {Error} Throws an error if the operation fails and a transaction rollback is performed.
  */
-export function deleteCreditTable(tableId: number) {
+export function deleteCreditTable(tableId: number): boolean {
     db.prepare('BEGIN TRANSACTION').run();
     try {
         db.prepare('DELETE FROM credits_rows WHERE table_id = ?').run(tableId);
@@ -393,7 +396,7 @@ export function deleteCreditTable(tableId: number) {
  * @param {string} newDate - The new date to assign to the credit in ISO format.
  * @return {object} The result of the database operation, including changes and lastInsertRowid properties.
  */
-export function updateCreditDate(creditId: number, newDate: string) {
+export function updateCreditDate(creditId: number, newDate: string): object {
     const stmt = db.prepare(`
     UPDATE credits_groups
     SET date = ?
@@ -423,7 +426,7 @@ export function addCreditTable(groupId: number, type: MoneyType): number {
  * @param {string} newTitle - The new title to assign to the credit group.
  * @return {number} - The number of rows affected by the update operation.
  */
-export function updateCreditTitle(creditId: number, newTitle: string) {
+export function updateCreditTitle(creditId: number, newTitle: string): number {
     const stmt = db.prepare("UPDATE credits_groups SET title = ? WHERE id = ?");
     const info = stmt.run(newTitle, creditId);
     return info.changes;
@@ -478,13 +481,13 @@ export function addCreditGroup(title: string, category: string): Credit {
         INSERT INTO credits_groups (title, date, category)
         VALUES (?, ?, ?)
     `);
-    stmt.run(title, dayjs().toISOString(), category);
+    stmt.run(title, dayjs().format("YYYY-MM-DD"), category);
 
     return {
         category,
         id: db.prepare("SELECT last_insert_rowid() AS id").get().id,
         title,
-        date: dayjs().toISOString(),
+        date: dayjs().format("YYYY-MM-DD"),
         tableIds: [],
         types: [MoneyType.Other],
         totalAmount: 0,

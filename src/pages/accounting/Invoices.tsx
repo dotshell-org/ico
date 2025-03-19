@@ -6,6 +6,8 @@ import {t} from "i18next";
 import InvoiceMiniatureRow from "../../components/invoices/InvoiceMiniatureRow.tsx";
 import {Country} from "../../types/Country.ts";
 import {Invoice} from "../../types/invoices/Invoice.ts";
+import {SummaryProperty} from "../../types/summary/SummaryProperty.ts";
+import {Orientation} from "../../types/sort/Orientation.ts";
 
 interface InvoicesProps {
     handleInvoiceMiniatureRowClicked: (invoice: Invoice) => void;
@@ -13,7 +15,7 @@ interface InvoicesProps {
 
 const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked }) => {
     const [filters, setFilters] = useState<Filter[]>([]);
-    const [sorts, setSorts] = useState<Sort[]>([]);
+    const [sorts, setSorts] = useState<Sort[]>([{property: SummaryProperty.Date, orientation: Orientation.Desc}]);
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [selectedTableType, setSelectedTableType] = useState<Country>(Country.None);
 

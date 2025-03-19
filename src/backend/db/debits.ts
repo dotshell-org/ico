@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import { Operator } from "../../types/filter/Operator";
 import { SummaryProperty } from "../../types/summary/SummaryProperty";
 import {Country} from "../../types/Country.ts";
+import {InvoiceProduct} from "../../types/invoices/InvoiceProduct.ts";
 
 /**
  * Retrieves a list of invoices based on the provided filters and sorting options.
@@ -25,31 +26,49 @@ export function getInvoices(filters: Filter[], sort: Sort[]): Invoice[] {
                i.issue_date,
                i.sale_service_date,
                i.country_code,
-               SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate)) as total_amount
+               COALESCE(SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate)), 0) as total_amount
         FROM invoices i
                  LEFT JOIN invoice_products ip ON i.id = ip.invoice_id
     `;
     const queryParams: any[] = [];
+    const whereConditions: string[] = [];
+    const havingConditions: string[] = [];
 
     if (filters.length > 0) {
-        const conditions = filters.map((filter) => {
-            const targetProperty = filter.property === SummaryProperty.Date
-                ? 'i.issue_date'
-                : filter.property === SummaryProperty.Amount
-                    ? 'total_amount'
-                    : `i.${filter.property}`;
-            if (filter.operator === Operator.Is && filter.property !== SummaryProperty.Amount) {
-                queryParams.push(`%${filter.value}%`);
-                return `${targetProperty} ${typeToOperator(filter.operator)} ?`;
-            } else {
+        filters.forEach((filter) => {
+            if (filter.property === SummaryProperty.Amount) {
+                // Amount filters go to HAVING clause
+                havingConditions.push(
+                    `total_amount ${typeToOperator(filter.operator)} ?`
+                );
                 queryParams.push(filter.value);
-                return `${targetProperty} ${typeToOperator(filter.operator)} ?`;
+            } else {
+                // Other filters go to WHERE clause
+                const targetProperty = filter.property === SummaryProperty.Date
+                    ? 'i.issue_date'
+                    : `i.${filter.property}`;
+
+                if (filter.operator === Operator.Is) {
+                    queryParams.push(`%${filter.value}%`);
+                } else {
+                    queryParams.push(filter.value);
+                }
+                whereConditions.push(
+                    `${targetProperty} ${typeToOperator(filter.operator)} ?`
+                );
             }
         });
-        query += " WHERE " + conditions.join(" AND ");
+    }
+
+    if (whereConditions.length > 0) {
+        query += " WHERE " + whereConditions.join(" AND ");
     }
 
     query += " GROUP BY i.id";
+
+    if (havingConditions.length > 0) {
+        query += " HAVING " + havingConditions.join(" AND ");
+    }
 
     if (sort.length > 0) {
         const sortConditions = sort.map((s) => {
@@ -79,7 +98,7 @@ export function getInvoices(filters: Filter[], sort: Sort[]): Invoice[] {
         issueDate: row.issue_date,
         saleServiceDate: row.sale_service_date,
         countryCode: row.country_code,
-        totalAmount: row.total_amount || 0
+        totalAmount: getInvoiceInclTaxTotal(row.id)
     }));
 }
 
@@ -99,7 +118,7 @@ export function addInvoice(title: string, category: string, country: Country): I
             VALUES (?, ?, ?, ?, ?)
         `);
 
-        const currentDate = dayjs().toISOString();
+        const currentDate = dayjs().format('YYYY-MM-DD');
         stmt.run(title, category, currentDate, currentDate, country);
 
         const invoiceId = db.prepare("SELECT last_insert_rowid() AS id").get().id;
@@ -207,4 +226,101 @@ export function updateInvoiceTitle(invoiceId: number, newTitle: string): void {
         WHERE id = ?
     `);
     stmt.run(newTitle, invoiceId);
+}
+
+/**
+ * Retrieves the list of products associated with a specific invoice.
+ *
+ * @param {number} invoiceId - The unique identifier of the invoice.
+ * @return {InvoiceProduct[]} Array of products linked to the specified invoice, including their details such as id, name, amount excluding tax, quantity, and tax rate.
+ */
+export function getInvoiceProducts(invoiceId: number): InvoiceProduct[] {
+    const stmt = db.prepare(`
+        SELECT id,
+               name,
+               amount_excl_tax,
+               quantity,
+               tax_rate
+        FROM invoice_products
+        WHERE invoice_id = ?
+    `);
+    return stmt.all(invoiceId);
+}
+
+/**
+ * Adds a product to an invoice in the database.
+ *
+ * @param {number} invoiceId - The ID of the invoice to which the product will be added.
+ * @param {string} name - The name of the product.
+ * @param {number} amountExclTax - The price of the product excluding tax.
+ * @param {number} quantity - The quantity of the product being added.
+ * @param {number} taxRate - The tax rate applicable to the product.
+ * @return {void} This function does not return a value.
+ */
+export function addInvoiceProduct(invoiceId: number, name: string, amountExclTax: number, quantity: number, taxRate: number): void {
+    const stmt = db.prepare(`
+        INSERT INTO invoice_products (invoice_id, name, amount_excl_tax, quantity, tax_rate)
+        VALUES (?, ?, ?, ?, ?)
+    `);
+    stmt.run(invoiceId, name, amountExclTax, quantity, taxRate);
+}
+
+/**
+ * Updates the quantity of a specific product in the invoice.
+ *
+ * @param {number} invoiceProductId - The unique identifier of the product in the invoice to be updated.
+ * @param {number} quantity - The new quantity to be set for the product.
+ * @return {void} Does not return a value.
+ */
+export function updateInvoiceProductQuantity(invoiceProductId: number, quantity: number): void {
+    const stmt = db.prepare(`
+        UPDATE invoice_products
+        SET quantity = ?
+        WHERE id = ?
+    `);
+    stmt.run(quantity, invoiceProductId);
+}
+
+/**
+ * Deletes an invoice product from the database identified by the given ID.
+ *
+ * @param {number} invoiceProductId - The ID of the invoice product to be deleted.
+ * @return {void} This function does not return a value.
+ */
+export function deleteInvoiceProduct(invoiceProductId: number): void {
+    const stmt = db.prepare(`
+        DELETE FROM invoice_products
+        WHERE id = ?
+    `);
+    stmt.run(invoiceProductId);
+}
+
+/**
+ * Calculates the total amount excluding tax for a specified invoice.
+ *
+ * @param {number} invoiceId - The unique identifier of the invoice.
+ * @return {number} The total amount excluding tax for the specified invoice.
+ */
+export function getInvoiceExclTaxTotal(invoiceId: number): number {
+    const stmt = db.prepare(`
+        SELECT SUM(amount_excl_tax * quantity) as total
+        FROM invoice_products
+        WHERE invoice_id = ?
+    `);
+    return stmt.get(invoiceId).total || 0;
+}
+
+/**
+ * Calculates the total amount of an invoice including tax.
+ *
+ * @param {number} invoiceId - The unique identifier of the invoice.
+ * @return {number} The total amount of the invoice including tax. Returns 0 if no products are found for the invoice.
+ */
+export function getInvoiceInclTaxTotal(invoiceId: number): number {
+    const stmt = db.prepare(`
+        SELECT SUM(amount_excl_tax * quantity * (1 + tax_rate/100)) as total
+        FROM invoice_products
+        WHERE invoice_id = ?
+    `);
+    return stmt.get(invoiceId).total || 0;
 }

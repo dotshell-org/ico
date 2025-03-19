@@ -3,17 +3,24 @@ import Container from "../Container.tsx";
 import React, {useState, useEffect} from "react";
 import InputField from "../InputField.tsx";
 import {Invoice} from "../../../types/invoices/Invoice.ts";
+import NoTaxTable from "../products-tables/NoTaxTable.tsx";
+import {TaxType} from "../../../types/invoices/TaxType.ts";
+import VATTable from "../products-tables/VATTable.tsx";
 
 interface FranceEditorProps {
-    invoice: Invoice
+    invoice: Invoice;
+    taxType: TaxType;
+    children?: React.ReactNode;
 }
 
-const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEditorProps) => {
+const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, children }: FranceEditorProps) => {
     const [titleValue, setTitleValue] = useState<string>(invoice.title);
     const [categoryValue, setCategoryValue] = useState<string>(invoice.category);
     const [allCategories, setAllCategories] = useState<string[]>([]);
     const [issueDate, setIssueDate] = useState<string>(invoice.issueDate);
     const [serviceDate, setServiceDate] = useState<string>(invoice.saleServiceDate);
+    const [exclVatTotal, setExclVatTotal] = useState<number>(0);
+    const [inclVatTotal, setInclVatTotal] = useState<number>(0);
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -26,6 +33,45 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
         };
         loadCategories();
     }, []);
+
+    useEffect(() => {
+        const loadTotal = async () => {
+            try {
+                const total = await window.ipcRenderer.invoke("getInvoiceExclTaxTotal", invoice.id);
+                setExclVatTotal(total);
+            } catch (error) {
+                console.error("Error when loading total:", error);
+            }
+        }
+        loadTotal();
+    }, [invoice.id]);
+
+    useEffect(() => {
+        const loadTotal = async () => {
+            try {
+                const total = await window.ipcRenderer.invoke("getInvoiceInclTaxTotal", invoice.id);
+                setInclVatTotal(total);
+            } catch (error) {
+                console.error("Error when loading total:", error);
+            }
+        }
+        loadTotal();
+    }, [invoice.id]);
+
+    const handleTotalUpdate = async () => {
+        try {
+            const newTotal = await window.ipcRenderer.invoke("getInvoiceExclTaxTotal", invoice.id);
+            setExclVatTotal(newTotal);
+        } catch (error) {
+            console.error("Error when updating total:", error);
+        }
+        try {
+            const newTotal = await window.ipcRenderer.invoke("getInvoiceInclTaxTotal", invoice.id);
+            setInclVatTotal(newTotal);
+        } catch (error) {
+            console.error("Error when updating total:", error);
+        }
+    };
 
     const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newTitle = e.target.value;
@@ -97,7 +143,8 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
                 ))}
             </datalist>
 
-            <div className="w-[calc(100%-20rem)] mr-2">
+            <div className="w-[calc(100%-15rem)] mr-2">
+                { children }
                 <Container title={"\uD83D\uDDD3\uFE0F " + t("dates")}>
                     <h3>{t("issue")}</h3>
                     <InputField
@@ -114,18 +161,43 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
                     />
                 </Container>
 
-                <Container title={"\uD83D\uDECD\uFE0F " + t("products")}>
-                    <></>
-                </Container>
+                {
+                    taxType === TaxType.None ? (
+                        <NoTaxTable invoiceId={invoice.id} onUpdate={handleTotalUpdate} />
+                    ) : taxType === TaxType.VAT ? (
+                        <VATTable invoiceId={invoice.id}  onUpdate={handleTotalUpdate} />
+                    ) : null
+                }
 
-                <div className="fixed right-0 top-0 h-full w-[20rem] border-l bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 flex items-center justify-center">
+                <div className="fixed right-0 top-0 h-full w-[15rem] border-l bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 flex items-center justify-center">
                     <div className="block">
-                        <h3 className="text-center text-md mt-8">
-                            {t("total")}
-                        </h3>
-                        <h1 className="text-center text-4xl">
-                            €0,00
-                        </h1>
+                        {
+                            taxType === TaxType.None ? (
+                                <>
+                                    <h3 className="text-center text-md mt-8">
+                                        {t("total")}
+                                    </h3>
+                                    <h1 className="text-center text-4xl">
+                                        €{exclVatTotal.toFixed(2)}
+                                    </h1>
+                                </>
+                            ) : taxType === TaxType.VAT ? (
+                                <>
+                                    <h3 className="text-center text-md mt-8">
+                                        {t("excl_vat_total")}
+                                    </h3>
+                                    <h1 className="text-center text-4xl">
+                                        €{exclVatTotal.toFixed(2)}
+                                    </h1>
+                                    <h3 className="text-center text-md mt-8">
+                                        {t("incl_vat_total")}
+                                    </h3>
+                                    <h1 className="text-center text-4xl">
+                                        €{inclVatTotal.toFixed(2)}
+                                    </h1>
+                                </>
+                            ) : null
+                        }
                     </div>
                 </div>
             </div>

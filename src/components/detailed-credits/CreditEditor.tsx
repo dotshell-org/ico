@@ -64,7 +64,6 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
             setDateValue(newDate);
         } else {
             setDateValue(credit.date);
-            console.error("Date invalide. Restauration de la date précédente.");
         }
     };
 

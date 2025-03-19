@@ -5,6 +5,8 @@ import {Sort} from "../../types/sort/Sort.ts";
 import {t} from "i18next";
 import CreditMiniatureRow from "../../components/detailed-credits/CreditMiniatureRow.tsx";
 import {Credit} from "../../types/detailed-credits/Credit.ts";
+import {SummaryProperty} from "../../types/summary/SummaryProperty.ts";
+import {Orientation} from "../../types/sort/Orientation.ts";
 
 interface DetailedCreditsProps {
     handleCreditMiniatureRowClicked: (credit: Credit) => void;
@@ -12,7 +14,7 @@ interface DetailedCreditsProps {
 
 const DetailedCredits: React.FC<DetailedCreditsProps> = ({ handleCreditMiniatureRowClicked }) => {
     const [filters, setFilters] = useState<Filter[]>([]);
-    const [sorts, setSorts] = useState<Sort[]>([]);
+    const [sorts, setSorts] = useState<Sort[]>([{property: SummaryProperty.Date, orientation: Orientation.Desc}]);
     const [credits, setCredits] = useState<Credit[]>([]);
 
     const handleFilterAdded = (filter: Filter) => {

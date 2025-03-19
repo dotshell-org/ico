@@ -21,10 +21,10 @@ import {
 } from "../src/backend/db/credits.ts";
 import {getCreditsSumByCategory, getDebitsSumByCategory, getTransactionsByMonth} from "../src/backend/db/reports.ts";
 import {
-  addInvoice,
-  deleteInvoice,
+  addInvoice, addInvoiceProduct,
+  deleteInvoice, deleteInvoiceProduct, getInvoiceExclTaxTotal, getInvoiceInclTaxTotal, getInvoiceProducts,
   getInvoices, updateInvoiceCategory,
-  updateInvoiceIssueDate,
+  updateInvoiceIssueDate, updateInvoiceProductQuantity,
   updateInvoiceSaleServiceDate, updateInvoiceTitle
 } from "../src/backend/db/debits.ts";
 
@@ -118,6 +118,13 @@ handleIpc("updateInvoiceIssueDate", updateInvoiceIssueDate);
 handleIpc("updateInvoiceSaleServiceDate", updateInvoiceSaleServiceDate);
 handleIpc("updateInvoiceCategory", updateInvoiceCategory);
 handleIpc("updateInvoiceTitle", updateInvoiceTitle);
+
+handleIpc("getInvoiceProducts", getInvoiceProducts);
+handleIpc("addInvoiceProduct", addInvoiceProduct);
+handleIpc("deleteInvoiceProduct", deleteInvoiceProduct);
+handleIpc("updateInvoiceProductQuantity", updateInvoiceProductQuantity);
+handleIpc("getInvoiceExclTaxTotal", getInvoiceExclTaxTotal);
+handleIpc("getInvoiceInclTaxTotal", getInvoiceInclTaxTotal);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
