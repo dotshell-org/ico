@@ -8,16 +8,6 @@ import { SummaryProperty } from "../../types/summary/SummaryProperty";
 import {Country} from "../../types/Country.ts";
 import {InvoiceProduct} from "../../types/invoices/InvoiceProduct.ts";
 
-/**
- * Retrieves a list of invoices based on the provided filters and sorting options.
- *
- * @param {Filter[]} filters - An array of filter objects used to filter the invoices.
- * Each filter should specify a property, an operator, and a value to match.
- * @param {Sort[]} sort - An array of sort objects used to determine the order of the results.
- * Each sort should specify a property and an orientation (ascending or descending).
- * @return {Invoice[]} An array of invoice objects, each containing details such as
- * ID, title, category, issue date, sale service date, country code, and total amount.
- */
 export function getInvoices(filters: Filter[], sort: Sort[]): Invoice[] {
     let query = `
         SELECT i.id,
@@ -26,7 +16,7 @@ export function getInvoices(filters: Filter[], sort: Sort[]): Invoice[] {
                i.issue_date,
                i.sale_service_date,
                i.country_code,
-               COALESCE(SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate)), 0) as total_amount
+               COALESCE(SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate / 100)), 0) as total_amount
         FROM invoices i
                  LEFT JOIN invoice_products ip ON i.id = ip.invoice_id
     `;
@@ -98,7 +88,7 @@ export function getInvoices(filters: Filter[], sort: Sort[]): Invoice[] {
         issueDate: row.issue_date,
         saleServiceDate: row.sale_service_date,
         countryCode: row.country_code,
-        totalAmount: getInvoiceInclTaxTotal(row.id)
+        totalAmount: row.total_amount
     }));
 }
 
@@ -323,4 +313,89 @@ export function getInvoiceInclTaxTotal(invoiceId: number): number {
         WHERE invoice_id = ?
     `);
     return stmt.get(invoiceId).total || 0;
+}
+
+/**
+ * Retrieves the country-specific specifications for an invoice.
+ *
+ * @param {number} invoiceId - The ID of the invoice to retrieve specifications for.
+ * @return {Record<string, string>} A dictionary containing keys and their corresponding values.
+ */
+export function getInvoiceCountrySpecifications(invoiceId: number): Record<string, string> {
+    const stmt = db.prepare(`
+        SELECT key, value
+        FROM invoice_country_specifications
+        WHERE invoice_id = ?
+    `);
+
+    const rows = stmt.all(invoiceId);
+    const specifications: Record<string, string> = {};
+
+    rows.forEach((row: { key: string; value: string; }) => {
+        specifications[row.key] = row.value;
+    });
+
+    return specifications;
+}
+
+/**
+ * Updates the country-specific information for an invoice
+ *
+ * @param {number} invoiceId - The ID of the invoice to update
+ * @param {string} key - The specification key to update
+ * @param {string} value - The new value for the specification
+ * @returns {void}
+ */
+export function updateInvoiceCountrySpecification(invoiceId: number, key: string, value: string): void {
+    const existingSpec = db.prepare(`
+        SELECT id
+        FROM invoice_country_specifications
+        WHERE invoice_id = ? AND key = ?
+    `).get(invoiceId, key);
+
+    if (existingSpec) {
+        // Update existing specification
+        db.prepare(`
+            UPDATE invoice_country_specifications
+            SET value = ?
+            WHERE invoice_id = ? AND key = ?
+        `).run(value, invoiceId, key);
+    } else {
+        // Insert new specification
+        db.prepare(`
+            INSERT INTO invoice_country_specifications (invoice_id, key, value)
+            VALUES (?, ?, ?)
+        `).run(invoiceId, key, value);
+    }
+}
+
+/**
+ * Retrieves the invoice number associated with the given invoice ID.
+ *
+ * @param {number} invoiceId - The unique identifier of the invoice to retrieve the number for.
+ * @return {string} The invoice number if found, otherwise an empty string.
+ */
+export function getInvoiceNo(invoiceId: number): string {
+    const stmt = db.prepare(`
+        SELECT no
+        FROM invoices
+        WHERE id = ?
+    `);
+    return stmt.get(invoiceId).no || '';
+}
+
+/**
+ * Updates the invoice number for the specified invoice ID in the database.
+ *
+ * @param {number} invoiceId - The ID of the invoice to update.
+ * @param {string} no - The new invoice number to set.
+ * @return {void} No return value.
+ */
+export function updateInvoiceNo(invoiceId: number, no: string): void {
+    const stmt = db.prepare(`
+        UPDATE invoices
+        SET no = ?
+        WHERE id = ?
+    `);
+    stmt.run(no, invoiceId);
 }

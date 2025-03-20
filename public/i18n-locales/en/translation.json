@@ -80,6 +80,8 @@
     "other": "Other",
     "products": "Products",
     "sale_or_service": "Sale/Service",
+    "vendor_or_service_provider": "Vendor/Service Provider",
+    "customer": "Customer",
     "tables_types": "Tables Types",
     "vat_no": "VAT No.",
     "new_product": "New Product",

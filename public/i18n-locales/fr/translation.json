@@ -82,8 +82,10 @@
     "other": "Autre",
     "products": "Produits",
     "sale_or_service": "Vente/Prestation de service",
+    "vendor_or_service_provider": "Vendeur/Prestataire de service",
+    "customer": "Client",
     "tables_types": "Types des Tableaux",
-    "vat_no": "N° TVA Intercommunal",
+    "vat_no": "N° TVA Intracommunautaire",
     "new_product": "Nouveau Produit",
 
     "p_credit": "Vous avez actuellement {categories} catégories répertoriées dans vos Crédits pour les 12 derniers mois, représentant un montant cumulé de {amount}.",

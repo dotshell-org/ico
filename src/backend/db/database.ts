@@ -8,7 +8,8 @@ db.exec(`
         category TEXT,
         issue_date TEXT,
         sale_service_date TEXT,
-        country_code INTEGER
+        country_code INTEGER,
+        no TEXT
     );
     CREATE TABLE IF NOT EXISTS invoice_products (
         id INTEGER PRIMARY KEY,
@@ -17,7 +18,6 @@ db.exec(`
         amount_excl_tax REAL,
         quantity INTEGER,
         tax_rate REAL,
-        
         
         FOREIGN KEY (invoice_id) REFERENCES invoices(id)
     );

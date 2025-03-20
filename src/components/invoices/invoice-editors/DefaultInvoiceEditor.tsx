@@ -1,7 +1,7 @@
 import {t} from "i18next";
 import Container from "../Container.tsx";
 import React, {useState, useEffect} from "react";
-import InputField from "../InputField.tsx";
+import DateField from "../DateField.tsx";
 import {Invoice} from "../../../types/invoices/Invoice.ts";
 import NoTaxTable from "../products-tables/NoTaxTable.tsx";
 import {TaxType} from "../../../types/invoices/TaxType.ts";
@@ -21,6 +21,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
     const [serviceDate, setServiceDate] = useState<string>(invoice.saleServiceDate);
     const [exclVatTotal, setExclVatTotal] = useState<number>(0);
     const [inclVatTotal, setInclVatTotal] = useState<number>(0);
+    const [invoiceNo, setInvoiceNo] = useState<string>("");
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -57,6 +58,18 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
         }
         loadTotal();
     }, [invoice.id]);
+
+    useEffect(() => {
+        const loadInvoiceNo = async () => {
+            try {
+                const no = await window.ipcRenderer.invoke("getInvoiceNo", invoice.id);
+                setInvoiceNo(no)
+            } catch (error) {
+                console.error("Error when loading invoice number:", error);
+            }
+        }
+        loadInvoiceNo();
+    }, []);
 
     const handleTotalUpdate = async () => {
         try {
@@ -121,6 +134,16 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
         }
     }
 
+    const handleChangeNo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newNo = e.target.value;
+        try {
+            await window.ipcRenderer.invoke("updateInvoiceNo", invoice.id, newNo);
+            setInvoiceNo(newNo);
+        } catch (error) {
+            console.error("Error when updating invoice number:", error);
+        }
+    };
+
     return (
         <div className="pb-6">
             <input
@@ -147,16 +170,14 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
                 { children }
                 <Container title={"\uD83D\uDDD3\uFE0F " + t("dates")}>
                     <h3>{t("issue")}</h3>
-                    <InputField
+                    <DateField
                         value={issueDate}
-                        type="date"
                         onChange={handleIssueDateChange}
                     />
 
                     <h3>{t("sale_or_service")}</h3>
-                    <InputField
+                    <DateField
                         value={serviceDate}
-                        type="date"
                         onChange={handleSaleServiceDateChange}
                     />
                 </Container>
@@ -170,14 +191,20 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
                 }
 
                 <div className="fixed right-0 top-0 h-full w-[15rem] border-l bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 flex items-center justify-center">
-                    <div className="block">
+                    <div className="block mt-20">
+                        <input
+                            className="text-2xl text-center mb-12 font-bold bg-transparent w-full cursor-text outline-none block"
+                            placeholder={t("num_no")}
+                            value={invoiceNo}
+                            onChange={handleChangeNo}
+                        />
                         {
                             taxType === TaxType.None ? (
                                 <>
                                     <h3 className="text-center text-md mt-8">
                                         {t("total")}
                                     </h3>
-                                    <h1 className="text-center text-4xl">
+                                    <h1 className="text-center text-3xl">
                                         €{exclVatTotal.toFixed(2)}
                                     </h1>
                                 </>
@@ -186,7 +213,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
                                     <h3 className="text-center text-md mt-8">
                                         {t("excl_vat_total")}
                                     </h3>
-                                    <h1 className="text-center text-4xl">
+                                    <h1 className="text-center text-3xl">
                                         €{exclVatTotal.toFixed(2)}
                                     </h1>
                                     <h3 className="text-center text-md mt-8">

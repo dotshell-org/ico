@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import {app, BrowserWindow, ipcMain} from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import "../src/backend/db/database.ts"
@@ -21,11 +21,20 @@ import {
 } from "../src/backend/db/credits.ts";
 import {getCreditsSumByCategory, getDebitsSumByCategory, getTransactionsByMonth} from "../src/backend/db/reports.ts";
 import {
-  addInvoice, addInvoiceProduct,
-  deleteInvoice, deleteInvoiceProduct, getInvoiceExclTaxTotal, getInvoiceInclTaxTotal, getInvoiceProducts,
-  getInvoices, updateInvoiceCategory,
-  updateInvoiceIssueDate, updateInvoiceProductQuantity,
-  updateInvoiceSaleServiceDate, updateInvoiceTitle
+  addInvoice,
+  addInvoiceProduct,
+  deleteInvoice,
+  deleteInvoiceProduct,
+  getInvoiceCountrySpecifications,
+  getInvoiceExclTaxTotal,
+  getInvoiceInclTaxTotal, getInvoiceNo,
+  getInvoiceProducts,
+  getInvoices,
+  updateInvoiceCategory, updateInvoiceCountrySpecification,
+  updateInvoiceIssueDate, updateInvoiceNo,
+  updateInvoiceProductQuantity,
+  updateInvoiceSaleServiceDate,
+  updateInvoiceTitle
 } from "../src/backend/db/debits.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -125,6 +134,11 @@ handleIpc("deleteInvoiceProduct", deleteInvoiceProduct);
 handleIpc("updateInvoiceProductQuantity", updateInvoiceProductQuantity);
 handleIpc("getInvoiceExclTaxTotal", getInvoiceExclTaxTotal);
 handleIpc("getInvoiceInclTaxTotal", getInvoiceInclTaxTotal);
+
+handleIpc("getInvoiceCountrySpecifications", getInvoiceCountrySpecifications);
+handleIpc("updateInvoiceCountrySpecification", updateInvoiceCountrySpecification);
+handleIpc("getInvoiceNo", getInvoiceNo);
+handleIpc("updateInvoiceNo", updateInvoiceNo);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
