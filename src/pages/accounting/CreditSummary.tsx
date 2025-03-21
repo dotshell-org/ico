@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-// You might want to define a TypeScript type for the `ipcRenderer` in the preload context for better type safety.
 import {Filter} from "../../types/filter/Filter.ts";
 import {Sort} from "../../types/sort/Sort.ts";
 import {SummaryObject} from "../../types/summary/SummaryObject.ts";

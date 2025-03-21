@@ -43,29 +43,29 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice }: FranceEdi
         <DefaultInvoiceEditor invoice={invoice} taxType={TaxType.VAT} >
             <Container title={"👔 " + t("vendor_or_service_provider")}>
                 <h3>{t("name")}</h3>
-                <CountrySpecificationField invoiceId={invoice.id} sqlKey="vendor_name" type="text" defaultValue={vendorName} />
+                <CountrySpecificationField invoiceId={invoice.id} sqlKey="vendor_name" type="text" defaultValue={vendorName} prefix="" />
 
                 <h3>{t("address")}</h3>
-                <CountrySpecificationField invoiceId={invoice.id} sqlKey="vendor_address" type="text" defaultValue={vendorAddress} />
+                <CountrySpecificationField invoiceId={invoice.id} sqlKey="vendor_address" type="text" defaultValue={vendorAddress} prefix="" />
 
-                <h3>SIRET/SIREN</h3>
-                <CountrySpecificationField invoiceId={invoice.id} sqlKey="vendor_siret" type="number" defaultValue={vendorSiret} />
+                <h3>SIRET</h3>
+                <CountrySpecificationField invoiceId={invoice.id} sqlKey="vendor_siret" type="number" defaultValue={vendorSiret} prefix="" />
 
                 <h3>APE/NAF</h3>
-                <CountrySpecificationField invoiceId={invoice.id} sqlKey="vendor_ape" type="number" defaultValue={vendorApe} />
+                <CountrySpecificationField invoiceId={invoice.id} sqlKey="vendor_ape" type="text" defaultValue={vendorApe} prefix="" />
 
                 <h3>{t("vat_no")}</h3>
-                <CountrySpecificationField invoiceId={invoice.id} sqlKey="vendor_vat" type="number" defaultValue={vendorVat} />
+                <CountrySpecificationField invoiceId={invoice.id} sqlKey="vendor_vat" type="number" defaultValue={vendorVat} prefix="FR" />
             </Container>
             <Container title={"👤 " + t("customer")}>
                 <h3>{t("name")}</h3>
-                <CountrySpecificationField invoiceId={invoice.id} sqlKey="customer_name" type="text" defaultValue={customerName} />
+                <CountrySpecificationField invoiceId={invoice.id} sqlKey="customer_name" type="text" defaultValue={customerName} prefix="" />
 
                 <h3>{t("address")}</h3>
-                <CountrySpecificationField invoiceId={invoice.id} sqlKey="customer_address" type="text" defaultValue={customerAddress} />
+                <CountrySpecificationField invoiceId={invoice.id} sqlKey="customer_address" type="text" defaultValue={customerAddress} prefix="" />
 
                 <h3>{t("vat_no")}</h3>
-                <CountrySpecificationField invoiceId={invoice.id} sqlKey="customer_vat" type="number" defaultValue={customerVat} />
+                <CountrySpecificationField invoiceId={invoice.id} sqlKey="customer_vat" type="number" defaultValue={customerVat} prefix="FR" />
             </Container>
         </DefaultInvoiceEditor>
     );

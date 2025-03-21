@@ -18,6 +18,8 @@ db.exec(`
         amount_excl_tax REAL,
         quantity INTEGER,
         tax_rate REAL,
+        discount_percentage REAL,
+        discount_amount REAL,
         
         FOREIGN KEY (invoice_id) REFERENCES invoices(id)
     );

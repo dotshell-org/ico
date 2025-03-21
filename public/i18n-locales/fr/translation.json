@@ -76,6 +76,7 @@
     "excl_vat_amount": "Montant HT",
     "incl_vat_amount": "Montant TTC",
     "tax_rate": "Taux TVA",
+    "discount": "Remise",
     "invoice_number": "Numéro de Facture",
     "issue": "Emission",
     "num_no": "N°",

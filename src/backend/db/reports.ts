@@ -23,7 +23,7 @@ export function getTransactionsByMonth(): number[][] {
     const creditRecords = creditStmt.all(startDate);
 
     const debitStmt = db.prepare(`
-        SELECT i.issue_date as date, SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate/100)) as amount
+        SELECT i.issue_date as date, SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate/100) * (1 - ip.discount_percentage / 100) - ip.discount_amount) as amount
         FROM invoices i
             JOIN invoice_products ip ON i.id = ip.invoice_id
         WHERE i.issue_date >= ?
@@ -101,7 +101,7 @@ export function getDebitsSumByCategory(): { categories: string[]; values: number
     const dateThreshold = dayjs().subtract(12, "month").toISOString();
     const query = `
         SELECT i.category,
-               SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate/100)) as total
+               SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate/100) * (1 - ip.discount_percentage / 100) - ip.discount_amount) as total
         FROM invoices i
                  JOIN invoice_products ip ON i.id = ip.invoice_id
         WHERE i.issue_date >= ?

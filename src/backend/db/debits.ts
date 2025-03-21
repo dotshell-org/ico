@@ -8,18 +8,24 @@ import { SummaryProperty } from "../../types/summary/SummaryProperty";
 import {Country} from "../../types/Country.ts";
 import {InvoiceProduct} from "../../types/invoices/InvoiceProduct.ts";
 
+/**
+ * Retrieves a list of invoices based on the specified filters and sorting options.
+ *
+ * @param {Filter[]} filters - An array of filter objects to apply to the query. Each filter specifies a property, operator, and value for filtering the invoices.
+ * @param {Sort[]} sort - An array of sorting objects to define the ordering of the query results. Each sorting object specifies a property and orientation (ascending or descending).
+ * @return {Invoice[]} An array of invoice objects that match the applied filters and are sorted according to the specified criteria.
+ */
 export function getInvoices(filters: Filter[], sort: Sort[]): Invoice[] {
-    let query = `
+    let query = `        
         SELECT i.id,
-               i.title,
-               i.category,
-               i.issue_date,
-               i.sale_service_date,
-               i.country_code,
-               COALESCE(SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate / 100)), 0) as total_amount
+            i.title,
+            i.category,
+            i.issue_date,
+            i.sale_service_date,
+            i.country_code,
+            COALESCE(SUM((ip.amount_excl_tax * ip.quantity * (1 - ip.discount_percentage / 100) * (1 + ip.tax_rate / 100)) - ip.discount_amount), 0) as total_amount
         FROM invoices i
-                 LEFT JOIN invoice_products ip ON i.id = ip.invoice_id
-    `;
+            LEFT JOIN invoice_products ip ON i.id = ip.invoice_id`;
     const queryParams: any[] = [];
     const whereConditions: string[] = [];
     const havingConditions: string[] = [];
@@ -230,7 +236,9 @@ export function getInvoiceProducts(invoiceId: number): InvoiceProduct[] {
                name,
                amount_excl_tax,
                quantity,
-               tax_rate
+               tax_rate,
+               discount_percentage,
+               discount_amount
         FROM invoice_products
         WHERE invoice_id = ?
     `);
@@ -247,12 +255,12 @@ export function getInvoiceProducts(invoiceId: number): InvoiceProduct[] {
  * @param {number} taxRate - The tax rate applicable to the product.
  * @return {void} This function does not return a value.
  */
-export function addInvoiceProduct(invoiceId: number, name: string, amountExclTax: number, quantity: number, taxRate: number): void {
+export function addInvoiceProduct(invoiceId: number, name: string, amountExclTax: number, quantity: number, taxRate: number, discountPercentage: number, discountAmount: number): void {
     const stmt = db.prepare(`
-        INSERT INTO invoice_products (invoice_id, name, amount_excl_tax, quantity, tax_rate)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO invoice_products (invoice_id, name, amount_excl_tax, quantity, tax_rate, discount_percentage, discount_amount)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
-    stmt.run(invoiceId, name, amountExclTax, quantity, taxRate);
+    stmt.run(invoiceId, name, amountExclTax, quantity, taxRate, discountPercentage, discountAmount);
 }
 
 /**
@@ -286,14 +294,14 @@ export function deleteInvoiceProduct(invoiceProductId: number): void {
 }
 
 /**
- * Calculates the total amount excluding tax for a specified invoice.
+ * Calculates the total amount excluding tax for a specified invoice, including discounts.
  *
  * @param {number} invoiceId - The unique identifier of the invoice.
  * @return {number} The total amount excluding tax for the specified invoice.
  */
 export function getInvoiceExclTaxTotal(invoiceId: number): number {
     const stmt = db.prepare(`
-        SELECT SUM(amount_excl_tax * quantity) as total
+        SELECT SUM(amount_excl_tax * quantity * (1 - discount_percentage / 100) - discount_amount) as total
         FROM invoice_products
         WHERE invoice_id = ?
     `);
@@ -308,7 +316,7 @@ export function getInvoiceExclTaxTotal(invoiceId: number): number {
  */
 export function getInvoiceInclTaxTotal(invoiceId: number): number {
     const stmt = db.prepare(`
-        SELECT SUM(amount_excl_tax * quantity * (1 + tax_rate/100)) as total
+        SELECT SUM(amount_excl_tax * quantity * (1 - discount_percentage / 100) * (1 + tax_rate/100) - discount_amount) as total
         FROM invoice_products
         WHERE invoice_id = ?
     `);

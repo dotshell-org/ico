@@ -19,11 +19,15 @@ const VATTable: React.FC<VATTableProps> = ({ invoiceId, onUpdate }) => {
         amount: number;
         quantity: number;
         taxRate: number;
+        discountPercentage: number;
+        discountAmount: number;
     }>({
         name: t("new_product") || "",
         amount: 0,
         quantity: 1,
         taxRate: 20,
+        discountPercentage: 0,
+        discountAmount: 0,
     });
 
     useEffect(() => {
@@ -86,7 +90,9 @@ const VATTable: React.FC<VATTableProps> = ({ invoiceId, onUpdate }) => {
                 newProduct.name,
                 newProduct.amount,
                 newProduct.quantity,
-                newProduct.taxRate
+                newProduct.taxRate,
+                newProduct.discountPercentage,
+                newProduct.discountAmount,
             );
             await refreshProducts();
             onUpdate();
@@ -99,6 +105,8 @@ const VATTable: React.FC<VATTableProps> = ({ invoiceId, onUpdate }) => {
             amount: 0,
             quantity: 1,
             taxRate: 20,
+            discountPercentage: 0,
+            discountAmount: 0,
         });
     };
 
@@ -114,6 +122,8 @@ const VATTable: React.FC<VATTableProps> = ({ invoiceId, onUpdate }) => {
                     <CreditTH content={t("name")} />
                     <CreditTH content={t("excl_vat_amount")} />
                     <CreditTH content={t("quantity")} />
+                    <CreditTH content={t("discount") + " (%)"} />
+                    <CreditTH content={t("discount") + " (€)"} />
                     <CreditTH content={t("excl_vat_total")} />
                     <CreditTH content={t("tax_rate")} />
                     <CreditTH content={t("incl_vat_total")} />
@@ -142,7 +152,21 @@ const VATTable: React.FC<VATTableProps> = ({ invoiceId, onUpdate }) => {
                             pointer={false}
                             border={true}
                             content={
-                                "€" + (row.amount_excl_tax * row.quantity).toFixed(2)
+                                row.discount_percentage + "%"
+                            }
+                        />
+                        <CreditTR
+                            pointer={false}
+                            border={true}
+                            content={
+                                "€" + row.discount_amount.toFixed(2)
+                            }
+                        />
+                        <CreditTR
+                            pointer={false}
+                            border={true}
+                            content={
+                                "€" + ((row.amount_excl_tax * row.quantity * (1 - row.discount_percentage / 100)) - row.discount_amount).toFixed(2)
                             }
                         />
                         <CreditTR
@@ -156,7 +180,7 @@ const VATTable: React.FC<VATTableProps> = ({ invoiceId, onUpdate }) => {
                             pointer={false}
                             border={true}
                             content={
-                                "€" + (row.amount_excl_tax * row.quantity * (1 + row.tax_rate/100)).toFixed(2)
+                                "€" + ((row.amount_excl_tax * row.quantity * (1 - row.discount_percentage / 100) * (1 + row.tax_rate / 100)) - row.discount_amount).toFixed(2)
                             }
                         />
                         <td className="border-gray-300 dark:border-gray-700 border text-center align-middle">
@@ -210,9 +234,42 @@ const VATTable: React.FC<VATTableProps> = ({ invoiceId, onUpdate }) => {
                                 }
                             />
                         </td>
+                        <td className="border-gray-300 dark:border-gray-700 border">
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.01"
+                                className="w-full p-1 text-center border rounded dark:bg-gray-900 dark:border-gray-600"
+                                value={newProduct.discountPercentage || 0}
+                                onChange={(e) =>
+                                    setNewProduct({
+                                        ...newProduct,
+                                        discountPercentage: parseFloat(e.target.value) || 0,
+                                    })
+                                }
+                                placeholder="%"
+                            />
+                        </td>
+                        <td className="border-gray-300 dark:border-gray-700 border">
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                className="w-full p-1 text-center border rounded dark:bg-gray-900 dark:border-gray-600"
+                                value={newProduct.discountAmount || 0}
+                                onChange={(e) =>
+                                    setNewProduct({
+                                        ...newProduct,
+                                        discountAmount: parseFloat(e.target.value) || 0,
+                                    })
+                                }
+                                placeholder="€"
+                            />
+                        </td>
                         <td className="border-gray-300 dark:border-gray-700 border text-center">
                             {"€" +
-                                (newProduct.amount * newProduct.quantity).toFixed(2)}
+                                ((newProduct.amount * newProduct.quantity * (1 - newProduct.discountPercentage / 100)) - newProduct.discountAmount).toFixed(2)}
                         </td>
 
                         <td className="border-gray-300 dark:border-gray-700 border">
@@ -232,7 +289,7 @@ const VATTable: React.FC<VATTableProps> = ({ invoiceId, onUpdate }) => {
                         </td>
                         <td className="border-gray-300 dark:border-gray-700 border text-center">
                             {"€" +
-                                (newProduct.amount * newProduct.quantity * (1 + newProduct.taxRate / 100)).toFixed(2)}
+                                ((newProduct.amount * newProduct.quantity * (1 - newProduct.discountPercentage / 100) * (1 + newProduct.taxRate / 100)) - newProduct.discountAmount).toFixed(2)}
                         </td>
                         <td className="border-gray-300 dark:border-gray-700 border text-center align-middle">
                             <button
@@ -247,7 +304,7 @@ const VATTable: React.FC<VATTableProps> = ({ invoiceId, onUpdate }) => {
 
                 <tr>
                     <td
-                        colSpan={7}
+                        colSpan={9}
                         className="w-full border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900 border border-t-2 text-center text-gray-500 dark:text-gray-400 p-0 transition-all select-none cursor-pointer"
                         onClick={() => setIsAdding(true)}
                     >

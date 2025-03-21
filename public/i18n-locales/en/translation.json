@@ -74,6 +74,7 @@
     "excl_vat_amount": "Excl. VAT Amount",
     "incl_vat_amount": "Incl. VAT Amount",
     "tax_rate": "Tax Rate",
+    "discount": "Discount",
     "invoice_number": "Invoice Number",
     "issue": "Issue",
     "num_no": "No.",

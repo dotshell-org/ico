@@ -166,7 +166,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
                 ))}
             </datalist>
 
-            <div className="w-[calc(100%-15rem)] mr-2">
+            <div className="w-[calc(100%-12rem)] mr-2">
                 { children }
                 <Container title={"\uD83D\uDDD3\uFE0F " + t("dates")}>
                     <h3>{t("issue")}</h3>
@@ -190,13 +190,18 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
                     ) : null
                 }
 
-                <div className="fixed right-0 top-0 h-full w-[15rem] border-l bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 flex items-center justify-center">
+                <div className="fixed right-0 top-0 h-full w-[12rem] border-l bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 flex items-center justify-center">
                     <div className="block mt-20">
                         <input
                             className="text-2xl text-center mb-12 font-bold bg-transparent w-full cursor-text outline-none block"
                             placeholder={t("num_no")}
                             value={invoiceNo}
-                            onChange={handleChangeNo}
+                            onChange={(e) => {
+                                if (e.target.value.length <= 19) {
+                                    handleChangeNo(e);
+                                }
+                            }}
+                            style={{fontSize: `min(1.5rem, ${16 / Math.max(invoiceNo.length, 1)}rem)`}}
                         />
                         {
                             taxType === TaxType.None ? (
@@ -219,7 +224,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
                                     <h3 className="text-center text-md mt-8">
                                         {t("incl_vat_total")}
                                     </h3>
-                                    <h1 className="text-center text-4xl">
+                                    <h1 className="text-center text-3xl">
                                         €{inclVatTotal.toFixed(2)}
                                     </h1>
                                 </>
