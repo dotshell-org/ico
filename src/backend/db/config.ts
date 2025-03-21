@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
-import {Operator} from "../../types/filter/Operator.ts";
-import {Orientation} from "../../types/sort/Orientation.ts";
+import {Operator} from "../../types/accounting/filter/Operator.ts";
+import {Orientation} from "../../types/accounting/sort/Orientation.ts";
 
 const require = createRequire(import.meta.url);
 const Database = require('better-sqlite3');

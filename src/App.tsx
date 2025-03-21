@@ -7,13 +7,13 @@ import DebitSummary from './pages/accounting/DebitSummary';
 import CreditSummary from './pages/accounting/CreditSummary';
 import DetailedCredits from "./pages/accounting/DetailedCredits.tsx";
 import Invoices from "./pages/accounting/Invoices.tsx";
-import CreditEditor from "./components/detailed-credits/CreditEditor.tsx";
-import {Credit} from "./types/detailed-credits/Credit.ts";
-import FranceInvoiceEditor from "./components/invoices/invoice-editors/FranceInvoiceEditor.tsx";
-import {Invoice} from "./types/invoices/Invoice.ts";
+import CreditEditor from "./components/accounting/detailed-credits/CreditEditor.tsx";
+import {Credit} from "./types/accounting/detailed-credits/Credit.ts";
+import FranceInvoiceEditor from "./components/accounting/invoices/invoice-editors/FranceInvoiceEditor.tsx";
+import {Invoice} from "./types/accounting/invoices/Invoice.ts";
 import {Country} from "./types/Country.ts";
-import DefaultInvoiceEditor from "./components/invoices/invoice-editors/DefaultInvoiceEditor.tsx";
-import {TaxType} from "./types/invoices/TaxType.ts";
+import DefaultInvoiceEditor from "./components/accounting/invoices/invoice-editors/DefaultInvoiceEditor.tsx";
+import {TaxType} from "./types/accounting/invoices/TaxType.ts";
 
 function App() {
     const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);

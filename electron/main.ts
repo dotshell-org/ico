@@ -1,7 +1,7 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import "../src/backend/db/database.ts"
+import "../src/backend/db/accounting/tables.ts"
 import {
   addCreditGroup,
   addCreditRow,
@@ -18,8 +18,8 @@ import {
   updateCreditRow,
   updateCreditTitle,
   updateOtherCreditRow
-} from "../src/backend/db/credits.ts";
-import {getCreditsSumByCategory, getDebitsSumByCategory, getTransactionsByMonth} from "../src/backend/db/reports.ts";
+} from "../src/backend/db/accounting/credits.ts";
+import {getCreditsSumByCategory, getDebitsSumByCategory, getTransactionsByMonth} from "../src/backend/db/accounting/reports.ts";
 import {
   addInvoice,
   addInvoiceProduct,
@@ -35,7 +35,7 @@ import {
   updateInvoiceProductQuantity,
   updateInvoiceSaleServiceDate,
   updateInvoiceTitle
-} from "../src/backend/db/debits.ts";
+} from "../src/backend/db/accounting/debits.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

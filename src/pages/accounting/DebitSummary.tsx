@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Filter } from "../../types/filter/Filter.ts";
-import { Sort } from "../../types/sort/Sort.ts";
-import { SummaryObject } from "../../types/summary/SummaryObject.ts";
-import Summary from "../../components/summary/Summary.tsx";
+import { Filter } from "../../types/accounting/filter/Filter.ts";
+import { Sort } from "../../types/accounting/sort/Sort.ts";
+import { SummaryObject } from "../../types/accounting/summary/SummaryObject.ts";
+import Summary from "../../components/accounting/summary/Summary.tsx";
 import {t} from "i18next";
-import {SummaryProperty} from "../../types/summary/SummaryProperty.ts";
-import {Orientation} from "../../types/sort/Orientation.ts";
-import {Invoice} from "../../types/invoices/Invoice.ts";
+import {SummaryProperty} from "../../types/accounting/summary/SummaryProperty.ts";
+import {Orientation} from "../../types/accounting/sort/Orientation.ts";
+import {Invoice} from "../../types/accounting/invoices/Invoice.ts";
 
 function DebitSummary() {
     const [filters, setFilters] = useState<Filter[]>([]);

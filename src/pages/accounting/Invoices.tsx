@@ -1,13 +1,13 @@
-import FilterSelection from "../../components/filter-selection/FilterSelection.tsx";
+import FilterSelection from "../../components/accounting/filter-selection/FilterSelection.tsx";
 import {useEffect, useState} from "react";
-import {Filter} from "../../types/filter/Filter.ts";
-import {Sort} from "../../types/sort/Sort.ts";
+import {Filter} from "../../types/accounting/filter/Filter.ts";
+import {Sort} from "../../types/accounting/sort/Sort.ts";
 import {t} from "i18next";
-import InvoiceMiniatureRow from "../../components/invoices/InvoiceMiniatureRow.tsx";
+import InvoiceMiniatureRow from "../../components/accounting/invoices/InvoiceMiniatureRow.tsx";
 import {Country} from "../../types/Country.ts";
-import {Invoice} from "../../types/invoices/Invoice.ts";
-import {SummaryProperty} from "../../types/summary/SummaryProperty.ts";
-import {Orientation} from "../../types/sort/Orientation.ts";
+import {Invoice} from "../../types/accounting/invoices/Invoice.ts";
+import {SummaryProperty} from "../../types/accounting/summary/SummaryProperty.ts";
+import {Orientation} from "../../types/accounting/sort/Orientation.ts";
 
 interface InvoicesProps {
     handleInvoiceMiniatureRowClicked: (invoice: Invoice) => void;

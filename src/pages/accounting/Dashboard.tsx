@@ -1,11 +1,11 @@
 import { t } from "i18next";
-import DashboardPieChart from "../../components/dashboard/DashboardPieChart.tsx";
-import { DashboardCharts } from "../../types/dashboard/DashboardCharts.ts";
+import DashboardPieChart from "../../components/accounting/dashboard/DashboardPieChart.tsx";
+import { DashboardCharts } from "../../types/accounting/dashboard/DashboardCharts.ts";
 import { LineChart } from "@mui/x-charts";
 import dayjs from "dayjs";
 import { useEffect, useState, useMemo } from "react";
-import DashboardTH from "../../components/dashboard/DashboardTH.tsx";
-import DashboardTR from "../../components/dashboard/DashboardTR.tsx";
+import DashboardTH from "../../components/accounting/dashboard/DashboardTH.tsx";
+import DashboardTR from "../../components/accounting/dashboard/DashboardTR.tsx";
 
 const xAxisData = Array.from({ length: 12 }, (_, i) =>
     dayjs().subtract(11 - i, "month").toDate()

@@ -1,12 +1,12 @@
-import FilterSelection from "../../components/filter-selection/FilterSelection.tsx";
+import FilterSelection from "../../components/accounting/filter-selection/FilterSelection.tsx";
 import {useEffect, useState} from "react";
-import {Filter} from "../../types/filter/Filter.ts";
-import {Sort} from "../../types/sort/Sort.ts";
+import {Filter} from "../../types/accounting/filter/Filter.ts";
+import {Sort} from "../../types/accounting/sort/Sort.ts";
 import {t} from "i18next";
-import CreditMiniatureRow from "../../components/detailed-credits/CreditMiniatureRow.tsx";
-import {Credit} from "../../types/detailed-credits/Credit.ts";
-import {SummaryProperty} from "../../types/summary/SummaryProperty.ts";
-import {Orientation} from "../../types/sort/Orientation.ts";
+import CreditMiniatureRow from "../../components/accounting/detailed-credits/CreditMiniatureRow.tsx";
+import {Credit} from "../../types/accounting/detailed-credits/Credit.ts";
+import {SummaryProperty} from "../../types/accounting/summary/SummaryProperty.ts";
+import {Orientation} from "../../types/accounting/sort/Orientation.ts";
 
 interface DetailedCreditsProps {
     handleCreditMiniatureRowClicked: (credit: Credit) => void;
