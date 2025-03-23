@@ -6,4 +6,6 @@ export enum Tabs {
     AccountingCreditEditor = 'accounting_credit_editor',
     AccountingInvoices = 'accounting_invoices',
     AccountingInvoiceEditor = 'accounting_invoice_editor',
+
+    StockDashboard = 'stock_dashboard'
 }

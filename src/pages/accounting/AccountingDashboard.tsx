@@ -11,7 +11,7 @@ const xAxisData = Array.from({ length: 12 }, (_, i) =>
     dayjs().subtract(11 - i, "month").toDate()
 );
 
-function Dashboard() {
+function AccountingDashboard() {
     const [seriesData, setSeriesData] = useState([
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -148,4 +148,4 @@ function Dashboard() {
     );
 }
 
-export default Dashboard;
+export default AccountingDashboard;

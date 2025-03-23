@@ -22,6 +22,10 @@ export const NavItemsGroup: React.FC<NavItemsGroupProps> = ({ window, selectedTa
             { text: "\uD83D\uDCDD " + t('detailed_credits'), tab: Tabs.AccountingDetailedCredits },
             { text: "\uD83E\uDDFE " + t('invoices'), tab: Tabs.AccountingInvoices },
         ];
+    } else if (window === Window.Stock) {
+        items = [
+            { text: "📊 " + t('dashboard'), tab: Tabs.StockDashboard },
+        ]
     }
 
     return (

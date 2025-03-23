@@ -14,6 +14,15 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({ selectedTab, setSelectedTab }) => {
     const [selectedWindow, setSelectedWindow] = useState<Window>(Window.Accounting);
 
+    const handleSetSelectedWindow = (window: Window) => {
+        if (window === Window.Accounting) {
+            setSelectedTab(Tabs.AccountingDashboard);
+        } else if (window === Window.Stock) {
+            setSelectedTab(Tabs.StockDashboard);
+        }
+        setSelectedWindow(window);
+    }
+
     return (
         <nav className="fixed top-0 w-full bg-gray-100 dark:bg-gray-800 z-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -21,7 +30,7 @@ const NavBar: React.FC<NavBarProps> = ({ selectedTab, setSelectedTab }) => {
                     <div className="w-full flex items-center">
                         <div className="ml-10 w-[calc(100%-10rem)] flex items-baseline space-x-4">
                             <img src={GlomeLogo} alt="Glome Logo" className="relative top-2.5 right-5 h-8 w-auto invert dark:invert-0" />
-                            <WindowSwitch window={Window.Accounting} selectedWindow={selectedWindow} setSelectedWindow={setSelectedWindow} />
+                            <WindowSwitch window={Window.Accounting} selectedWindow={selectedWindow} setSelectedWindow={handleSetSelectedWindow} />
                             <NavItemsGroup window={selectedWindow} selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
                         </div>
                         <UserMenu />

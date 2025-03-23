@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useMediaQuery, createTheme, ThemeProvider } from '@mui/material';
 import NavBar from "./components/nav/NavBar";
 import { Tabs } from './types/nav/Tabs.ts';
-import Dashboard from './pages/accounting/Dashboard';
+import AccountingDashboard from './pages/accounting/AccountingDashboard.tsx';
 import DebitSummary from './pages/accounting/DebitSummary';
 import CreditSummary from './pages/accounting/CreditSummary';
 import DetailedCredits from "./pages/accounting/DetailedCredits.tsx";
@@ -14,6 +14,7 @@ import {Invoice} from "./types/accounting/invoices/Invoice.ts";
 import {Country} from "./types/Country.ts";
 import DefaultInvoiceEditor from "./components/accounting/invoices/invoice-editors/DefaultInvoiceEditor.tsx";
 import {TaxType} from "./types/accounting/invoices/TaxType.ts";
+import StockDashboard from "./pages/stock/StockDashboard.tsx";
 
 function App() {
     const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
@@ -53,7 +54,7 @@ function App() {
     const renderContent = () => {
         switch (selectedTab) {
             case Tabs.AccountingDashboard:
-                return <Dashboard/>;
+                return <AccountingDashboard/>;
             case Tabs.AccountingCredit:
                 return <CreditSummary/>;
             case Tabs.AccountingDebit:
@@ -77,6 +78,9 @@ function App() {
                     return <FranceInvoiceEditor invoice={invoiceInEditor }/>;
                 }
                 return <h1>{invoiceInEditor.countryCode}</h1>;
+
+            case Tabs.StockDashboard:
+                return <StockDashboard />
 
             default:
                 return null;
