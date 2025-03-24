@@ -37,10 +37,10 @@ function App() {
         countryCode: 0,
     });
 
-    // Vérifier si l'utilisateur préfère le mode sombre
+    // Check if user prefers dark mode
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
-    // Créer le thème dynamiquement en fonction de la préférence
+    // Create theme dynamically based on preference
     const theme = useMemo(() =>
         createTheme({
             palette: {

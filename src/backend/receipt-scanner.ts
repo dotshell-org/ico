@@ -16,31 +16,31 @@ interface ReceiptData {
 
 async function scanReceipt(imagePath: string): Promise<ReceiptData> {
     try {
-        // Initialiser Tesseract avec le français
+        // Initialize Tesseract with French language
         const worker = await createWorker('fra');
 
-        // Extraire le texte de l'image
+        // Extract text from image
         const { data: { text } } = await worker.recognize(imagePath);
 
-        // Terminer le worker Tesseract
+        // Terminate Tesseract worker
         await worker.terminate();
 
-        // Initialiser l'objet de retour
+        // Initialize return object
         const receiptData: ReceiptData = {};
 
-        // Analyser le texte ligne par ligne
+        // Analyze text line by line
         const lines = text.split('\n');
 
-        // Expression régulière pour trouver la date (formats communs en France)
+        // Regular expression to find date (common formats in France)
         const dateRegex = /(\d{2}[/.]\d{2}[/.]\d{2,4})|(\d{2}[-]\d{2}[-]\d{2,4})/;
 
-        // Expression régulière pour trouver le total
+        // Regular expression to find total
         const totalRegex = /total.*?(\d+[.,]\d{2})/i;
 
-        // Expression régulière pour trouver les montants TVA
+        // Regular expression to find VAT amounts
         const tvaRegex = /tva.*?(\d+[.,]\d{1,2}).*?(%)/i;
 
-        // Chercher la date
+        // Search for date
         for (const line of lines) {
             const dateMatch = line.match(dateRegex);
             if (dateMatch) {
@@ -49,7 +49,7 @@ async function scanReceipt(imagePath: string): Promise<ReceiptData> {
             }
         }
 
-        // Chercher le total
+        // Search for total
         for (const line of lines) {
             const totalMatch = line.match(totalRegex);
             if (totalMatch) {
@@ -58,10 +58,10 @@ async function scanReceipt(imagePath: string): Promise<ReceiptData> {
             }
         }
 
-        // Chercher le nom du commerçant (généralement dans les premières lignes)
+        // Search for merchant name (usually in first lines)
         receiptData.merchant = lines[0].trim();
 
-        // Chercher les taux de TVA
+        // Search for VAT rates
         receiptData.tva = [];
         for (const line of lines) {
             const tvaMatch = line.match(tvaRegex);
@@ -73,10 +73,10 @@ async function scanReceipt(imagePath: string): Promise<ReceiptData> {
             }
         }
 
-        // Essayer de trouver les articles
+        // Try to find items
         receiptData.items = [];
         for (const line of lines) {
-            // Chercher les lignes qui contiennent un prix
+            // Search for lines containing a price
             const priceMatch = line.match(/(\d+[.,]\d{2})\s*€?\s*$/);
             if (priceMatch) {
                 const price = parseFloat(priceMatch[1].replace(',', '.'));
@@ -94,18 +94,18 @@ async function scanReceipt(imagePath: string): Promise<ReceiptData> {
         return receiptData;
 
     } catch (error) {
-        console.error('Erreur lors de l\'analyse de la facture:', error);
-        throw new Error('Échec de l\'analyse de la facture');
+        console.error('Error while analyzing receipt:', error);
+        throw new Error('Receipt analysis failed');
     }
 }
 
 export async function processReceipt(imagePath: string): Promise<ReceiptData> {
     try {
         const result = await scanReceipt(imagePath);
-        console.log('Données extraites:', JSON.stringify(result, null, 2));
+        console.log('Data extracted:', JSON.stringify(result, null, 2));
         return result;
     } catch (error) {
-        console.error('Erreur:', error);
+        console.error('Error:', error);
         throw error;
     }
 }

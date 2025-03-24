@@ -52,7 +52,7 @@ let win: BrowserWindow | null
 function createWindow() {
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC!, '../public/glome-icon.png'),
-    // Ajout des options de taille minimale
+    // Add minimum size options
     minWidth: 900,
     minHeight: 600,
     webPreferences: {
@@ -60,7 +60,7 @@ function createWindow() {
     },
   })
 
-  // Masquer la barre de menu
+  // Hide menu bar
   win.setMenuBarVisibility(false)
 
   win.webContents.on('did-finish-load', () => {
