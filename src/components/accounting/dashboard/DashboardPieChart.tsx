@@ -133,8 +133,6 @@ const DashboardPieChart: React.FC<CustomPieChartProps> = ({ type }) => {
                 ? t("p_credit")
                 : type === DashboardCharts.Debit
                     ? t("p_debit")
-                    : type === DashboardCharts.Profit
-                        ? t("p_profit")
                         : "";
         return paragraph
             .replace("{categories}", `<strong>${data.categories.length}</strong>`)

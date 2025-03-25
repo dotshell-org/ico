@@ -89,7 +89,16 @@
 
     "p_credit": "You currently have {categories} categories listed in your 📈<strong>Credits</strong> for the last 12 months, amounting to a total of {amount}.",
     "p_debit": "You currently have {categories} categories listed in your 📉<strong>Debits</strong> for the last 12 months, amounting to a total of {amount}.",
-
+    "p_stock": "During the last 12 months, you recorded a minimum of {min_amount} units and a maximum of {max_amount} units for {object} in your 📦<strong>Stock</strong>.",
+    
     "none": "None",
-    "france": "France"
+    "france": "France",
+
+    "inventory": "Inventory",
+    "inventory_of": "Inventory of",
+    "object": "Object",
+    "select_object": "Select Object",
+    "nothing": "Nothing",
+    "not_selected": "Not Selected"
+
 }

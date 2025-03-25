@@ -91,7 +91,16 @@
 
     "p_credit": "Vous avez actuellement {categories} catégories répertoriées dans vos Crédits pour les 12 derniers mois, représentant un montant cumulé de {amount}.",
     "p_debit": "Vous avez actuellement {categories} catégories répertoriées dans vos Débits pour les 12 derniers mois, représentant un montant cumulé de {amount}",
+    "p_stock": "Au cours des 12 derniers mois, vous avez enregistré un minimum de {min_amount} exemplaires et un maximum de {max_amount} exemplaires pour {object} dans votre \uD83D\uDCE6<strong>Stock</strong>.",
 
     "none": "Aucun",
-    "france": "France"
+    "france": "France",
+
+    "inventory": "Inventaire",
+    "inventory_of": "Inventaire du",
+    "object": "Objet",
+    "select_object": "Sélectionner Objet",
+    "nothing": "Rien",
+    "not_selected": "Non Sélectionné"
+
 }

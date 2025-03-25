@@ -2,6 +2,7 @@ import {app, BrowserWindow, ipcMain} from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import "../src/backend/db/accounting/tables.ts"
+import "../src/backend/db/stock/tables.ts"
 import {
   addCreditGroup,
   addCreditRow,
@@ -36,6 +37,7 @@ import {
   updateInvoiceSaleServiceDate,
   updateInvoiceTitle
 } from "../src/backend/db/accounting/debits.ts";
+import {getAllObjects, getInventory, getObjectAmountCurve} from "../src/backend/db/stock/getters.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -93,6 +95,8 @@ function handleIpc(name: string, handler: (...args: any[]) => any) {
   });
 }
 
+// Accounting
+
 handleIpc("getCredits", getCredits);
 handleIpc("getDebits", getInvoices);
 handleIpc("getTransactionsByMonth", getTransactionsByMonth);
@@ -139,6 +143,12 @@ handleIpc("getInvoiceCountrySpecifications", getInvoiceCountrySpecifications);
 handleIpc("updateInvoiceCountrySpecification", updateInvoiceCountrySpecification);
 handleIpc("getInvoiceNo", getInvoiceNo);
 handleIpc("updateInvoiceNo", updateInvoiceNo);
+
+// Stock
+
+handleIpc("getInventory", getInventory);
+handleIpc("getAllObjects", getAllObjects)
+handleIpc("getObjectAmountCurve", getObjectAmountCurve);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
