@@ -1,7 +1,7 @@
 import { t } from "i18next";
 import {BarChart} from "@mui/x-charts";
 import React, { useEffect, useState } from "react";
-import ObjectStockLineChart from "../../components/stock/ObjectStockLineChart.tsx";
+import ObjectStockLineChart from "../../components/stock/dashboard/ObjectStockLineChart.tsx";
 import { StockObject } from "../../types/stock/StockObject.ts";
 import StockTH from "../../components/stock/table/StockTH.tsx";
 import StockTR from "../../components/stock/table/StockTR.tsx";
@@ -97,7 +97,7 @@ const StockDashboard: React.FC = () => {
                             onChange={(e) => setSearchDate(e.target.value)}
                         />
                     </h2>
-                    <table className="w-full border border-white dark:border-gray-950 border-2 border-y-0">
+                    <table className="w-full border-white dark:border-gray-950 border-2 border-y-0">
                         <thead>
                             <StockTH content={t("object")} />
                             <StockTH content={t("quantity")} />

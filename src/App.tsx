@@ -15,6 +15,7 @@ import {Country} from "./types/Country.ts";
 import DefaultInvoiceEditor from "./components/accounting/invoices/invoice-editors/DefaultInvoiceEditor.tsx";
 import {TaxType} from "./types/accounting/invoices/TaxType.ts";
 import StockDashboard from "./pages/stock/StockDashboard.tsx";
+import StockMovementsSummary from "./pages/stock/StockMovementsSummary.tsx";
 
 function App() {
     const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
@@ -81,6 +82,9 @@ function App() {
 
             case Tabs.StockDashboard:
                 return <StockDashboard />
+
+            case Tabs.StockMovements:
+                return <StockMovementsSummary />
 
             default:
                 return null;

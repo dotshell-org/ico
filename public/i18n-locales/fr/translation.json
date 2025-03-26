@@ -101,6 +101,9 @@
     "object": "Objet",
     "select_object": "Sélectionner Objet",
     "nothing": "Rien",
-    "not_selected": "Non Sélectionné"
+    "not_selected": "Non Sélectionné",
+
+    "movements": "Mouvements",
+    "movement": "Mouvement"
 
 }

@@ -25,6 +25,7 @@ export const NavItemsGroup: React.FC<NavItemsGroupProps> = ({ window, selectedTa
     } else if (window === Window.Stock) {
         items = [
             { text: "📊 " + t('dashboard'), tab: Tabs.StockDashboard },
+            { text: "🔄 " + t('movements'), tab: Tabs.StockMovements }
         ]
     }
 
