@@ -32,7 +32,7 @@ const SelectOperatorComponent: React.FC<SelectOperatorProps> = ({ onChange, prop
                     <option value={Operator.IsExactly}>{t("is_exactly")}</option>
                 </>
             );
-        } else if (property === SummaryProperty.Amount) {
+        } else if (property === SummaryProperty.Quantity) {
             return (
                 <>
                     <option value={Operator.IsExactly}>{t("is_exactly")}</option>
@@ -43,8 +43,9 @@ const SelectOperatorComponent: React.FC<SelectOperatorProps> = ({ onChange, prop
         } else if (property === SummaryProperty.Movement) {
             return (
                 <>
-                    <option value={Operator.Is}>{t("is")}</option>
-                    <option value={Operator.IsExactly}>{t("is_exactly")}</option>
+                    <option value={Operator.IsExactly}>{t("more_than")}</option>
+                    <option value={Operator.MoreThan}>{t("more_than")}</option>
+                    <option value={Operator.LessThan}>{t("less_than")}</option>
                 </>
             );
         } else {

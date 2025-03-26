@@ -28,7 +28,7 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
 
     const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const inputValue =
-            property === SummaryProperty.Amount
+            property === SummaryProperty.Quantity
                 ? parseFloat(event.target.value) || ""
                 : event.target.value;
         setValue(inputValue);
@@ -64,7 +64,7 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
                 />
 
                 <h2 className="mt-4">{t("value")}</h2>
-                {property === SummaryProperty.Amount ? (
+                {property === SummaryProperty.Quantity ? (
                     <input
                         type="number"
                         className="mt-2 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600"

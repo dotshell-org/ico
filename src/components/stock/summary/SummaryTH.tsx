@@ -15,8 +15,8 @@ const SummaryTH: React.FC<SummaryTHProps> = ({ property }) => {
                 return "📅";
             case SummaryProperty.Object:
                 return "💡";
-            case SummaryProperty.Amount:
-                return "\uD83D\uDCB0";
+            case SummaryProperty.Quantity:
+                return "🧮";
             case SummaryProperty.Movement:
                 return "🔄";
         }

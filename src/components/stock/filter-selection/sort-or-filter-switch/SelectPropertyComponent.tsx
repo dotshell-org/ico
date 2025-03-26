@@ -23,8 +23,8 @@ const SelectPropertyComponent: React.FC<SelectComponentProps> = ({ onChange }) =
         >
             <option value={SummaryProperty.Date}>{"📅 " + t("date")}</option>
             <option value={SummaryProperty.Object}>{"💡 " + t("object")}</option>
-            <option value={SummaryProperty.Amount}>{"\uD83D\uDCB0 " + t("amount")}</option>
-            <option value={SummaryProperty.Movement}>{"🔄 " + t("movement ")}</option>
+            <option value={SummaryProperty.Quantity}>{"🧮 " + t("quantity")}</option>
+            <option value={SummaryProperty.Movement}>{"🔄 " + t("movement")}</option>
         </select>
     );
 };

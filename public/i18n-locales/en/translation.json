@@ -45,6 +45,8 @@
     "total": "Total",
     "total_amount": "Total Amount",
     "unique_count": "Unique Values",
+    "negative_sum": "Negative Sum",
+    "positive_sum": "Positive Sum",
 
     "after": "After",
     "asc": "Ascending",

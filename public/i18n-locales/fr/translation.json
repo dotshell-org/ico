@@ -47,6 +47,8 @@
     "total": "Total",
     "total_amount": "Montant total",
     "unique_count": "Valeurs uniques",
+    "negative_sum": "Somme Négative",
+    "positive_sum": "Somme Positive",
 
     "after": "Après",
     "asc": "Ascendant",

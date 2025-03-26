@@ -5,12 +5,12 @@ db.exec(`
         id INTEGER PRIMARY KEY,
         date TEXT,
         object TEXT,
-        amount INTEGER
+        quantity INTEGER
     );
     CREATE TABLE IF NOT EXISTS deletions (
         id INTEGER PRIMARY KEY,
         date TEXT,
         object TEXT,
-        amount INTEGER
+        quantity INTEGER
     );
 `);

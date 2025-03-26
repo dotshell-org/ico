@@ -84,7 +84,7 @@ function Summary({ title, objects, filters, sorts, onFilterAdded, onFilterRemove
                 .map((credit) => {
                     switch (selectedColumn) {
                         case 0:
-                            return formatDate(credit.date);
+                            return credit.date;
                         case 1:
                             return credit.title;
                         case 2:

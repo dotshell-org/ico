@@ -1,5 +1,10 @@
 import {StockObject} from "../../../types/stock/StockObject.ts";
-import {db} from "../config.ts";
+import {db, typeToOperator} from "../config.ts";
+import {Filter} from "../../../types/stock/summary/filter/Filter.ts";
+import {Sort} from "../../../types/stock/summary/sort/Sort.ts";
+import {Movement} from "../../../types/stock/summary/Movement.ts";
+import {SummaryProperty} from "../../../types/stock/summary/SummaryProperty.ts";
+import {Operator} from "../../../types/accounting/filter/Operator.ts";
 
 /**
  * Fetches the current inventory of objects based on additions and deletions in the database up to a specific date.
@@ -17,8 +22,8 @@ export function getInventory(date: string): StockObject[] {
                     ROW_NUMBER() OVER (ORDER BY object) as id,
                         object as name,
                     (
-                        COALESCE((SELECT SUM(amount) FROM additions WHERE additions.object = all_objects.object AND date <= ?), 0) -
-                        COALESCE((SELECT SUM(amount) FROM deletions WHERE deletions.object = all_objects.object AND date <= ?), 0)
+                        COALESCE((SELECT SUM(quantity) FROM additions WHERE additions.object = all_objects.object AND date <= ?), 0) -
+                        COALESCE((SELECT SUM(quantity) FROM deletions WHERE deletions.object = all_objects.object AND date <= ?), 0)
                         ) as quantity
                 FROM (
                          SELECT DISTINCT object FROM additions
@@ -84,16 +89,16 @@ export function getObjectAmountCurve(object: string): number[] {
             offset < 11 ), cumulative_data AS (
             SELECT
                 m.month_start, (
-                COALESCE ((SELECT SUM (amount) FROM additions WHERE object = ? AND date < m.month_start), 0) -
-                COALESCE ((SELECT SUM (amount) FROM deletions WHERE object = ? AND date < m.month_start), 0)
+                COALESCE ((SELECT SUM(quantity) FROM additions WHERE object = ? AND date < m.month_start), 0) -
+                COALESCE ((SELECT SUM(quantity) FROM deletions WHERE object = ? AND date < m.month_start), 0)
                 ) AS quantity
             FROM months m
                 )
             SELECT c.month_start,
                    CASE
                        WHEN c.month_start = DATE('now', 'start of month') THEN
-                COALESCE ((SELECT SUM (amount) FROM additions WHERE object = ?), 0) -
-                COALESCE ((SELECT SUM (amount) FROM deletions WHERE object = ?), 0)
+                COALESCE ((SELECT SUM(quantity) FROM additions WHERE object = ?), 0) -
+                COALESCE ((SELECT SUM(quantity) FROM deletions WHERE object = ?), 0)
                 ELSE c.quantity
             END
             AS quantity
@@ -104,6 +109,67 @@ export function getObjectAmountCurve(object: string): number[] {
         return stmt.all(object, object, object, object).map((row: { quantity: number }) => row.quantity);
     } catch (error) {
         console.error("Error fetching object amount curve:", error);
+        return [];
+    }
+}
+
+export function getMovements(filters: Filter[], sorts: Sort[]): Movement[] {
+    try {
+        let query = `
+            WITH all_movements AS (SELECT ROW_NUMBER() OVER (ORDER BY date, id) as id,
+                date
+               , object
+               , SUM (movement) OVER (PARTITION BY object ORDER BY date
+               , id) as quantity
+               , movement
+            FROM (
+                SELECT id, date, object, quantity as movement
+                FROM additions
+                UNION ALL
+                SELECT id, date, object, -quantity as movement
+                FROM deletions
+                )
+                )
+            SELECT id, date, object, quantity, movement
+            FROM all_movements`;
+
+        const queryParams: any[] = [];
+
+        if (filters && filters.length > 0) {
+            const conditions = filters.map(filter => {
+                if (filter.property === SummaryProperty.Quantity ||
+                    filter.property === SummaryProperty.Movement) {
+                    queryParams.push(filter.value);
+                    return `${filter.property} ${typeToOperator(filter.operator)} ?`;
+                } else if (filter.operator === Operator.Is) {
+                    queryParams.push(`%${filter.value}%`);
+                    return `${filter.property} ${typeToOperator(filter.operator)} ?`;
+                } else {
+                    queryParams.push(filter.value);
+                    return `${filter.property} ${typeToOperator(filter.operator)} ?`;
+                }
+            });
+
+            if (conditions.length > 0) {
+                query += ` WHERE ${conditions.join(' AND ')}`;
+            }
+        }
+
+        if (sorts && sorts.length > 0) {
+            const sortConditions = sorts.map(sort =>
+                `${sort.property} ${typeToOperator(sort.orientation)}`
+            );
+
+            if (sortConditions.length > 0) {
+                query += ` ORDER BY ${sortConditions.join(', ')}`;
+            }
+        }
+
+        const stmt = db.prepare(query);
+
+        return stmt.all(...queryParams);
+    } catch (error) {
+        console.error("Error fetching movements:", error);
         return [];
     }
 }
