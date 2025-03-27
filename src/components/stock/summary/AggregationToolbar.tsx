@@ -19,7 +19,7 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({columnIndex, val
 
     let additionalElement = null;
 
-    if (columnIndex === 2) {
+    if (columnIndex === 3) {
         // Numeric column: sum, minimum, and maximum.
         const numbers = values.map(val => parseFloat(val)).filter(num => !isNaN(num));
         const sum = numbers.reduce((acc, num) => acc + num, 0);
@@ -39,7 +39,7 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({columnIndex, val
                 </div>
             </>
         );
-    } else if (columnIndex === 0) {
+    } else if (columnIndex === 1) {
         // Date column: date range and number of days between the minimum and maximum date.
         const dates = values
             .map(dateStr => new Date(dateStr))
@@ -58,7 +58,7 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({columnIndex, val
                 {maxDate ? maxDate.toLocaleDateString() : "-"} ({dayDiff} {t("days")})
             </div>
         );
-    } else if (columnIndex === 3) {
+    } else if (columnIndex === 4) {
         // Numeric column with additional negative and positive sums.
         const numbers = values.map(val => parseFloat(val)).filter(num => !isNaN(num));
         const sum = numbers.reduce((acc, num) => acc + num, 0);
@@ -86,8 +86,8 @@ const AggregationToolbar: React.FC<AggregationToolbarProps> = ({columnIndex, val
                 </div>
             </>
         );
-    } else if (columnIndex === 1) {
-        // Text column (e.g., title): number of unique values and occurrences of each one.
+    } else if (columnIndex === 2 || columnIndex === 0) {
+        // Text columns (e.g., index 0 and 2): number of unique values and occurrences of each one.
         const uniqueValuesCount = values.reduce((acc: Record<string, number>, val) => {
             acc[val] = (acc[val] || 0) + 1;
             return acc;

@@ -3,7 +3,11 @@ import dayjs from "dayjs";
 import {t} from "i18next";
 import React, {useEffect, useState} from "react";
 
-const ObjectStockLineChart: React.FC = () => {
+interface ObjectStockLineChartProps {
+    stockId: number;
+}
+
+const ObjectStockLineChart: React.FC<ObjectStockLineChartProps> = ({ stockId }) => {
     const [allObjects, setAllObjects] = useState<string[]>([]);
 
     const [selectedObject, setSelectedObject] = useState<string>(t("nothing"));
@@ -27,7 +31,7 @@ const ObjectStockLineChart: React.FC = () => {
     useEffect(() => {
         setIsLoading(true);
         (window as any).ipcRenderer
-            .invoke("getObjectAmountCurve", selectedObject)
+            .invoke("getObjectAmountCurve", selectedObject, stockId)
             .then((result: number[]) => {
                 if (result.length === 0) {
                     setStockData(Array(12).fill(0));
@@ -46,7 +50,7 @@ const ObjectStockLineChart: React.FC = () => {
             .finally(() => {
                 setIsLoading(false);
             });
-    }, [selectedObject]);
+    }, [selectedObject, stockId]);
 
     const xAxisData = Array.from({ length: 12 }, (_, i) =>
         dayjs().subtract(11 - i, "month").toDate()

@@ -1,4 +1,4 @@
-import i18n, { t } from "i18next";
+import i18n, {t} from "i18next";
 import React, {useEffect, useState} from "react";
 import FilterSelection from "../../components/stock/filter-selection/FilterSelection.tsx";
 import SummaryTH from "../../components/stock/summary/SummaryTH.tsx";
@@ -101,12 +101,14 @@ const StockMovementsSummary: React.FC = () => {
                 .map((movement) => {
                     switch (selectedColumn) {
                         case 0:
-                            return movement.date;
+                            return movement.stock_name;
                         case 1:
-                            return movement.object;
+                            return movement.date;
                         case 2:
-                            return movement.quantity.toString();
+                            return movement.object;
                         case 3:
+                            return movement.quantity.toString();
+                        case 4:
                             return movement.movement.toString();
                         default:
                             return "";
@@ -122,6 +124,7 @@ const StockMovementsSummary: React.FC = () => {
                 <table className="w-full table-auto border-white dark:border-gray-950 border-2 border-t-0 border-b-gray-300 dark:border-b-gray-700 border-b-2 cursor-pointer">
                     <thead>
                     <tr>
+                        <SummaryTH property={SummaryProperty.Stock} />
                         <SummaryTH property={SummaryProperty.Date} />
                         <SummaryTH property={SummaryProperty.Object} />
                         <SummaryTH property={SummaryProperty.Quantity} />
@@ -135,28 +138,34 @@ const StockMovementsSummary: React.FC = () => {
                 {movements.map((movement, index) => (
                     <tr key={movement.id} className="transition-all">
                         <MovementSummaryTR
-                            content={formatDate(movement.date)}
+                            content={movement.stock_name}
                             positive={movement.movement > 0}
                             isSelected={selectedColumn === 0 && selectedRows.includes(movement.id)}
                             onClick={(event) => handleCellClick(event, 0, index, movement.id)}
                         />
                         <MovementSummaryTR
-                            content={movement.object}
+                            content={formatDate(movement.date)}
                             positive={movement.movement > 0}
                             isSelected={selectedColumn === 1 && selectedRows.includes(movement.id)}
                             onClick={(event) => handleCellClick(event, 1, index, movement.id)}
                         />
                         <MovementSummaryTR
-                            content={movement.quantity.toString()}
+                            content={movement.object}
                             positive={movement.movement > 0}
                             isSelected={selectedColumn === 2 && selectedRows.includes(movement.id)}
                             onClick={(event) => handleCellClick(event, 2, index, movement.id)}
                         />
                         <MovementSummaryTR
-                            content={movement.movement > 0 ? `+${movement.movement}` : movement.movement.toString()}
+                            content={movement.quantity.toString()}
                             positive={movement.movement > 0}
                             isSelected={selectedColumn === 3 && selectedRows.includes(movement.id)}
                             onClick={(event) => handleCellClick(event, 3, index, movement.id)}
+                        />
+                        <MovementSummaryTR
+                            content={movement.movement > 0 ? `+${movement.movement}` : movement.movement.toString()}
+                            positive={movement.movement > 0}
+                            isSelected={selectedColumn === 4 && selectedRows.includes(movement.id)}
+                            onClick={(event) => handleCellClick(event, 4, index, movement.id)}
                         />
                     </tr>
                 ))}

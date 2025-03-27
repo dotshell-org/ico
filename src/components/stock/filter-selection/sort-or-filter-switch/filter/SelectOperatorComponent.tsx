@@ -1,7 +1,7 @@
 import React, {ChangeEvent, useState} from 'react';
-import { t } from "i18next";
-import { Operator } from "../../../../../types/stock/summary/filter/Operator.ts";
-import { SummaryProperty } from "../../../../../types/stock/summary/SummaryProperty.ts";
+import {t} from "i18next";
+import {Operator} from "../../../../../types/stock/summary/filter/Operator.ts";
+import {SummaryProperty} from "../../../../../types/stock/summary/SummaryProperty.ts";
 
 interface SelectOperatorProps {
     onChange: (selectedProperty: Operator) => void;
@@ -17,7 +17,15 @@ const SelectOperatorComponent: React.FC<SelectOperatorProps> = ({ onChange, prop
     };
 
     const getOptionsForProperty = () => {
-        if (property === SummaryProperty.Date) {
+        if (property === SummaryProperty.Stock) {
+            return (
+                <>
+                    <option value={Operator.Is}>{t("is")}</option>
+                    <option value={Operator.IsExactly}>{t("is_exactly")}</option>
+                </>
+            );
+
+        } else if (property === SummaryProperty.Date) {
             return (
                 <>
                     <option value={Operator.Is}>{t("is")}</option>
@@ -43,7 +51,7 @@ const SelectOperatorComponent: React.FC<SelectOperatorProps> = ({ onChange, prop
         } else if (property === SummaryProperty.Movement) {
             return (
                 <>
-                    <option value={Operator.IsExactly}>{t("more_than")}</option>
+                    <option value={Operator.IsExactly}>{t("is_exactly")}</option>
                     <option value={Operator.MoreThan}>{t("more_than")}</option>
                     <option value={Operator.LessThan}>{t("less_than")}</option>
                 </>
