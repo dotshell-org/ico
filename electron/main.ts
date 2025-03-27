@@ -37,7 +37,13 @@ import {
   updateInvoiceSaleServiceDate,
   updateInvoiceTitle
 } from "../src/backend/db/accounting/debits.ts";
-import {getAllObjects, getInventory, getMovements, getObjectAmountCurve} from "../src/backend/db/stock/getters.ts";
+import {
+  getAllObjects,
+  getAllStocks,
+  getInventory,
+  getMovements,
+  getObjectAmountCurve
+} from "../src/backend/db/stock/getters.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -148,6 +154,7 @@ handleIpc("updateInvoiceNo", updateInvoiceNo);
 
 handleIpc("getInventory", getInventory);
 handleIpc("getAllObjects", getAllObjects)
+handleIpc("getAllStocks", getAllStocks)
 handleIpc("getObjectAmountCurve", getObjectAmountCurve);
 
 handleIpc("getMovements", getMovements)

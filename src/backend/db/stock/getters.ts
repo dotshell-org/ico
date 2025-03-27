@@ -5,6 +5,7 @@ import {Sort} from "../../../types/stock/summary/sort/Sort.ts";
 import {Movement} from "../../../types/stock/summary/Movement.ts";
 import {SummaryProperty} from "../../../types/stock/summary/SummaryProperty.ts";
 import {Operator} from "../../../types/stock/summary/filter/Operator.ts";
+import {Stock} from "../../../types/stock/Stock.ts";
 
 /**
  * Fetches the current inventory of objects based on additions and deletions in the database up to a specific date.
@@ -79,6 +80,27 @@ export function getAllObjects(stockId: number): string[] {
         return stmt.all(...params).map((row: { object: string }) => row.object);
     } catch (error) {
         console.error("Error fetching all objects:", error);
+        return [];
+    }
+}
+
+/**
+ * Retrieves a list of all unique stock names from the database, sorted in ascending order.
+ *
+ * @return {string[]} An array of stock names. Returns an empty array if an error occurs.
+ */
+export function getAllStocks(): Stock[] {
+    try {
+        const stmt = db.prepare(`
+            SELECT * FROM stocks
+            ORDER BY name ASC
+        `);
+        return stmt.all().map((row: { id: number; name: string }) => ({
+            id: row.id,
+            name: row.name,
+        }));
+    } catch (error) {
+        console.error("Error fetching all stocks:", error);
         return [];
     }
 }

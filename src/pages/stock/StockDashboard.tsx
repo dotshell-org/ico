@@ -6,8 +6,11 @@ import { StockObject } from "../../types/stock/StockObject.ts";
 import StockTH from "../../components/stock/table/StockTH.tsx";
 import StockTR from "../../components/stock/table/StockTR.tsx";
 import dayjs from "dayjs";
+import {Stock} from "../../types/stock/Stock.ts";
 
 const StockDashboard: React.FC = () => {
+    const [allStocks, setAllStocks] = useState<Stock[]>([]);
+
     const [stockId, setStockId] = useState<number>(0);
     const [inventoryData, setInventoryData] = useState<StockObject[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -52,6 +55,17 @@ const StockDashboard: React.FC = () => {
                 })
         }
     }, [searchDate, stockId]);
+
+    useEffect(() => {
+        (window as any).ipcRenderer
+            .invoke("getAllStocks")
+            .then((result: Stock[]) => {
+                setAllStocks(result);
+            })
+            .catch((error: any) => {
+                console.error("Error fetching all stocks", error);
+            });
+    }, []);
     
     return (
         <div className="pb-20">
@@ -63,9 +77,12 @@ const StockDashboard: React.FC = () => {
                 onChange={(e) => setStockId(Number(e.target.value))}
                 value={stockId}
             >
-                <option value={0}>Tout</option>
-                <option value={1}>Stock A</option>
-                <option value={2}>Stock B</option>
+                <option key={0} value={0}>{t("all")}</option>
+                {
+                    allStocks.map((stock) => (
+                        <option key={stock.id} value={stock.id}>{stock.name}</option>
+                    ))
+                }
             </select>
 
             {isLoading ? (
