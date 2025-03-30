@@ -13,6 +13,7 @@ db.exec(`
     CREATE TABLE IF NOT EXISTS invoice_products (
         id INTEGER PRIMARY KEY,
         invoice_id INTEGER,
+        addition_id INTEGER,
         name TEXT,
         amount_excl_tax REAL,
         quantity INTEGER,

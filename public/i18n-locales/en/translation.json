@@ -105,6 +105,13 @@
 
     "movements": "Movements",
     "movement": "Movement",
-    "all": "All"
+    "all": "All",
+    "links": "Links",
+    "unlinked": "Unlinked",
+    "linked": "Linked",
+    "link": "Link",
+    "or": "Or",
+    "ignore_in_stock": "Ignore in Stock",
+    "quantity_in_invoice": "Quantity in Invoice"
 
 }

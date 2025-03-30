@@ -8,5 +8,6 @@ export enum Tabs {
     AccountingInvoiceEditor = 'accounting_invoice_editor',
 
     StockDashboard = 'stock_dashboard',
-    StockMovements = 'stock_movements'
+    StockMovements = 'stock_movements',
+    StockLinks = 'stock_links',
 }

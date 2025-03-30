@@ -6,7 +6,7 @@ db.exec(`
         name TEXT
     );
     CREATE TABLE IF NOT EXISTS additions (
-        id INTEGER PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         stock_id INTEGER,
         date TEXT,
         object TEXT,
@@ -15,7 +15,7 @@ db.exec(`
         FOREIGN KEY (stock_id) REFERENCES stocks(id)
     );
     CREATE TABLE IF NOT EXISTS deletions (
-        id INTEGER PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         stock_id INTEGER,
         date TEXT,
         object TEXT,

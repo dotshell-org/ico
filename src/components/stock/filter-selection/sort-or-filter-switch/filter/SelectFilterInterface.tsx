@@ -1,10 +1,10 @@
-import React, {useState} from "react";
-import {useTranslation} from "react-i18next";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import SelectPropertyComponent from "../SelectPropertyComponent.tsx";
-import {SummaryProperty} from "../../../../../types/stock/summary/SummaryProperty.ts";
+import { SummaryProperty } from "../../../../../types/stock/summary/SummaryProperty.ts";
 import SelectOperatorComponent from "./SelectOperatorComponent.tsx";
-import {Operator} from "../../../../../types/stock/summary/filter/Operator.ts";
-import {Filter} from "../../../../../types/stock/summary/filter/Filter.ts";
+import { Operator } from "../../../../../types/stock/summary/filter/Operator.ts";
+import { Filter } from "../../../../../types/stock/summary/filter/Filter.ts";
 
 interface SelectFilterInterfaceProps {
     onAdded: (filter: Filter) => void;
@@ -27,10 +27,7 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
     };
 
     const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const inputValue =
-            property === SummaryProperty.Quantity
-                ? parseFloat(event.target.value) || ""
-                : event.target.value;
+        const inputValue = event.target.value;
         setValue(inputValue);
     };
 
@@ -72,12 +69,12 @@ const SelectFilterInterface: React.FC<SelectFilterInterfaceProps> = ({ onAdded, 
                         value={value}
                         onChange={handleValueChange}
                     />
-                ) : property === SummaryProperty.Quantity ? (
+                ) : property === SummaryProperty.Quantity || property === SummaryProperty.Movement ? (
                     <input
                         type="number"
                         className="mt-2 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600"
                         placeholder={t("enter_value") as string}
-                        value={value}
+                        value={value || ""}
                         onChange={handleValueChange}
                     />
                 ) : property === SummaryProperty.Date ? (

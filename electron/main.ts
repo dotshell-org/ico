@@ -42,8 +42,9 @@ import {
   getAllStocks,
   getInventory,
   getMovements,
-  getObjectAmountCurve
+  getObjectAmountCurve, getStockLinkProps, getStockLinks
 } from "../src/backend/db/stock/getters.ts";
+import {ignoreInvoiceProductInStock, linkInvoiceProductInStock} from "../src/backend/db/stock/setters.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -153,11 +154,17 @@ handleIpc("updateInvoiceNo", updateInvoiceNo);
 // Stock
 
 handleIpc("getInventory", getInventory);
-handleIpc("getAllObjects", getAllObjects)
-handleIpc("getAllStocks", getAllStocks)
+handleIpc("getAllObjects", getAllObjects);
+handleIpc("getAllStocks", getAllStocks);
 handleIpc("getObjectAmountCurve", getObjectAmountCurve);
 
-handleIpc("getMovements", getMovements)
+handleIpc("getMovements", getMovements);
+
+handleIpc("getStockLinks", getStockLinks);
+
+handleIpc("ignoreInvoiceProductInStock", ignoreInvoiceProductInStock);
+handleIpc("linkInvoiceProductInStock", linkInvoiceProductInStock);
+handleIpc("getStockLinkProps", getStockLinkProps);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -168,8 +175,8 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
+    createWindow();
   }
 });
 
-app.whenReady().then(createWindow)
+app.whenReady().then(createWindow);

@@ -6,6 +6,8 @@ import {Movement} from "../../../types/stock/summary/Movement.ts";
 import {SummaryProperty} from "../../../types/stock/summary/SummaryProperty.ts";
 import {Operator} from "../../../types/stock/summary/filter/Operator.ts";
 import {Stock} from "../../../types/stock/Stock.ts";
+import {InvoiceProductLink} from "../../../types/stock/InvoiceProductLink.ts";
+import {InvoiceProductLinkProps} from "../../../types/stock/InvoiceProductLinkProps.ts";
 
 /**
  * Fetches the current inventory of objects based on additions and deletions in the database up to a specific date.
@@ -213,7 +215,9 @@ export function getMovements(filters: Filter[], sorts: Sort[]): Movement[] {
                     return `stock_name ${typeToOperator(filter.operator)} ?`;
                 } else if (filter.property === SummaryProperty.Quantity ||
                     filter.property === SummaryProperty.Movement) {
-                    queryParams.push(filter.value);
+                    if (typeof filter.value === "string") {
+                        queryParams.push(parseInt(filter.value));
+                    }
                     return `${filter.property} ${typeToOperator(filter.operator)} ?`;
                 } else if (filter.operator === Operator.Is) {
                     queryParams.push(`%${filter.value}%`);
@@ -250,4 +254,33 @@ export function getMovements(filters: Filter[], sorts: Sort[]): Movement[] {
         console.error("Error fetching movements:", error);
         return [];
     }
+}
+
+/**
+ * Retrieves a list of stock links from the database, representing invoice product details.
+ *
+ * @return {InvoiceProductLink[]} An array of objects containing stock link details,
+ *                                including id, name, quantity, and whether it is linked.
+ */
+export function getStockLinks(linkedFilter: boolean | null): InvoiceProductLink[] {
+    const stmt = db.prepare(`
+        SELECT ip.id as id, ip.name as name, ip.quantity as quantity, ip.addition_id as addition_id
+        FROM invoice_products ip
+        JOIN invoices i
+        ON ip.invoice_id = i.id
+        ${linkedFilter === true ? "WHERE ip.addition_id <> 0" : (linkedFilter === false ? "WHERE ip.addition_id = 0" : "")}
+        ORDER BY i.issue_date ASC
+    `);
+
+    return stmt.all();
+}
+
+export function getStockLinkProps(additionId: number): InvoiceProductLinkProps {
+    const stmt = db.prepare(`
+        SELECT a.object as name, a.quantity as quantity, s.name as stock_name
+        FROM additions a
+        JOIN stocks s ON s.id = a.stock_id
+        WHERE a.id = ?
+    `);
+    return stmt.all(additionId);
 }

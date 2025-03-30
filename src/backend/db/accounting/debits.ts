@@ -259,10 +259,10 @@ export function getInvoiceProducts(invoiceId: number): InvoiceProduct[] {
  */
 export function addInvoiceProduct(invoiceId: number, name: string, amountExclTax: number, quantity: number, taxRate: number, discountPercentage: number, discountAmount: number): void {
     const stmt = db.prepare(`
-        INSERT INTO invoice_products (invoice_id, name, amount_excl_tax, quantity, tax_rate, discount_percentage, discount_amount)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO invoice_products (invoice_id, addition_id, name, amount_excl_tax, quantity, tax_rate, discount_percentage, discount_amount)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    stmt.run(invoiceId, name, amountExclTax, quantity, taxRate, discountPercentage, discountAmount);
+    stmt.run(invoiceId, 0, name, amountExclTax, quantity, taxRate, discountPercentage, discountAmount);
 }
 
 /**
