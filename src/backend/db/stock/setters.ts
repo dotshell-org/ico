@@ -1,10 +1,10 @@
 import {db} from "../config.ts";
 
 /**
- * Ignores the stock of a product associated with an invoice by removing its addition entry and updating the addition ID.
+ * Ignores the stock entry associated with a specific invoice product by deleting the linked addition and updating the product's addition reference.
  *
- * @param {number} product_id - The ID of the product within the invoice to be ignored in stock.
- * @return {*} The result of the execution of the database statement.
+ * @param {number} product_id - The unique identifier of the invoice product whose stock entry should be ignored.
+ * @return {void} This function does not return a value.
  */
 export function ignoreInvoiceProductInStock(product_id: number): void {
     const deleteStmt = db.prepare(`
@@ -26,41 +26,28 @@ export function ignoreInvoiceProductInStock(product_id: number): void {
 }
 
 /**
- * Links an invoice product to a stock entry. If the stock does not exist, it creates a new stock entry.
- * If `addition_id` is 0, it creates a new addition and links it to the invoice product. Otherwise,
- * it updates the existing addition.
+ * Links an invoice product to a stock addition. If the addition_id is less than or equal to 0,
+ * it creates a new stock addition entry and links it to the specified product.
+ * Otherwise, it updates the existing stock addition with the provided details.
  *
- * @param {number} product_id - The ID of the product in the invoice to be linked.
- * @param {number} addition_id - The ID of the existing addition. If 0, a new addition is created.
- * @param {string} name - The name or description of the addition or product.
- * @param {number} quantity - The quantity of the product to be added or updated in the addition.
- * @param {string} stock_name - The name of the stock to which the product should be associated.
- * @return {void}
+ * @param {number} product_id - The unique identifier of the product in the invoice.
+ * @param {number} addition_id - The identifier for the stock addition to link or update. If 0 or negative, a new addition entry will be created.
+ * @param {string} name - The name or description of the stock addition.
+ * @param {number} quantity - The quantity for the stock addition.
+ * @param {string} stock_name - The name of the stock to associate with the addition.
+ * @return {void} This function does not return a value.
  */
 export function linkInvoiceProductInStock(product_id: number, addition_id: number, name: string, quantity: number, stock_name: string): void {
-    if (addition_id === 0) {
-        // First check if the stock exists, if not create it
-        const stockCheckStmt = db.prepare('SELECT id FROM stocks WHERE name = ?');
-        let stock = stockCheckStmt.get(stock_name);
-        let stock_id;
-
-        if (!stock) {
-            // Create new stock if it doesn't exist
-            const createStockStmt = db.prepare('INSERT INTO stocks (name) VALUES (?)');
-            const result = createStockStmt.run(stock_name);
-            stock_id = result.lastInsertRowid;
-        } else {
-            stock_id = stock.id;
-        }
-
-        // Create new addition
+    // If addition_id <= 0, create a new record in additions
+    if (addition_id <= 0) {
+        // Insert stock_name directly into the additions table
         const additionStmt = db.prepare(`
-            INSERT INTO additions (stock_id, date, object, quantity)
+            INSERT INTO additions (stock_name, date, object, quantity)
             VALUES (?, datetime('now'), ?, ?)
         `);
-        const additionResult = additionStmt.run(stock_id, name, quantity);
+        const additionResult = additionStmt.run(stock_name, name, quantity);
 
-        // Link the addition to the invoice product
+        // Link the newly created addition to the relevant product
         const linkStmt = db.prepare(`
             UPDATE invoice_products
             SET addition_id = ?
@@ -68,13 +55,14 @@ export function linkInvoiceProductInStock(product_id: number, addition_id: numbe
         `);
         linkStmt.run(additionResult.lastInsertRowid, product_id);
     } else {
-        // Update existing addition
+        // Otherwise, update the existing addition
         const updateStmt = db.prepare(`
             UPDATE additions
             SET object = ?,
-                quantity = ?
+                quantity = ?,
+                stock_name = ?
             WHERE id = ?
         `);
-        updateStmt.run(name, quantity, addition_id);
+        updateStmt.run(name, quantity, stock_name, addition_id);
     }
 }

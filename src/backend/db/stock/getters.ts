@@ -5,7 +5,6 @@ import {Sort} from "../../../types/stock/summary/sort/Sort.ts";
 import {Movement} from "../../../types/stock/summary/Movement.ts";
 import {SummaryProperty} from "../../../types/stock/summary/SummaryProperty.ts";
 import {Operator} from "../../../types/stock/summary/filter/Operator.ts";
-import {Stock} from "../../../types/stock/Stock.ts";
 import {InvoiceProductLink} from "../../../types/stock/InvoiceProductLink.ts";
 import {InvoiceProductLinkProps} from "../../../types/stock/InvoiceProductLinkProps.ts";
 
@@ -15,34 +14,43 @@ import {InvoiceProductLinkProps} from "../../../types/stock/InvoiceProductLinkPr
  * that have a positive quantity in stock.
  *
  * @param {string} date - The date (inclusive) up to which the inventory is calculated.
- * @param stockId
+ * @param stockName
  * @return {StockObject[]} An array of stock objects, each containing an `id`, `name`, and `quantity`.
  */
-export function getInventory(date: string, stockId: number): StockObject[] {
+export function getInventory(date: string, stockName?: string): StockObject[] {
     try {
-        const stockIdCondition = stockId > 0 ? `AND stock_id = ?` : ``;
+        const stockNameCondition = stockName && stockName.trim() !== ""
+            ? `AND stock_name = ?`
+            : "";
+
         const stmt = db.prepare(`
             WITH inventory AS (
                 SELECT
-                    ROW_NUMBER() OVER (ORDER BY object) as id,
-                        object as name,
+                    ROW_NUMBER() OVER (ORDER BY object) AS id,
+                    object AS name,
                     COALESCE((
-                                 SELECT SUM(quantity)
-                                 FROM additions
-                                 WHERE additions.object = all_objects.object AND date <= ? ${stockIdCondition}
-                    ), 0) -
+                        SELECT SUM(quantity)
+                        FROM additions
+                        WHERE additions.object = all_objects.object
+                        AND date <= ?
+                        ${stockNameCondition}
+                    ), 0)
+                    -
                     COALESCE((
-                                 SELECT SUM(quantity)
-                                 FROM deletions
-                                 WHERE deletions.object = all_objects.object AND date <= ? ${stockIdCondition}
-                    ), 0) AS quantity
+                        SELECT SUM(quantity)
+                        FROM deletions
+                        WHERE deletions.object = all_objects.object
+                        AND date <= ?
+                        ${stockNameCondition}
+                    ), 0)
+                    AS quantity
                 FROM (
-                         SELECT DISTINCT object
-                         FROM additions
-                         UNION
-                         SELECT DISTINCT object
-                         FROM deletions
-                     ) all_objects
+                    SELECT DISTINCT object
+                    FROM additions
+                    UNION
+                    SELECT DISTINCT object
+                    FROM deletions
+                ) all_objects
             )
             SELECT *
             FROM inventory
@@ -50,14 +58,17 @@ export function getInventory(date: string, stockId: number): StockObject[] {
             ORDER BY name
         `);
 
-        const params = stockId > 0 ? [date, stockId, date, stockId] : [date, date];
+        const params = stockName && stockName.trim() !== ""
+            ? [date, stockName, date, stockName]
+            : [date, date];
+
         return stmt.all(...params).map((row: { id: number; name: string; quantity: number }) => ({
             id: row.id,
             name: row.name,
             quantity: row.quantity,
         }));
     } catch (error) {
-        console.error("Error fetching inventory:", error);
+        console.error("Erreur lors de la récupération de l’inventaire:", error);
         return [];
     }
 }
@@ -68,20 +79,30 @@ export function getInventory(date: string, stockId: number): StockObject[] {
  *
  * @return {string[]} An array of unique object strings. If an error occurs, an empty array is returned.
  */
-export function getAllObjects(stockId: number): string[] {
+export function getAllObjects(stockName?: string): string[] {
     try {
-        const stockIdCondition = stockId > 0 ? `stock_id = ?` : `1=1`;
+        const stockNameCondition = stockName && stockName.trim() !== ""
+            ? `stock_name = ?`
+            : `1=1`;
+
         const stmt = db.prepare(`
-            SELECT DISTINCT object FROM additions WHERE ${stockIdCondition}
+            SELECT DISTINCT object
+            FROM additions
+            WHERE ${stockNameCondition}
             UNION
-            SELECT DISTINCT object FROM deletions WHERE ${stockIdCondition}
+            SELECT DISTINCT object
+            FROM deletions
+            WHERE ${stockNameCondition}
             ORDER BY object ASC
         `);
 
-        const params = stockId > 0 ? [stockId, stockId] : [];
+        const params = stockName && stockName.trim() !== ""
+            ? [stockName, stockName]
+            : [];
+
         return stmt.all(...params).map((row: { object: string }) => row.object);
     } catch (error) {
-        console.error("Error fetching all objects:", error);
+        console.error("Erreur lors de la récupération des objets:", error);
         return [];
     }
 }
@@ -91,84 +112,20 @@ export function getAllObjects(stockId: number): string[] {
  *
  * @return {string[]} An array of stock names. Returns an empty array if an error occurs.
  */
-export function getAllStocks(): Stock[] {
+export function getAllStocks(): string[] {
     try {
         const stmt = db.prepare(`
-            SELECT * FROM stocks
-            ORDER BY name ASC
-        `);
-        return stmt.all().map((row: { id: number; name: string }) => ({
-            id: row.id,
-            name: row.name,
-        }));
-    } catch (error) {
-        console.error("Error fetching all stocks:", error);
-        return [];
-    }
-}
-
-/**
- * Fetches the stock amount curve of a specific object for the last 12 months.
- * The output is an array of 12 numbers representing the quantity of the object
- * at the start of each month, including the current quantity as the last value.
- *
- * @param {string} object - The name of the object to query.
- * @param stockId
- * @return {number[]} An array of 12 numbers representing the quantities.
- */
-export function getObjectAmountCurve(object: string, stockId: number): number[] {
-    try {
-        const stockIdCondition = stockId > 0 ? `AND stock_id = ?` : ``;
-        const stmt = db.prepare(`
-            WITH RECURSIVE months(offset, month_start) AS (
-                SELECT 0, DATE('now', 'start of month')
-            UNION ALL
-            SELECT offset + 1, DATE('now', 'start of month', '-' || (offset + 1) || ' months')
-            FROM months
-            WHERE offset < 11
-                ),
-                cumulative_data AS (
-            SELECT
-                m.month_start,
-                COALESCE((
-                SELECT SUM(quantity)
-                FROM additions
-                WHERE object = ? AND date < m.month_start ${stockIdCondition}
-                    ), 0) -
-                COALESCE((
-                SELECT SUM(quantity)
-                FROM deletions
-                WHERE object = ? AND date < m.month_start ${stockIdCondition}
-                    ), 0) AS quantity
-            FROM months m
-                )
-            SELECT
-                c.month_start,
-                CASE
-                    WHEN c.month_start = DATE('now', 'start of month') THEN
-                COALESCE((
-                SELECT SUM(quantity)
-                FROM additions
-                WHERE object = ? ${stockIdCondition}
-                    ), 0) -
-                COALESCE((
-                SELECT SUM(quantity)
-                FROM deletions
-                WHERE object = ? ${stockIdCondition}
-                    ), 0)
-                ELSE c.quantity
-            END AS quantity
-            FROM cumulative_data c
-            ORDER BY c.month_start ASC
+            SELECT DISTINCT stock_name
+            FROM additions
+            UNION
+            SELECT DISTINCT stock_name
+            FROM deletions
+            ORDER BY stock_name ASC
         `);
 
-        const params = stockId > 0 ?
-            [object, stockId, object, stockId, object, stockId, object, stockId] :
-            [object, object, object, object];
-
-        return stmt.all(...params).map((row: { quantity: number }) => row.quantity);
+        return stmt.all().map((row: { stock_name: string }) => row.stock_name);
     } catch (error) {
-        console.error("Error fetching object amount curve:", error);
+        console.error("Erreur lors de la récupération des noms de stock:", error);
         return [];
     }
 }
@@ -275,6 +232,12 @@ export function getStockLinks(linkedFilter: boolean | null): InvoiceProductLink[
     return stmt.all();
 }
 
+/**
+ * Retrieves stock link properties for a given addition ID.
+ *
+ * @param {number} additionId - The ID of the addition to fetch related stock information.
+ * @return {InvoiceProductLinkProps} The properties of the stock link, including object name, quantity, and stock name.
+ */
 export function getStockLinkProps(additionId: number): InvoiceProductLinkProps {
     const stmt = db.prepare(`
         SELECT a.object as name, a.quantity as quantity, s.name as stock_name
@@ -282,5 +245,5 @@ export function getStockLinkProps(additionId: number): InvoiceProductLinkProps {
         JOIN stocks s ON s.id = a.stock_id
         WHERE a.id = ?
     `);
-    return stmt.all(additionId);
+    return stmt.get(additionId);
 }
