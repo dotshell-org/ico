@@ -6,12 +6,11 @@ import { StockObject } from "../../types/stock/StockObject.ts";
 import StockTH from "../../components/stock/table/StockTH.tsx";
 import StockTR from "../../components/stock/table/StockTR.tsx";
 import dayjs from "dayjs";
-import {Stock} from "../../types/stock/Stock.ts";
 
 const StockDashboard: React.FC = () => {
-    const [allStocks, setAllStocks] = useState<Stock[]>([]);
+    const [allStocks, setAllStocks] = useState<string[]>([]);
 
-    const [stockId, setStockId] = useState<number>(0);
+    const [stockName, setStockName] = useState<string>("");
     const [inventoryData, setInventoryData] = useState<StockObject[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     
@@ -21,7 +20,7 @@ const StockDashboard: React.FC = () => {
     useEffect(() => {
         setIsLoading(true);
         (window as any).ipcRenderer
-            .invoke("getInventory", dayjs().format("YYYY-MM-DD"), stockId)
+            .invoke("getInventory", dayjs().format("YYYY-MM-DD"), stockName)
             .then((result: StockObject[]) => {
                 if (result.length === 0) {
                     setInventoryData([
@@ -41,12 +40,12 @@ const StockDashboard: React.FC = () => {
             .finally(() => {
                 setIsLoading(false);
             });
-    }, [stockId]);
+    }, [stockName]);
 
     useEffect(() => {
         if (searchDate) {
             (window as any).ipcRenderer
-                .invoke("getInventory", searchDate, stockId)
+                .invoke("getInventory", searchDate, stockName)
                 .then((result: StockObject[]) => {
                     setSearchedInventoryData(result);
                 })
@@ -54,12 +53,12 @@ const StockDashboard: React.FC = () => {
                     console.error("Error fetching inventory by date", error);
                 })
         }
-    }, [searchDate, stockId]);
+    }, [searchDate, stockName]);
 
     useEffect(() => {
         (window as any).ipcRenderer
             .invoke("getAllStocks")
-            .then((result: Stock[]) => {
+            .then((result: string[]) => {
                 setAllStocks(result);
             })
             .catch((error: any) => {
@@ -74,13 +73,13 @@ const StockDashboard: React.FC = () => {
             </h1>
             <select
                 className="w-52 p-0.5 bg-gray-100 dark:bg-gray-900 rounded cursor-pointer"
-                onChange={(e) => setStockId(Number(e.target.value))}
-                value={stockId}
+                onChange={(e) => setStockName(e.target.value)}
+                value={stockName}
             >
-                <option key={0} value={0}>{t("all")}</option>
+                <option value="">{t("all")}</option>
                 {
                     allStocks.map((stock) => (
-                        <option key={stock.id} value={stock.id}>{stock.name}</option>
+                        <option value={stock}>{stock}</option>
                     ))
                 }
             </select>
@@ -113,7 +112,7 @@ const StockDashboard: React.FC = () => {
                     </div>
 
                     <h2 className="mt-8 mb-2 text-2xl">{"💡 " + t("object")}</h2>
-                    <ObjectStockLineChart stockId={stockId} />
+                    <ObjectStockLineChart stockName={stockName} />
 
                     <h2 className="mt-8 mb-2 text-2xl flex items-center">
                         {"🕒 " + t("inventory_of")}

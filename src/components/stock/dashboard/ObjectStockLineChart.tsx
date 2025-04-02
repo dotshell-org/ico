@@ -4,10 +4,10 @@ import {t} from "i18next";
 import React, {useEffect, useState} from "react";
 
 interface ObjectStockLineChartProps {
-    stockId: number;
+    stockName: string;
 }
 
-const ObjectStockLineChart: React.FC<ObjectStockLineChartProps> = ({ stockId }) => {
+const ObjectStockLineChart: React.FC<ObjectStockLineChartProps> = ({ stockName }) => {
     const [allObjects, setAllObjects] = useState<string[]>([]);
 
     const [selectedObject, setSelectedObject] = useState<string>(t("nothing"));
@@ -31,7 +31,7 @@ const ObjectStockLineChart: React.FC<ObjectStockLineChartProps> = ({ stockId }) 
     useEffect(() => {
         setIsLoading(true);
         (window as any).ipcRenderer
-            .invoke("getObjectAmountCurve", selectedObject, stockId)
+            .invoke("getObjectAmountCurve", selectedObject, stockName)
             .then((result: number[]) => {
                 if (result.length === 0) {
                     setStockData(Array(12).fill(0));
@@ -50,7 +50,7 @@ const ObjectStockLineChart: React.FC<ObjectStockLineChartProps> = ({ stockId }) 
             .finally(() => {
                 setIsLoading(false);
             });
-    }, [selectedObject, stockId]);
+    }, [selectedObject, stockName]);
 
     const xAxisData = Array.from({ length: 12 }, (_, i) =>
         dayjs().subtract(11 - i, "month").toDate()
@@ -70,7 +70,7 @@ const ObjectStockLineChart: React.FC<ObjectStockLineChartProps> = ({ stockId }) 
             <div className="w-1/6 h-[21rem] p-4 mr-2 rounded shadow-sm border border-gray-300 dark:border-gray-700">
                 <div className="text-left">
                     <select
-                        className="border border-gray-300 cursor-pointer rounded p-1 mt-1 mb-2 w-full"
+                        className="border border-gray-300 dark:border-gray-700 dark:bg-gray-800 cursor-pointer rounded p-1 mt-1 mb-2 w-full"
                         onChange={handleSelectChange}
                         value={selectedObject}
                     >

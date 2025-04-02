@@ -15,6 +15,7 @@ const StockLinks: React.FC<StockLinksProps> = ({  }) => {
     const [selectedLink, setSelectedLink] = useState<InvoiceProductLink>({
         id: 0,
         name: "",
+        date: "2000-00-00",
         quantity: 0,
         addition_id: 0
     });

@@ -283,16 +283,27 @@ export function updateInvoiceProductQuantity(invoiceProductId: number, quantity:
 
 /**
  * Deletes an invoice product from the database identified by the given ID.
+ * Also deletes the addition associated with the product.
  *
  * @param {number} invoiceProductId - The ID of the invoice product to be deleted.
  * @return {void} This function does not return a value.
  */
 export function deleteInvoiceProduct(invoiceProductId: number): void {
-    const stmt = db.prepare(`
+    const stmt1 = db.prepare(`
+        DELETE FROM additions
+        WHERE id = (
+            SELECT addition_id
+            FROM invoice_products
+            WHERE id = ?
+        )
+    `);
+    stmt1.run(invoiceProductId);
+
+    const stmt2 = db.prepare(`
         DELETE FROM invoice_products
         WHERE id = ?
     `);
-    stmt.run(invoiceProductId);
+    stmt2.run(invoiceProductId);
 }
 
 /**

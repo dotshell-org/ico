@@ -34,18 +34,19 @@ export function ignoreInvoiceProductInStock(product_id: number): void {
  * @param {number} addition_id - The identifier for the stock addition to link or update. If 0 or negative, a new addition entry will be created.
  * @param {string} name - The name or description of the stock addition.
  * @param {number} quantity - The quantity for the stock addition.
+ * @param date
  * @param {string} stock_name - The name of the stock to associate with the addition.
  * @return {void} This function does not return a value.
  */
-export function linkInvoiceProductInStock(product_id: number, addition_id: number, name: string, quantity: number, stock_name: string): void {
+export function linkInvoiceProductInStock(product_id: number, addition_id: number, stock_name: string, date: string, name: string, quantity: number): void {
     // If addition_id <= 0, create a new record in additions
     if (addition_id <= 0) {
         // Insert stock_name directly into the additions table
         const additionStmt = db.prepare(`
             INSERT INTO additions (stock_name, date, object, quantity)
-            VALUES (?, datetime('now'), ?, ?)
+            VALUES (?, ?, ?, ?)
         `);
-        const additionResult = additionStmt.run(stock_name, name, quantity);
+        const additionResult = additionStmt.run(stock_name, date, name, quantity);
 
         // Link the newly created addition to the relevant product
         const linkStmt = db.prepare(`
@@ -60,9 +61,10 @@ export function linkInvoiceProductInStock(product_id: number, addition_id: numbe
             UPDATE additions
             SET object = ?,
                 quantity = ?,
+                date = ?,
                 stock_name = ?
             WHERE id = ?
         `);
-        updateStmt.run(name, quantity, stock_name, addition_id);
+        updateStmt.run(name, quantity, date, stock_name, addition_id);
     }
 }

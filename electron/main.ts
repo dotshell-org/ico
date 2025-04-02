@@ -63,7 +63,7 @@ function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC!, '../public/glome-icon.png'),
     // Add minimum size options
     minWidth: 900,
-    minHeight: 600,
+    minHeight: 650,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
