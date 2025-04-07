@@ -308,3 +308,20 @@ export function getObjectAmountCurve(object: string, stockName: string): number[
         return Array(12).fill(0);
     }
 }
+
+/**
+ * Retrieves a list of all distinct object names from the additions and deletions tables.
+ *
+ * @return {string[]} An array of unique object names.
+ */
+export function getAllObjectNames(): string[] {
+    const stmt = db.prepare(`
+        SELECT DISTINCT object
+        FROM additions
+        UNION
+        SELECT DISTINCT object
+        FROM deletions
+    `);
+
+    return stmt.all().map((row: { object: string }) => row.object);
+}

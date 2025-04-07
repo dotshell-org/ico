@@ -178,6 +178,16 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+*::-webkit-calendar-picker-indicator {
+  padding-bottom: 0.6rem;
+}
+
+.hide-calendar-picker::-webkit-calendar-picker-indicator {
+  color: transparent;
+  cursor: text;
+  display: none;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

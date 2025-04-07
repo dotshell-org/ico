@@ -27,7 +27,7 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
         const updateDate = async () => {
             if (dateValue !== credit.date) {
                 try {
-                    await window.ipcRenderer.invoke("updateCreditDate", credit.id, dateValue);
+                    await (window as any).ipcRenderer.invoke("updateCreditDate", credit.id, dateValue);
                     console.log("Date updated successfully!");
                 } catch (error) {
                     console.error("Error when updating the date:", error);
@@ -42,7 +42,7 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
         const updateTitle = async () => {
             if (titleValue !== credit.title) {
                 try {
-                    await window.ipcRenderer.invoke("updateCreditTitle", credit.id, titleValue);
+                    await (window as any).ipcRenderer.invoke("updateCreditTitle", credit.id, titleValue);
                     console.log("Title updated successfully!");
                 } catch (error) {
                     console.error("Error when updating the title:", error);
@@ -74,7 +74,7 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
     const handleCategoryChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newCategory = e.target.value;
         try {
-            await window.ipcRenderer.invoke("updateCreditCategory", credit.id, newCategory);
+            await (window as any).ipcRenderer.invoke("updateCreditCategory", credit.id, newCategory);
             console.log("Category updated successfully!");
             setCategoryValue(newCategory);
         } catch (error) {
@@ -84,7 +84,7 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
 
     const handleAddNewTable = async () => {
         try {
-            const newTableId = await window.ipcRenderer.invoke(
+            const newTableId = await (window as any).ipcRenderer.invoke(
                 "addCreditTable",
                 credit.id,
                 selectedTableType
@@ -99,7 +99,7 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
     useEffect(() => {
         const loadCategories = async () => {
             try {
-                const categories = await window.ipcRenderer.invoke("getAllCategories");
+                const categories = await (window as any).ipcRenderer.invoke("getAllCategories");
                 setAllCategories(categories);
             } catch (error) {
                 console.error("Error loading categories:", error);

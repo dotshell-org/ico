@@ -12,10 +12,35 @@ interface SetLinkInterfaceProps {
 const SetLinkInterface: React.FC<SetLinkInterfaceProps> = ({ link, onClose, onUpdate }) => {
     const { t } = useTranslation();
 
+    const [objectNames, setObjectNames] = React.useState<string[]>([]);
+    const [stockNames, setStockNames] = React.useState<string[]>([])
+
     const [name, setName] = React.useState<string>("");
     const [quantity, setQuantity] = React.useState<number>(0);
     const [date, setDate] = React.useState<string>(link.date);
     const [stock_name, setStockName] = React.useState<string>("");
+
+    useEffect(() => {
+        (window as any).ipcRenderer
+            .invoke("getAllObjectNames")
+            .then((result: string[]) => {
+                setObjectNames(result);
+            })
+            .catch((error: any) => {
+                console.error("Error when fetching objects", error);
+            });
+    }, []);
+
+    useEffect(() => {
+        (window as any).ipcRenderer
+            .invoke("getAllStocks")
+            .then((result: string[]) => {
+                setStockNames(result);
+            })
+            .catch((error: any) => {
+                console.error("Error when fetching stocks", error);
+            });
+    }, []);
 
     useEffect(() => {
         (window as any).ipcRenderer
@@ -94,11 +119,17 @@ const SetLinkInterface: React.FC<SetLinkInterfaceProps> = ({ link, onClose, onUp
                 <div>
                     <h2>{t("name")}</h2>
                     <input
-                        className="mt-1 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600"
+                        className="mt-1 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600 hide-calendar-picker"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        list="nameOptions"
                     />
+                    <datalist id="nameOptions">
+                        {objectNames.map((e) => (
+                            <option key={e} value={e}/>
+                        ))}
+                    </datalist>
                 </div>
 
                 <div>
@@ -124,11 +155,17 @@ const SetLinkInterface: React.FC<SetLinkInterfaceProps> = ({ link, onClose, onUp
                 <div>
                     <h2>{t("stock")}</h2>
                     <input
-                        className="mt-1 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600"
+                        className="mt-1 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600 hide-calendar-picker"
                         type="text"
                         value={stock_name}
                         onChange={(e) => setStockName(e.target.value)}
+                        list="stockOptions"
                     />
+                    <datalist id="stockOptions">
+                        {stockNames.map((e) => (
+                            <option key={e} value={e}/>
+                        ))}
+                    </datalist>
                 </div>
 
                 <div className="col-span-2">

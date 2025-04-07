@@ -1,7 +1,7 @@
 import { db, typeToOperator } from '../config.ts';
 import { Filter } from "../../../types/accounting/filter/Filter.ts";
 import { Sort } from "../../../types/accounting/sort/Sort.ts";
-import { Invoice } from "../../../types/accounting/invoices/Invoice.ts";  // Vous devrez créer ce type
+import { Invoice } from "../../../types/accounting/invoices/Invoice.ts";
 import dayjs from "dayjs";
 import { Operator } from "../../../types/accounting/filter/Operator.ts";
 import { SummaryProperty } from "../../../types/accounting/summary/SummaryProperty.ts";
@@ -138,7 +138,7 @@ export function addInvoice(title: string, category: string, country: Country): I
 
 /**
  * Deletes an invoice and all its associated data from the database.
- * Removes associated products and country-specific specifications before deleting the invoice.
+ * Removes associated products, their linked additions, and country-specific specifications before deleting the invoice.
  *
  * @param {number} invoiceId - The ID of the invoice to be deleted.
  * @return {void} This function does not return a value.
@@ -146,11 +146,23 @@ export function addInvoice(title: string, category: string, country: Country): I
 export function deleteInvoice(invoiceId: number): void {
     db.prepare('BEGIN TRANSACTION').run();
     try {
-        // Supprimer d'abord les produits associés
+        // Delete all additions linked to this invoice's products
+        db.prepare(`
+            DELETE FROM additions 
+            WHERE id IN (
+                SELECT addition_id 
+                FROM invoice_products 
+                WHERE invoice_id = ? AND addition_id IS NOT NULL
+            )
+        `).run(invoiceId);
+
+        // Delete associated products first
         db.prepare('DELETE FROM invoice_products WHERE invoice_id = ?').run(invoiceId);
-        // Supprimer les spécifications pays
+
+        // Delete country specifications
         db.prepare('DELETE FROM invoice_country_specifications WHERE invoice_id = ?').run(invoiceId);
-        // Supprimer la facture
+
+        // Delete the invoice
         db.prepare('DELETE FROM invoices WHERE id = ?').run(invoiceId);
 
         db.prepare('COMMIT').run();

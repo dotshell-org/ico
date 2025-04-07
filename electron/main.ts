@@ -38,6 +38,7 @@ import {
   updateInvoiceTitle
 } from "../src/backend/db/accounting/debits.ts";
 import {
+  getAllObjectNames,
   getAllObjects,
   getAllStocks,
   getInventory,
@@ -156,6 +157,7 @@ handleIpc("updateInvoiceNo", updateInvoiceNo);
 handleIpc("getInventory", getInventory);
 handleIpc("getAllObjects", getAllObjects);
 handleIpc("getAllStocks", getAllStocks);
+handleIpc("getAllObjectNames", getAllObjectNames);
 handleIpc("getObjectAmountCurve", getObjectAmountCurve);
 
 handleIpc("getMovements", getMovements);
