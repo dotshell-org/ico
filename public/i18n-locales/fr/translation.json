@@ -114,6 +114,8 @@
     "link": "Lier",
     "or": "Ou",
     "ignore_in_stock": "Ignorer dans le Stock",
-    "quantity_in_invoice": "Quantité dans la Facture"
+    "quantity_in_invoice": "Quantité dans la Facture",
+    "edit_movements": "Editer Mouvements",
+    "edit": "Editer"
 
 }

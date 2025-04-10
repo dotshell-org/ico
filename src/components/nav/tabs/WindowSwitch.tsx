@@ -12,21 +12,18 @@ const windowColors: { [key in Window]: string } = {
     [Window.Accounting]: 'bg-red-500 hover:bg-red-400',
     [Window.Stock]: 'bg-green-500 hover:bg-green-400',
     [Window.Sales]: 'bg-blue-500 hover:bg-blue-400',
-    [Window.Cafeteria]: 'bg-yellow-500 hover:bg-yellow-400',
 };
 
 const windowEmojis: { [key in Window]: string } = {
     [Window.Accounting]: '💰 ',
     [Window.Stock]: '📦 ',
     [Window.Sales]: '🛒 ',
-    [Window.Cafeteria]: '☕ ',
 }
 
 const windowStrings: { [key in Window]: string } = {
     [Window.Accounting]: 'accounting',
     [Window.Stock]: 'stock',
     [Window.Sales]: 'sales',
-    [Window.Cafeteria]: 'cafeteria',
 };
 
 const NavItem: React.FC<NavItemProps> = ({ selectedWindow, setSelectedWindow }) => {

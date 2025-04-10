@@ -112,6 +112,8 @@
     "link": "Link",
     "or": "Or",
     "ignore_in_stock": "Ignore in Stock",
-    "quantity_in_invoice": "Quantity in Invoice"
+    "quantity_in_invoice": "Quantity in Invoice",
+    "edit_movements": "Edit Movements",
+    "edit": "Edit"
 
 }

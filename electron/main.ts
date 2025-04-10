@@ -45,7 +45,13 @@ import {
   getMovements,
   getObjectAmountCurve, getStockLinkProps, getStockLinks
 } from "../src/backend/db/stock/getters.ts";
-import {ignoreInvoiceProductInStock, linkInvoiceProductInStock} from "../src/backend/db/stock/setters.ts";
+import {
+  addMovement,
+  deleteMovement,
+  editMovement,
+  ignoreInvoiceProductInStock,
+  linkInvoiceProductInStock
+} from "../src/backend/db/stock/setters.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -167,6 +173,9 @@ handleIpc("getStockLinks", getStockLinks);
 handleIpc("ignoreInvoiceProductInStock", ignoreInvoiceProductInStock);
 handleIpc("linkInvoiceProductInStock", linkInvoiceProductInStock);
 handleIpc("getStockLinkProps", getStockLinkProps);
+handleIpc("editMovement", editMovement);
+handleIpc("deleteMovement", deleteMovement);
+handleIpc("addMovement", addMovement);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

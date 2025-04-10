@@ -182,6 +182,10 @@ button:focus-visible {
   padding-bottom: 0.6rem;
 }
 
+input[type='date']::-webkit-calendar-picker-indicator {
+  padding-bottom: 0;
+}
+
 .hide-calendar-picker::-webkit-calendar-picker-indicator {
   color: transparent;
   cursor: text;

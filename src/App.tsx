@@ -17,6 +17,7 @@ import {TaxType} from "./types/accounting/invoices/TaxType.ts";
 import StockDashboard from "./pages/stock/StockDashboard.tsx";
 import StockMovementsSummary from "./pages/stock/StockMovementsSummary.tsx";
 import StockLinks from "./pages/stock/StockLinks.tsx";
+import EditStockMovements from "./pages/stock/EditStockMovements.tsx";
 
 function App() {
     const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
@@ -75,18 +76,20 @@ function App() {
                 }}/>;
             case Tabs.AccountingInvoiceEditor:
                 if (invoiceInEditor.countryCode == Country.None) {
-                    return <DefaultInvoiceEditor invoice={invoiceInEditor} taxType={TaxType.None} />;
+                    return <DefaultInvoiceEditor invoice={invoiceInEditor} taxType={TaxType.None}/>;
                 } else if (invoiceInEditor.countryCode == Country.France) {
-                    return <FranceInvoiceEditor invoice={invoiceInEditor }/>;
+                    return <FranceInvoiceEditor invoice={invoiceInEditor}/>;
                 }
                 return <h1>{invoiceInEditor.countryCode}</h1>;
 
             case Tabs.StockDashboard:
-                return <StockDashboard />
+                return <StockDashboard/>
             case Tabs.StockMovements:
-                return <StockMovementsSummary />
+                return <StockMovementsSummary/>
             case Tabs.StockLinks:
-                return <StockLinks />
+                return <StockLinks/>
+            case Tabs.StockEditMovements:
+                return <EditStockMovements />
 
             default:
                 return null;

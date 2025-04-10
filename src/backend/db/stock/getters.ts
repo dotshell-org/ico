@@ -154,12 +154,11 @@ export function getMovements(filters: Filter[], sorts: Sort[]): Movement[] {
     try {
         const queryParams: (string | number)[] = [];
         let query = `
-            WITH all_movements AS (
-                SELECT ROW_NUMBER() OVER (ORDER BY date, m.id) as id,
-                date,
-                object,
-                stock_name,
-                SUM(movement) OVER (PARTITION BY object, stock_name ORDER BY date, m.id) as quantity,
+            WITH all_movements AS (SELECT ROW_NUMBER() OVER (ORDER BY date, m.id) as id, m.id as local_id,
+                date, 
+                object, 
+                stock_name, 
+                SUM (movement) OVER (PARTITION BY object, stock_name ORDER BY date, m.id) as quantity, 
                 movement
             FROM (
                 SELECT id, date, object, quantity as movement, stock_name
@@ -169,7 +168,7 @@ export function getMovements(filters: Filter[], sorts: Sort[]): Movement[] {
                 FROM deletions
                 ) m
                 )
-            SELECT id, date, object, stock_name, quantity, movement
+            SELECT id, local_id, date, object, stock_name, quantity, movement
             FROM all_movements`;
 
         if (filters && filters.length > 0) {
