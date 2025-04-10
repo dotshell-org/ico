@@ -266,8 +266,7 @@ export function getObjectAmountCurve(object: string, stockName: string): number[
     try {
         const stockNameCondition = stockName && stockName.trim() !== "" ? "AND stock_name = ?" : "";
         const stmt = db.prepare(`
-            WITH RECURSIVE
-                dates AS (SELECT date ('now', '-11 months') as date
+            WITH RECURSIVE dates AS (SELECT date ('now', '-11 months') as date
             UNION ALL
             SELECT date (date, '+1 month')
             FROM dates
@@ -279,7 +278,7 @@ export function getObjectAmountCurve(object: string, stockName: string): number[
                 strftime('%Y-%m', date) as month, COALESCE (SUM (CASE
                 WHEN type = 'addition' THEN quantity
                 WHEN type = 'deletion' THEN -quantity
-                END), 0) as quantity
+                END), 0) as monthly_change
             FROM (
                 SELECT date, quantity, 'addition' as type
                 FROM additions
@@ -291,15 +290,40 @@ export function getObjectAmountCurve(object: string, stockName: string): number[
                 )
             GROUP BY strftime('%Y-%m', date)
                 )
-            SELECT COALESCE(mq.quantity, 0) as quantity
+                    , initial_stock AS (
+            SELECT COALESCE (SUM (CASE
+                WHEN type = 'addition' THEN quantity
+                WHEN type = 'deletion' THEN -quantity
+                END), 0) as initial_quantity
+            FROM (
+                SELECT date, quantity, 'addition' as type
+                FROM additions
+                WHERE object = ? ${stockNameCondition} AND date < date ('now', '-11 months')
+                UNION ALL
+                SELECT date, quantity, 'deletion' as type
+                FROM deletions
+                WHERE object = ? ${stockNameCondition} AND date < date ('now', '-11 months')
+                )
+                )
+                    , cumulative_stock AS (
+            SELECT
+                d.date, (SELECT initial_quantity FROM initial_stock) +
+                COALESCE ((
+                SELECT SUM (mq.monthly_change)
+                FROM monthly_quantities mq
+                WHERE strftime('%Y-%m', d.date) >= mq.month
+                ), 0) as cumulative_quantity
             FROM dates d
-                     LEFT JOIN monthly_quantities mq ON strftime('%Y-%m', d.date) = mq.month
-            ORDER BY d.date
+                )
+            SELECT strftime('%Y-%m', date) as month,
+                cumulative_quantity as quantity
+            FROM cumulative_stock
+            ORDER BY date
         `);
 
         const params = stockName && stockName.trim() !== ""
-            ? [object, stockName, object, stockName]
-            : [object, object];
+            ? [object, stockName, object, stockName, object, stockName, object, stockName]
+            : [object, object, object, object];
 
         const result = stmt.all(...params);
         return result.map((row: { quantity: number }) => row.quantity);
