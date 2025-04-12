@@ -139,31 +139,31 @@ const StockMovementsSummary: React.FC = () => {
                     <tr key={movement.id} className="transition-all">
                         <MovementSummaryTR
                             content={movement.stock_name}
-                            positive={movement.movement > 0}
+                            movement={movement.movement}
                             isSelected={selectedColumn === 0 && selectedRows.includes(movement.id)}
                             onClick={(event) => handleCellClick(event, 0, index, movement.id)}
                         />
                         <MovementSummaryTR
                             content={formatDate(movement.date)}
-                            positive={movement.movement > 0}
+                            movement={movement.movement}
                             isSelected={selectedColumn === 1 && selectedRows.includes(movement.id)}
                             onClick={(event) => handleCellClick(event, 1, index, movement.id)}
                         />
                         <MovementSummaryTR
                             content={movement.object}
-                            positive={movement.movement > 0}
+                            movement={movement.movement}
                             isSelected={selectedColumn === 2 && selectedRows.includes(movement.id)}
                             onClick={(event) => handleCellClick(event, 2, index, movement.id)}
                         />
                         <MovementSummaryTR
                             content={movement.quantity.toString()}
-                            positive={movement.movement > 0}
+                            movement={movement.movement}
                             isSelected={selectedColumn === 3 && selectedRows.includes(movement.id)}
                             onClick={(event) => handleCellClick(event, 3, index, movement.id)}
                         />
                         <MovementSummaryTR
                             content={movement.movement > 0 ? `+${movement.movement}` : movement.movement.toString()}
-                            positive={movement.movement > 0}
+                            movement={movement.movement}
                             isSelected={selectedColumn === 4 && selectedRows.includes(movement.id)}
                             onClick={(event) => handleCellClick(event, 4, index, movement.id)}
                         />

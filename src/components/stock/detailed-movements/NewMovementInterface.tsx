@@ -1,23 +1,22 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import {Movement} from "../../../types/stock/summary/Movement.ts";
+import dayjs from "dayjs";
 
-interface EditMovementInterfaceProps {
-    movement: Movement;
+interface NewMovementInterfaceProps {
     onClose: () => void;
-    onEdited: () => void;
+    onAdded: () => void;
 }
 
-const EditMovementInterface: React.FC<EditMovementInterfaceProps> = ({ movement, onClose, onEdited }) => {
+const NewMovementInterface: React.FC<NewMovementInterfaceProps> = ({ onClose, onAdded }) => {
     const { t } = useTranslation();
 
     const [objectNames, setObjectNames] = React.useState<string[]>([]);
     const [stockNames, setStockNames] = React.useState<string[]>([])
 
-    const [name, setName] = React.useState<string>(movement.object);
-    const [movementNumber, setMovementNumber] = React.useState<number>(movement.movement);
-    const [date, setDate] = React.useState<string>(movement.date);
-    const [stock_name, setStockName] = React.useState<string>(movement.stock_name);
+    const [name, setName] = React.useState<string>("");
+    const [movementNumber, setMovementNumber] = React.useState<number>(0);
+    const [date, setDate] = React.useState<string>(dayjs().format("YYYY-MM-DD"));
+    const [stock_name, setStockName] = React.useState<string>("");
 
     useEffect(() => {
         (window as any).ipcRenderer
@@ -41,11 +40,11 @@ const EditMovementInterface: React.FC<EditMovementInterfaceProps> = ({ movement,
             });
     }, []);
 
-    const handleEditButtonClicked = () => {
+    const handleNewButtonClicked = () => {
         (window as any).ipcRenderer
-            .invoke("editMovement", movement.local_id, name, movementNumber, date, stock_name)
+            .invoke("addMovement", name, movementNumber, date, stock_name)
             .then(() => {
-                onEdited();
+                onAdded();
                 onClose();
             })
             .catch(() => {
@@ -64,7 +63,7 @@ const EditMovementInterface: React.FC<EditMovementInterfaceProps> = ({ movement,
                     ✕
                 </button>
                 <div>
-                    <h1 className="text-2xl font-bold mb-4">{"✏️ " + t("edit")}</h1>
+                    <h1 className="text-2xl font-bold mb-4">{"➕ " + t("new")}</h1>
                 </div>
 
                 <div>
@@ -122,9 +121,9 @@ const EditMovementInterface: React.FC<EditMovementInterfaceProps> = ({ movement,
                 <div>
                     <button
                         className="w-full p-2 mt-4 bg-gray-100 dark:bg-gray-600"
-                        onClick={handleEditButtonClicked}
+                        onClick={handleNewButtonClicked}
                     >
-                        {t("edit")}
+                        {t("add")}
                     </button>
                 </div>
             </div>
@@ -132,4 +131,4 @@ const EditMovementInterface: React.FC<EditMovementInterfaceProps> = ({ movement,
     );
 };
 
-export default EditMovementInterface;
+export default NewMovementInterface;

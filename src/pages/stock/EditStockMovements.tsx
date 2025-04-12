@@ -8,6 +8,7 @@ import {Orientation} from "../../types/accounting/sort/Orientation.ts";
 import FilterSelection from "../../components/stock/filter-selection/FilterSelection.tsx";
 import {Movement} from "../../types/stock/summary/Movement.ts";
 import EditMovementInterface from "../../components/stock/detailed-movements/EditMovementInterface.tsx";
+import NewMovementInterface from "../../components/stock/detailed-movements/NewMovementInterface.tsx";
 
 const EditStockMovements: React.FC = () => {
     const [filters, setFilters] = useState<Filter[]>([]);
@@ -15,6 +16,7 @@ const EditStockMovements: React.FC = () => {
     const [movements, setMovements] = useState<Movement[]>([]);
 
     const [showEditInterface, setShowEditInterface] = useState<boolean>(false);
+    const [showNewInterface, setShowNewInterface] = useState<boolean>(false);
 
     const [selectedMovement, setSelectedMovement] = useState<Movement>({
         id: 0,
@@ -67,10 +69,6 @@ const EditStockMovements: React.FC = () => {
             });
     }
 
-    const handleNewMovement = () => {
-
-    }
-
     return (
         <>
             <div className="fixed left-10 right-10 top-16 bg-white dark:bg-gray-950 pt-10">
@@ -108,7 +106,7 @@ const EditStockMovements: React.FC = () => {
 
             <button
                 type="button"
-                onClick={handleNewMovement}
+                onClick={() => setShowNewInterface(true)}
                 className="mt-5 mb-16 p-1 w-full text-sm bg-transparent hover:bg-blue-500 border border-blue-500 text-blue-500 hover:text-white rounded transition-all duration-300"
             >
                 {t("new")}
@@ -116,6 +114,10 @@ const EditStockMovements: React.FC = () => {
 
             {
                 showEditInterface && <EditMovementInterface movement={selectedMovement} onClose={() => setShowEditInterface(false)} onEdited={handleEdited} />
+            }
+
+            {
+                showNewInterface && <NewMovementInterface onClose={() => setShowNewInterface(false)} onAdded={handleEdited} />
             }
 
         </>

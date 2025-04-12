@@ -18,7 +18,7 @@ const MovementMiniatureRow: React.FC<MovementMiniatureRowProps> = ({ movement, o
 
     const handleDeleted = () => {
         (window as any).ipcRenderer
-            .invoke("deleteMovement", movement.local_id, movement.quantity > 0)
+            .invoke("deleteMovement", movement.local_id, movement.movement >= 0)
             .then(() => {
                 onDelete();
             })

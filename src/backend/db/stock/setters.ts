@@ -69,20 +69,8 @@ export function linkInvoiceProductInStock(product_id: number, addition_id: numbe
     }
 }
 
-/**
- * Updates an existing movement record in the database with the provided details.
- * If the quantity sign changes (positive to negative or vice versa), it moves the record
- * from additions to deletions table or vice versa.
- *
- * @param id - The ID of the movement to update
- * @param {string} name - The name of the object being updated
- * @param {number} quantity - The updated quantity of the movement
- * @param {string} date - The updated date for the movement in YYYY-MM-DD format
- * @param {string} stock_name - The name of the stock associated with the movement
- * @return {void} This function does not return a value
- */
 export function editMovement(id: number, name: string, quantity: number, date: string, stock_name: string): void {
-    // First, check if we need to move the record between tables
+    // First, check if we need to move the record between tables or create a deletion from an addition
     const findCurrentTableStmt = db.prepare(`
         SELECT 'additions' as table_name
         FROM additions
@@ -99,7 +87,7 @@ export function editMovement(id: number, name: string, quantity: number, date: s
     const targetTable = quantity < 0 ? 'deletions' : 'additions';
     const absQuantity = Math.abs(quantity);
 
-    // If table changed, we need to move the record
+    // If table changed, or we need to create a deletion from an addition
     if (currentTable && currentTable !== targetTable) {
         // Begin transaction to ensure atomicity
         db.transaction(() => {
@@ -126,8 +114,14 @@ export function editMovement(id: number, name: string, quantity: number, date: s
                 `);
                 updateReferenceStmt.run(insertResult.lastInsertRowid, id);
             }
-            // Note: If we need to handle deletion_id references in the future, add similar code here
         })();
+    } else if (!currentTable && targetTable === 'deletions') {
+        // Handle case where addition is not directly found and needs to be created as deletion
+        const insertStmt = db.prepare(`
+            INSERT INTO deletions (stock_name, date, object, quantity)
+            VALUES (?, ?, ?, ?)
+        `);
+        insertStmt.run(stock_name, date, name, absQuantity);
     } else {
         // Just update the existing record if we're not changing tables
         const updateStmt = db.prepare(`
