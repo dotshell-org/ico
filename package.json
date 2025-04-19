@@ -1,5 +1,5 @@
 {
-  "name": "glome",
+  "name": "ico",
   "private": true,
   "version": "0.1.0",
   "description": "An open source, modern accounting software.",
@@ -64,8 +64,8 @@
   },
   "main": "dist-electron/main.js",
   "build": {
-    "appId": "com.example.glome",
-    "productName": "Glome",
+    "appId": "org.dotshell.ico",
+    "productName": "Ico",
     "win": {
       "target": "nsis",
       "icon": "build/icons/win/icon.ico"
