@@ -26,7 +26,7 @@ function AccountingDashboard() {
     });
 
     useEffect(() => {
-        window.ipcRenderer
+        (window as any).ipcRenderer
             .invoke("getTransactionsByMonth")
             .then((result: number[][]) => {
                 setSeriesData(result);
@@ -35,7 +35,7 @@ function AccountingDashboard() {
                 console.error("Error when fetching transactions", error);
             });
 
-        window.ipcRenderer
+        (window as any).ipcRenderer
             .invoke("getCreditsSumByCategory")
             .then((result: { categories: string[]; values: number[] }) => {
                 setCredits(result);
@@ -44,7 +44,7 @@ function AccountingDashboard() {
                 console.error("Error when fetching credits", err);
             });
 
-        window.ipcRenderer
+        (window as any).ipcRenderer
             .invoke("getDebitsSumByCategory")
             .then((result: { categories: string[]; values: number[] }) => {
                 setDebits(result);

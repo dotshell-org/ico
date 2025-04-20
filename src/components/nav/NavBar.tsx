@@ -3,7 +3,7 @@ import UserMenu from './user_menu/UserMenu';
 import WindowSwitch from './tabs/WindowSwitch';
 import { Window } from '../../types/nav/Window.ts';
 import { NavItemsGroup } from './tabs/NavItemsGroup';
-import GlomeLogo from '/glome.svg';
+import IcoLogo from '/ico.svg';
 import { Tabs } from '../../types/nav/Tabs.ts';
 
 interface NavBarProps {
@@ -29,7 +29,7 @@ const NavBar: React.FC<NavBarProps> = ({ selectedTab, setSelectedTab }) => {
                 <div className="flex h-20 items-center justify-between">
                     <div className="w-full flex items-center">
                         <div className="ml-10 w-[calc(100%-10rem)] flex items-baseline space-x-4">
-                            <img src={GlomeLogo} alt="Glome Logo" className="relative top-2.5 right-5 h-8 w-auto invert dark:invert-0" />
+                            <img src={IcoLogo} alt="Ico Logo" className="relative top-2.5 right-5 h-8 w-auto invert dark:invert-0" />
                             <WindowSwitch window={Window.Accounting} selectedWindow={selectedWindow} setSelectedWindow={handleSetSelectedWindow} />
                             <NavItemsGroup window={selectedWindow} selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
                         </div>

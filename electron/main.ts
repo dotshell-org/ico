@@ -67,7 +67,7 @@ let win: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC!, '../public/glome-icon.png'),
+    icon: path.join(process.env.VITE_PUBLIC!, '../public/ico-icon.png'),
     // Add minimum size options
     minWidth: 900,
     minHeight: 650,
