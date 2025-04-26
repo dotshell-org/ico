@@ -4,3 +4,5 @@ dist-electron/
 release/
 local.db
 /.idea/workspace.xml
+.idea
+default.account

@@ -1,7 +1,7 @@
 import {db} from "../config.ts";
 
 /**
- * Ignores the stock entry associated with a specific invoice product by deleting the linked addition and updating the product's addition reference.
+ * Ignores the stock entry associated with a specific invoice product by deleting the linked movement and updating the product's addition reference.
  *
  * @param {number} product_id - The unique identifier of the invoice product whose stock entry should be ignored.
  * @return {void} This function does not return a value.
@@ -9,7 +9,7 @@ import {db} from "../config.ts";
 export function ignoreInvoiceProductInStock(product_id: number): void {
     const deleteStmt = db.prepare(`
         DELETE
-        FROM additions
+        FROM stock_movements
         WHERE id = (SELECT addition_id
                     FROM invoice_products
                     WHERE id = ?);
@@ -26,39 +26,39 @@ export function ignoreInvoiceProductInStock(product_id: number): void {
 }
 
 /**
- * Links an invoice product to a stock addition. If the addition_id is less than or equal to 0,
- * it creates a new stock addition entry and links it to the specified product.
- * Otherwise, it updates the existing stock addition with the provided details.
+ * Links an invoice product to a stock movement. If the addition_id is less than or equal to 0,
+ * it creates a new stock movement entry and links it to the specified product.
+ * Otherwise, it updates the existing stock movement with the provided details.
  *
  * @param {number} product_id - The unique identifier of the product in the invoice.
- * @param {number} addition_id - The identifier for the stock addition to link or update. If 0 or negative, a new addition entry will be created.
- * @param {string} name - The name or description of the stock addition.
- * @param {number} quantity - The quantity for the stock addition.
+ * @param {number} addition_id - The identifier for the stock movement to link or update. If 0 or negative, a new movement entry will be created.
+ * @param {string} name - The name or description of the stock movement.
+ * @param {number} quantity - The quantity for the stock movement.
  * @param date
- * @param {string} stock_name - The name of the stock to associate with the addition.
+ * @param {string} stock_name - The name of the stock to associate with the movement.
  * @return {void} This function does not return a value.
  */
 export function linkInvoiceProductInStock(product_id: number, addition_id: number, stock_name: string, date: string, name: string, quantity: number): void {
-    // If addition_id <= 0, create a new record in additions
+    // If addition_id <= 0, create a new record in stock_movements
     if (addition_id <= 0) {
-        // Insert stock_name directly into the additions table
-        const additionStmt = db.prepare(`
-            INSERT INTO additions (stock_name, date, object, quantity)
+        // Insert stock_name directly into the stock_movements table
+        const movementStmt = db.prepare(`
+            INSERT INTO stock_movements (stock_name, date, object, quantity)
             VALUES (?, ?, ?, ?)
         `);
-        const additionResult = additionStmt.run(stock_name, date, name, quantity);
+        const movementResult = movementStmt.run(stock_name, date, name, quantity);
 
-        // Link the newly created addition to the relevant product
+        // Link the newly created movement to the relevant product
         const linkStmt = db.prepare(`
             UPDATE invoice_products
             SET addition_id = ?
             WHERE id = ?
         `);
-        linkStmt.run(additionResult.lastInsertRowid, product_id);
+        linkStmt.run(movementResult.lastInsertRowid, product_id);
     } else {
-        // Otherwise, update the existing addition
+        // Otherwise, update the existing movement
         const updateStmt = db.prepare(`
-            UPDATE additions
+            UPDATE stock_movements
             SET object = ?,
                 quantity = ?,
                 date = ?,
@@ -70,118 +70,55 @@ export function linkInvoiceProductInStock(product_id: number, addition_id: numbe
 }
 
 export function editMovement(id: number, name: string, quantity: number, date: string, stock_name: string): void {
-    // First, check if we need to move the record between tables or create a deletion from an addition
-    const findCurrentTableStmt = db.prepare(`
-        SELECT 'additions' as table_name
-        FROM additions
-        WHERE id = ?
-        UNION
-        SELECT 'deletions' as table_name
-        FROM deletions
+    // Simply update the movement in the single table
+    const updateStmt = db.prepare(`
+        UPDATE stock_movements
+        SET object = ?,
+            quantity = ?,
+            date = ?,
+            stock_name = ?
         WHERE id = ?
     `);
 
-    const currentTable = findCurrentTableStmt.get(id, id)?.table_name;
-
-    // Determine target table based on quantity sign
-    const targetTable = quantity < 0 ? 'deletions' : 'additions';
-    const absQuantity = Math.abs(quantity);
-
-    // If table changed, or we need to create a deletion from an addition
-    if (currentTable && currentTable !== targetTable) {
-        // Begin transaction to ensure atomicity
-        db.transaction(() => {
-            // Insert into new table
-            const insertStmt = db.prepare(`
-                INSERT INTO ${targetTable} (stock_name, date, object, quantity)
-                VALUES (?, ?, ?, ?)
-            `);
-            const insertResult = insertStmt.run(stock_name, date, name, absQuantity);
-
-            // Delete from old table
-            const deleteStmt = db.prepare(`
-                DELETE FROM ${currentTable}
-                WHERE id = ?
-            `);
-            deleteStmt.run(id);
-
-            // If this movement is linked to an invoice_product, update the reference
-            if (currentTable === 'additions') {
-                const updateReferenceStmt = db.prepare(`
-                    UPDATE invoice_products
-                    SET addition_id = ?
-                    WHERE addition_id = ?
-                `);
-                updateReferenceStmt.run(insertResult.lastInsertRowid, id);
-            }
-        })();
-    } else if (!currentTable && targetTable === 'deletions') {
-        // Handle case where addition is not directly found and needs to be created as deletion
-        const insertStmt = db.prepare(`
-            INSERT INTO deletions (stock_name, date, object, quantity)
-            VALUES (?, ?, ?, ?)
-        `);
-        insertStmt.run(stock_name, date, name, absQuantity);
-    } else {
-        // Just update the existing record if we're not changing tables
-        const updateStmt = db.prepare(`
-            UPDATE ${targetTable}
-            SET object = ?,
-                quantity = ?,
-                date = ?,
-                stock_name = ?
-            WHERE id = ?
-        `);
-
-        updateStmt.run(name, absQuantity, date, stock_name, id);
-    }
+    updateStmt.run(name, quantity, date, stock_name, id);
 }
 
 /**
  * Deletes a movement record from the database based on the specified ID.
- * If the movement is an addition linked to an invoice_product, the function
- * also unlinks the invoice_product by setting its addition_id to -1.
+ * If the movement is linked to an invoice_product, the function
+ * also unlinks the invoice_product by setting its addition_id to 0.
  *
  * @param {number} id - The ID of the movement record to be deleted.
- * @param {boolean} positive - Indicates whether the movement is positive (addition) or negative (deletion).
+ * @param {boolean} positive - Not used in this version but kept for backward compatibility.
  * @return {void} This function does not return any value.
  */
 export function deleteMovement(id: number, positive: boolean): void {
     // Use a transaction to ensure all operations occur atomically
     db.transaction(() => {
-        if (positive) {
-            // First, check if this addition is linked to any invoice_products
-            const checkLinkStmt = db.prepare(`
-                SELECT id FROM invoice_products
+        // Check if this movement is linked to any invoice_products
+        const checkLinkStmt = db.prepare(`
+            SELECT id FROM invoice_products
+            WHERE addition_id = ?
+        `);
+
+        const linkedProducts = checkLinkStmt.all(id);
+
+        // If linked products exist, update them to set addition_id to 0
+        if (linkedProducts.length > 0) {
+            const unlinkStmt = db.prepare(`
+                UPDATE invoice_products
+                SET addition_id = 0
                 WHERE addition_id = ?
             `);
-
-            const linkedProducts = checkLinkStmt.all(id);
-
-            // If linked products exist, update them to set addition_id to 0
-            if (linkedProducts.length > 0) {
-                const unlinkStmt = db.prepare(`
-                    UPDATE invoice_products
-                    SET addition_id = 0
-                    WHERE addition_id = ?
-                `);
-                unlinkStmt.run(id);
-            }
-
-            // Now delete the addition
-            const deleteStmt = db.prepare(`
-                DELETE FROM additions
-                WHERE id = ?
-            `);
-            deleteStmt.run(id);
-        } else {
-            // For deletions, we simply delete the record
-            const deleteStmt = db.prepare(`
-                DELETE FROM deletions
-                WHERE id = ?
-            `);
-            deleteStmt.run(id);
+            unlinkStmt.run(id);
         }
+
+        // Delete the movement
+        const deleteStmt = db.prepare(`
+            DELETE FROM stock_movements
+            WHERE id = ?
+        `);
+        deleteStmt.run(id);
     })();
 }
 
@@ -196,7 +133,7 @@ export function deleteMovement(id: number, positive: boolean): void {
  */
 export function addMovement(name: string, quantity: number, date: string, stock_name: string): void {
     const insertStmt = db.prepare(`
-        INSERT INTO additions (stock_name, date, object, quantity)
+        INSERT INTO stock_movements (stock_name, date, object, quantity)
         VALUES (?, ?, ?, ?)
     `);
     insertStmt.run(stock_name, date, name, quantity);

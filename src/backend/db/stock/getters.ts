@@ -9,7 +9,7 @@ import {InvoiceProductLink} from "../../../types/stock/InvoiceProductLink.ts";
 import {InvoiceProductLinkProps} from "../../../types/stock/InvoiceProductLinkProps.ts";
 
 /**
- * Fetches the current inventory of objects based on additions and deletions in the database up to a specific date.
+ * Fetches the current inventory of objects based on movements in the database up to a specific date.
  * The method calculates the net quantity for each object and returns a list of objects
  * that have a positive quantity in stock.
  *
@@ -35,18 +35,8 @@ export function getInventory(date: string, stockName?: string): StockObject[] {
                     COALESCE(
                         (
                             SELECT SUM(quantity)
-                            FROM additions
-                            WHERE additions.object = all_objects.object
-                              AND date <= date(?, '+1 day')
-                              ${stockNameCondition}
-                        ), 
-                        0
-                    ) -
-                    COALESCE(
-                        (
-                            SELECT SUM(quantity)
-                            FROM deletions
-                            WHERE deletions.object = all_objects.object
+                            FROM stock_movements
+                            WHERE stock_movements.object = all_objects.object
                               AND date <= date(?, '+1 day')
                               ${stockNameCondition}
                         ), 
@@ -54,10 +44,8 @@ export function getInventory(date: string, stockName?: string): StockObject[] {
                     ) AS quantity
                 FROM (
                     SELECT DISTINCT object
-                    FROM additions ${stockNameFilter}
-                    UNION
-                    SELECT DISTINCT object
-                    FROM deletions ${stockNameFilter}
+                    FROM stock_movements
+                    ${stockNameFilter}
                 ) all_objects
             )
             SELECT *
@@ -67,8 +55,8 @@ export function getInventory(date: string, stockName?: string): StockObject[] {
         `);
 
         const params = stockName && stockName.trim() !== ""
-            ? [date, stockName, date, stockName, stockName, stockName]
-            : [date, date];
+            ? [date, stockName, stockName]
+            : [date];
 
         return stmt.all(...params).map((row: { id: number; name: string; quantity: number }) => ({
             id: row.id,
@@ -82,7 +70,7 @@ export function getInventory(date: string, stockName?: string): StockObject[] {
 }
 
 /**
- * Retrieves a list of all unique objects from the additions and deletions tables,
+ * Retrieves a list of all unique objects from the stock_movements table,
  * sorted in alphabetical order.
  *
  * @return {string[]} An array of unique object strings. If an error occurs, an empty array is returned.
@@ -95,17 +83,13 @@ export function getAllObjects(stockName?: string): string[] {
 
         const stmt = db.prepare(`
             SELECT DISTINCT object
-            FROM additions
-            WHERE ${stockNameCondition}
-            UNION
-            SELECT DISTINCT object
-            FROM deletions
+            FROM stock_movements
             WHERE ${stockNameCondition}
             ORDER BY object ASC
         `);
 
         const params = stockName && stockName.trim() !== ""
-            ? [stockName, stockName]
+            ? [stockName]
             : [];
 
         return stmt.all(...params).map((row: { object: string }) => row.object);
@@ -124,11 +108,7 @@ export function getAllStocks(): string[] {
     try {
         const stmt = db.prepare(`
             SELECT DISTINCT stock_name
-            FROM (
-                 SELECT stock_name FROM additions
-                 UNION
-                 SELECT stock_name FROM deletions
-            ) combined_stocks
+            FROM stock_movements
             ORDER BY stock_name;
         `);
 
@@ -141,33 +121,27 @@ export function getAllStocks(): string[] {
 
 /**
  * Retrieves a list of movements based on the specified filters and sorting criteria.
- * The method consolidates data from additions and deletions, calculates cumulative quantities,
- * and optionally filters and sorts the result.
+ * The method calculates cumulative quantities and optionally filters and sorts the result.
  *
  * @param {Filter[]} filters - An array of filter objects used to specify filtering conditions.
  * Each filter includes a property, operator, and value to define its filtering logic.
  * @param {Sort[]} sorts - An array of sort objects used to specify sorting behavior.
  * Each sort includes a property and orientation to determine the order of results.
- * @return {Movement[]} An array of `Movement` objects representing the consolidated and filtered/sorted list of movements.
+ * @return {Movement[]} An array of `Movement` objects representing the filtered/sorted list of movements.
  */
 export function getMovements(filters: Filter[], sorts: Sort[]): Movement[] {
     try {
         const queryParams: (string | number)[] = [];
         let query = `
-            WITH all_movements AS (SELECT ROW_NUMBER() OVER (ORDER BY date, m.id) as id, m.id as local_id,
+            WITH all_movements AS (SELECT 
+                ROW_NUMBER() OVER (ORDER BY date, id) as id, 
+                id as local_id,
                 date, 
                 object, 
                 stock_name, 
-                SUM (movement) OVER (PARTITION BY object, stock_name ORDER BY date, m.id) as quantity, 
-                movement
-            FROM (
-                SELECT id, date, object, quantity as movement, stock_name
-                FROM additions
-                UNION ALL
-                SELECT id, date, object, -quantity as movement, stock_name
-                FROM deletions
-                ) m
-                )
+                SUM(quantity) OVER (PARTITION BY object, stock_name ORDER BY date, id) as quantity, 
+                quantity as movement
+            FROM stock_movements)
             SELECT id, local_id, date, object, stock_name, quantity, movement
             FROM all_movements`;
 
@@ -247,7 +221,7 @@ export function getStockLinks(linkedFilter: boolean | null): InvoiceProductLink[
 export function getStockLinkProps(additionId: number): InvoiceProductLinkProps | undefined {
     const stmt = db.prepare(`
         SELECT object as name, quantity, date, stock_name
-        FROM additions
+        FROM stock_movements
         WHERE id = ?
     `);
     return stmt.get(additionId);
@@ -274,41 +248,22 @@ export function getObjectAmountCurve(object: string, stockName: string): number[
                 )
                 , monthly_quantities AS (
             SELECT
-                strftime('%Y-%m', date) as month, COALESCE (SUM (CASE
-                WHEN type = 'addition' THEN quantity
-                WHEN type = 'deletion' THEN -quantity
-                END), 0) as monthly_change
-            FROM (
-                SELECT date, quantity, 'addition' as type
-                FROM additions
-                WHERE object = ? ${stockNameCondition}
-                UNION ALL
-                SELECT date, quantity, 'deletion' as type
-                FROM deletions
-                WHERE object = ? ${stockNameCondition}
-                )
+                strftime('%Y-%m', date) as month, 
+                COALESCE(SUM(quantity), 0) as monthly_change
+            FROM stock_movements
+            WHERE object = ? ${stockNameCondition}
             GROUP BY strftime('%Y-%m', date)
                 )
-                    , initial_stock AS (
-            SELECT COALESCE (SUM (CASE
-                WHEN type = 'addition' THEN quantity
-                WHEN type = 'deletion' THEN -quantity
-                END), 0) as initial_quantity
-            FROM (
-                SELECT date, quantity, 'addition' as type
-                FROM additions
-                WHERE object = ? ${stockNameCondition} AND date < date ('now', '-11 months')
-                UNION ALL
-                SELECT date, quantity, 'deletion' as type
-                FROM deletions
-                WHERE object = ? ${stockNameCondition} AND date < date ('now', '-11 months')
+                , initial_stock AS (
+            SELECT COALESCE(SUM(quantity), 0) as initial_quantity
+            FROM stock_movements
+            WHERE object = ? ${stockNameCondition} AND date < date('now', '-11 months')
                 )
-                )
-                    , cumulative_stock AS (
+                , cumulative_stock AS (
             SELECT
                 d.date, (SELECT initial_quantity FROM initial_stock) +
                 COALESCE ((
-                SELECT SUM (mq.monthly_change)
+                SELECT SUM(mq.monthly_change)
                 FROM monthly_quantities mq
                 WHERE strftime('%Y-%m', d.date) >= mq.month
                 ), 0) as cumulative_quantity
@@ -321,8 +276,8 @@ export function getObjectAmountCurve(object: string, stockName: string): number[
         `);
 
         const params = stockName && stockName.trim() !== ""
-            ? [object, stockName, object, stockName, object, stockName, object, stockName]
-            : [object, object, object, object];
+            ? [object, stockName, object, stockName]
+            : [object, object];
 
         const result = stmt.all(...params);
         return result.map((row: { quantity: number }) => row.quantity);
@@ -333,17 +288,14 @@ export function getObjectAmountCurve(object: string, stockName: string): number[
 }
 
 /**
- * Retrieves a list of all distinct object names from the additions and deletions tables.
+ * Retrieves a list of all distinct object names from the stock_movements table.
  *
  * @return {string[]} An array of unique object names.
  */
 export function getAllObjectNames(): string[] {
     const stmt = db.prepare(`
         SELECT DISTINCT object
-        FROM additions
-        UNION
-        SELECT DISTINCT object
-        FROM deletions
+        FROM stock_movements
     `);
 
     return stmt.all().map((row: { object: string }) => row.object);
