@@ -11,4 +11,6 @@ export enum Tabs {
     StockMovements = 'stock_movements',
     StockLinks = 'stock_links',
     StockEditMovements = 'stock_edit_movements',
+
+    SalesDashboard = 'sales_dashboard',
 }

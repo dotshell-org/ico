@@ -26,7 +26,7 @@ const windowStrings: { [key in Window]: string } = {
     [Window.Sales]: 'sales',
 };
 
-const NavItem: React.FC<NavItemProps> = ({ selectedWindow, setSelectedWindow }) => {
+const WindowSwitch: React.FC<NavItemProps> = ({ selectedWindow, setSelectedWindow }) => {
     const { t }: { t: (key: string) => string } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -82,4 +82,4 @@ const NavItem: React.FC<NavItemProps> = ({ selectedWindow, setSelectedWindow }) 
     );
 };
 
-export default NavItem;
+export default WindowSwitch;

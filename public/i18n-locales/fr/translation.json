@@ -67,7 +67,11 @@
     "coins": "Pièces",
 
     "days": "jours",
+    "day": "Jour",
+    "week": "Semaine",
     "month": "Mois",
+    "year": "Année",
+    "allTime": "Tout le temps",
 
     "address": "Adresse",
     "country": "Pays",
@@ -101,6 +105,7 @@
     "inventory": "Inventaire",
     "inventory_of": "Inventaire du",
     "object": "Objet",
+    "objects": "Objets",
     "select_object": "Sélectionner Objet",
     "nothing": "Rien",
     "not_selected": "Non Sélectionné",

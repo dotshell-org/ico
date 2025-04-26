@@ -65,7 +65,11 @@
     "coins": "Coins",
 
     "days": "days",
+    "day": "Day",
+    "week": "Week",
     "month": "Month",
+    "year": "Year",
+    "allTime": "All Time",
 
     "address": "Address",
     "country": "Country",
@@ -99,6 +103,7 @@
     "inventory": "Inventory",
     "inventory_of": "Inventory of",
     "object": "Object",
+    "objects": "Objects",
     "select_object": "Select Object",
     "nothing": "Nothing",
     "not_selected": "Not Selected",

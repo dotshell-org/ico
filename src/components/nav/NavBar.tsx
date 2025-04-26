@@ -19,6 +19,8 @@ const NavBar: React.FC<NavBarProps> = ({ selectedTab, setSelectedTab }) => {
             setSelectedTab(Tabs.AccountingDashboard);
         } else if (window === Window.Stock) {
             setSelectedTab(Tabs.StockDashboard);
+        } else if (window === Window.Sales) {
+            setSelectedTab(Tabs.SalesDashboard);
         }
         setSelectedWindow(window);
     }

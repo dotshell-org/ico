@@ -18,6 +18,7 @@ import StockDashboard from "./pages/stock/StockDashboard.tsx";
 import StockMovementsSummary from "./pages/stock/StockMovementsSummary.tsx";
 import StockLinks from "./pages/stock/StockLinks.tsx";
 import EditStockMovements from "./pages/stock/EditStockMovements.tsx";
+import SalesDashboard from "./pages/sales/SalesDashboard.tsx";
 
 function App() {
     const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
@@ -90,6 +91,9 @@ function App() {
                 return <StockLinks/>
             case Tabs.StockEditMovements:
                 return <EditStockMovements />
+
+            case Tabs.SalesDashboard:
+                return <SalesDashboard />
 
             default:
                 return null;
