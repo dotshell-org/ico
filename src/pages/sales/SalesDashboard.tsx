@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { LineChart, PieChart } from "@mui/x-charts";
 import { TextField } from "@mui/material";
 import dayjs from "dayjs";
@@ -10,19 +10,37 @@ const SalesDashboard = () => {
     const [startDate, setStartDate] = React.useState(dayjs().format('YYYY-MM-DD'));
     const [endDate, setEndDate] = React.useState(dayjs().format('YYYY-MM-DD'));
 
-    const lineChartData = [
-        { x: '2023-01-01', y: 0 },
-        { x: '2023-01-02', y: 0 },
-        { x: '2023-01-03', y: 0 },
-        { x: '2023-01-04', y: 0 },
-        { x: '2023-01-05', y: 0 },
-    ];
+    const [lineChartData, setLineChartData] = React.useState<{x: string, y: number}[]>([]);
+    useEffect(() => {
+        (window as any).ipcRenderer
+            .invoke("getRevenueData", timeFrame)
+            .then((result: {x: string, y: number}[]) => {
+                setLineChartData(result)
+            })
+            .catch((error: any) => {
+                console.error("Error when fetching revenue data", error);
+            });
+    }, []);
 
-    const pieChartData = [
-        { id: 0, value: 1, label: 'Product A' },
-        { id: 1, value: 1, label: 'Product B' },
-        { id: 2, value: 1, label: 'Product C' },
-    ];
+    const [pieChartData, setPieChartData] = React.useState<{id: number, value: number, label: string}[]>([]);
+    useEffect(() => {
+        (window as any).ipcRenderer
+            .invoke("getSalesSummary", startDate, endDate)
+            .then((result: { [objectName: string]: number }) => {
+                setPieChartData(
+                    Object.entries(result).map(([objectName, quantity], index) => {
+                        return {
+                            id: index,
+                            value: quantity,
+                            label: objectName
+                        };
+                    })
+                );
+            })
+            .catch((error: any) => {
+                console.error("Error when fetching sales summary", error);
+            });
+    }, [startDate, endDate]);
 
     const rainbowColors = [
         "#7ec8ff", "#5abeff", "#36a3ff", "#1288ff", "#006dea",
@@ -31,8 +49,15 @@ const SalesDashboard = () => {
 
     const handleTimeFrameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
-        // Convertir en `unknown` puis en `TimeFrame`
         setTimeFrame(TimeFrame[value as unknown as keyof typeof TimeFrame]);
+        (window as any).ipcRenderer
+            .invoke("getRevenueData", TimeFrame[value as unknown as keyof typeof TimeFrame])
+            .then((result: {x: string, y: number}[]) => {
+                setLineChartData(result)
+            })
+            .catch((error: any) => {
+                console.error("Error when fetching revenue data", error);
+            });
     };
 
     // @ts-ignore

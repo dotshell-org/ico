@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import "../src/backend/db/accounting/tables.ts"
 import "../src/backend/db/stock/tables.ts"
+import "../src/backend/db/sales/tables.ts"
 import {
   addCreditGroup,
   addCreditRow,
@@ -52,6 +53,7 @@ import {
   ignoreInvoiceProductInStock,
   linkInvoiceProductInStock
 } from "../src/backend/db/stock/setters.ts";
+import {getRevenueData, getSales, getSalesSummary} from "../src/backend/db/sales/getters.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -176,6 +178,10 @@ handleIpc("getStockLinkProps", getStockLinkProps);
 handleIpc("editMovement", editMovement);
 handleIpc("deleteMovement", deleteMovement);
 handleIpc("addMovement", addMovement);
+
+handleIpc("getSales", getSales);
+handleIpc("getSalesSummary", getSalesSummary);
+handleIpc("getRevenueData", getRevenueData);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
