@@ -88,15 +88,20 @@ const EditSaleInterface: React.FC<EditSaleInterfaceProps> = ({ sale, onClose, on
     }, [stock, stockNames]);
 
     const handleEditButtonClicked = () => {
+        console.log("Tentative de modification de la vente avec ID:", sale.id);
+        console.log("Données envoyées:", { id: sale.local_id || sale.id, name, quantity, price, date, stock });
+        
         (window as any).ipcRenderer
-            .invoke("editSale", sale.id, name, quantity, price, date, stock)
+            .invoke("editSale", sale.local_id || sale.id, name, quantity, price, date, stock)
             .then(() => {
+                console.log("Vente modifiée avec succès");
                 onEdited();
                 onClose();
             })
-            .catch(() => {
-                console.error("Error editing sale");
-            })
+            .catch((error: any) => {
+                console.error("Erreur lors de la modification de la vente:", error);
+                alert("Erreur lors de la modification de la vente: " + error.message);
+            });
     };
 
     return (

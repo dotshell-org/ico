@@ -20,14 +20,19 @@ const formatPrice = (price: number) => {
 
 const SaleMiniatureRow: React.FC<SaleMiniatureRowProps> = ({ sale, onClick, onDelete }) => {
 
-    const handleDeleted = () => {
+    const handleDeleted = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Empêche le clic de se propager à l'élément parent
+        
+        console.log("Tentative de suppression de la vente avec ID:", sale.id);
         (window as any).ipcRenderer
-            .invoke("deleteSale", sale.id)
+            .invoke("deleteSale", sale.local_id || sale.id) // Utilise local_id si disponible, sinon utilise id
             .then(() => {
+                console.log("Vente supprimée avec succès");
                 onDelete();
             })
             .catch((error: any) => {
-                console.error("Error deleting sale", error);
+                console.error("Erreur lors de la suppression de la vente:", error);
+                alert("Erreur lors de la suppression de la vente: " + error.message);
             });
     }
 
