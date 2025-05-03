@@ -31,7 +31,9 @@ export const NavItemsGroup: React.FC<NavItemsGroupProps> = ({ window, selectedTa
         ]
     } else if (window === Window.Sales) {
         items = [
-            { text: "📊 " + t('dashboard'), tab: Tabs.SalesDashboard}
+            { text: "📊 " + t('dashboard'), tab: Tabs.SalesDashboard},
+            { text: "🛒" + t('sales'), tab: Tabs.SalesSales},
+            { text: "✏️" + t('edit_sales'), tab: Tabs.SalesEditSales},
         ]
     }
 

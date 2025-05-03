@@ -121,6 +121,7 @@
     "ignore_in_stock": "Ignorer dans le Stock",
     "quantity_in_invoice": "Quantité dans la Facture",
     "edit_movements": "Editer Mouvements",
-    "edit": "Editer"
+    "edit": "Editer",
+    "edit_sales": "Editer Ventes"
 
 }
