@@ -82,35 +82,21 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 let win: BrowserWindow | null
 
 function createWindow() {
-  win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC!, '../public/ico-icon.png'),
-    // Add minimum size options
-    minWidth: 900,
-    minHeight: 650,
+  const win = new BrowserWindow({
+    width: 800,
+    height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
-  })
+  });
 
-  // Hide menu bar
-  win.setMenuBarVisibility(false)
+  win.setMenu(null); // Supprime la barre de menu
 
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', new Date().toLocaleString())
-  })
-
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL).then(() => {
-      if (!win) {
-        throw new Error('"win" is not defined')
-      }
-    })
+  const isDev = process.env.VITE_DEV_SERVER_URL;
+  if (isDev) {
+    win.loadURL(isDev);
   } else {
-    win.loadFile(path.join(RENDERER_DIST, 'index.html')).then(() => {
-      if (!win) {
-        throw new Error('"win" is not defined')
-      }
-    })
+    win.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 }
 

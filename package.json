@@ -72,6 +72,11 @@
       "target": "nsis",
       "icon": "build/icons/win/icon.ico"
     },
-    "buildDependenciesFromSource": true
+    "buildDependenciesFromSource": true,
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "public/**/*"
+    ]
   }
 }
