@@ -33,6 +33,8 @@ export function getSales(filters: Filter[], sorts: Sort[]): Sale[] {
                     filter.property === SummaryProperty.Price) {
                     if (typeof filter.value === "string") {
                         queryParams.push(parseFloat(filter.value));
+                    } else {
+                        queryParams.push(filter.value);
                     }
                     return `${filter.property} ${typeToOperator(filter.operator)} ?`;
                 } else if (filter.operator === Operator.Is) {
@@ -64,7 +66,6 @@ export function getSales(filters: Filter[], sorts: Sort[]): Sale[] {
         }
 
         const stmt = db.prepare(query);
-
         return stmt.all(...queryParams);
     } catch (error) {
         console.error("Error fetching sales:", error);
