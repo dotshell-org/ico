@@ -33,8 +33,8 @@ void i18n
     })
 
 // Add a listener for language changes from the main process
-if (window.ipcRenderer) {
-    window.ipcRenderer.on('language-changed', (_event, language) => {
+if ((window as any).ipcRenderer) {
+    (window as any).ipcRenderer.on('language-changed', (_event: any, language: string | undefined) => {
         if (language && (language === 'en' || language === 'fr')) {
             void i18n.changeLanguage(language)
             localStorage.setItem('language', language)
@@ -49,8 +49,8 @@ export const changeLanguage = async (language: string) => {
         localStorage.setItem('language', language)
         
         // Inform the main process about the language change
-        if (window.ipcRenderer) {
-            await window.ipcRenderer.invoke('changeLanguage', language)
+        if ((window as any).ipcRenderer) {
+            await (window as any).ipcRenderer.invoke('changeLanguage', language)
         }
         
         return true

@@ -193,8 +193,4 @@ export function deleteAccount(id: string): void {
 }
 
 // Update the database connection based on the current account
-export function updateDatabaseConnection(): void {
-    const currentAccount = getCurrentAccount();
-    // This would update the database connection in config.ts
-    // For now, we'll rely on the renderer process to reload the app
-}
+export function updateDatabaseConnection(): void {}

@@ -28,7 +28,7 @@ function DebitSummary() {
     }
 
     useEffect(() => {
-        window.ipcRenderer
+        (window as any).ipcRenderer
             .invoke("getDebits", filters, sorts)
             .then((result: Invoice[]) => {
                 setDebits(result.map(e => {

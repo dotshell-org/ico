@@ -92,7 +92,7 @@ export function editMovement(id: number, name: string, quantity: number, date: s
  * @param {boolean} positive - Not used in this version but kept for backward compatibility.
  * @return {void} This function does not return any value.
  */
-export function deleteMovement(id: number, positive: boolean): void {
+export function deleteMovement(id: number): void {
     // Use a transaction to ensure all operations occur atomically
     db.transaction(() => {
         // Check if this movement is linked to any invoice_products

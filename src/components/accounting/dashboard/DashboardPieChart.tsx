@@ -27,7 +27,7 @@ const DashboardPieChart: React.FC<CustomPieChartProps> = ({ type }) => {
 
     useEffect(() => {
         setIsLoading(true);
-        window.ipcRenderer
+        (window as any).ipcRenderer
             .invoke(api())
             .then((result: Object) => {
                 setData(result);

@@ -66,8 +66,7 @@ import {
   getCurrentAccount, 
   createAccount, 
   switchAccount, 
-  deleteAccount,
-  updateDatabaseConnection
+  deleteAccount
 } from '../src/backend/account-manager'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
