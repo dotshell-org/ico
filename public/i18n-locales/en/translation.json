@@ -129,5 +129,24 @@
     "migrate_sales_to_stock": "Synchronize sales with stock",
     "migrating": "Synchronizing...",
     "migration_success": "{count} sales have been synchronized with stock",
-    "no_sales_to_migrate": "All sales are already synchronized with stock"
+    "no_sales_to_migrate": "All sales are already synchronized with stock",
+    
+    "user": "User",
+    "account_management": "Account Management",
+    "account_management_description": "Manage your accounts. Each account is stored in a separate database file.",
+    "current_account": "Current Account",
+    "available_accounts": "Available Accounts",
+    "no_accounts": "No accounts available",
+    "last_accessed": "Last accessed",
+    "created": "Created",
+    "default": "Default",
+    "switch_to": "Switch to",
+    "delete": "Delete",
+    "create_new_account": "Create New Account",
+    "new_account": "New Account",
+    "account_name_placeholder": "Account name",
+    "create": "Create",
+    "cancel": "Cancel",
+    "confirm_delete_account": "Are you sure you want to delete this account? This action cannot be undone.",
+    "dismiss": "Dismiss"
 }

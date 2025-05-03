@@ -60,6 +60,14 @@ import {
   deleteSale,
   migrateSalesToStockMovements
 } from "../src/backend/db/sales/setters.ts";
+import { 
+  getAccounts, 
+  getCurrentAccount, 
+  createAccount, 
+  switchAccount, 
+  deleteAccount,
+  updateDatabaseConnection
+} from '../src/backend/account-manager'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -195,6 +203,23 @@ handleIpc("addSale", addSale);
 handleIpc("editSale", editSale);
 handleIpc("deleteSale", deleteSale);
 handleIpc("migrateSalesToStockMovements", migrateSalesToStockMovements);
+
+// Account management
+
+ipcMain.handle('getAccounts', () => getAccounts())
+ipcMain.handle('getCurrentAccount', () => getCurrentAccount())
+ipcMain.handle('createAccount', (_event, name: string) => createAccount(name))
+ipcMain.handle('switchAccount', (_event, id: string) => {
+  const account = switchAccount(id)
+  // After switching accounts, we need to restart the app to load the new database
+  app.relaunch()
+  app.exit(0)
+  return account
+})
+ipcMain.handle('deleteAccount', (_event, id: string) => {
+  deleteAccount(id)
+  return getAccounts()
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

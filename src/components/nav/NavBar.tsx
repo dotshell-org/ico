@@ -35,7 +35,7 @@ const NavBar: React.FC<NavBarProps> = ({ selectedTab, setSelectedTab }) => {
                             <WindowSwitch window={Window.Accounting} selectedWindow={selectedWindow} setSelectedWindow={handleSetSelectedWindow} />
                             <NavItemsGroup window={selectedWindow} selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
                         </div>
-                        <UserMenu />
+                        <UserMenu setSelectedTab={setSelectedTab} />
                     </div>
                 </div>
             </div>

@@ -131,5 +131,24 @@
     "migrate_sales_to_stock": "Synchroniser les ventes avec le stock",
     "migrating": "Synchronisation en cours...",
     "migration_success": "{count} ventes ont été synchronisées avec le stock",
-    "no_sales_to_migrate": "Toutes les ventes sont déjà synchronisées avec le stock"
+    "no_sales_to_migrate": "Toutes les ventes sont déjà synchronisées avec le stock",
+    
+    "user": "Utilisateur",
+    "account_management": "Gestion des comptes",
+    "account_management_description": "Gérez vos comptes. Chaque compte est stocké dans un fichier de base de données séparé.",
+    "current_account": "Compte actuel",
+    "available_accounts": "Comptes disponibles",
+    "no_accounts": "Aucun compte disponible",
+    "last_accessed": "Dernier accès",
+    "created": "Créé le",
+    "default": "Par défaut",
+    "switch_to": "Utiliser",
+    "delete": "Supprimer",
+    "create_new_account": "Créer un nouveau compte",
+    "new_account": "Nouveau compte",
+    "account_name_placeholder": "Nom du compte",
+    "create": "Créer",
+    "cancel": "Annuler",
+    "confirm_delete_account": "Êtes-vous sûr de vouloir supprimer ce compte? Cette action ne peut pas être annulée.",
+    "dismiss": "Fermer"
 }

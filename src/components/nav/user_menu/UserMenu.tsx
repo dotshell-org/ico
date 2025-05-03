@@ -1,14 +1,22 @@
 import React, { useState, useRef } from 'react';
 import noProfile from '/no-profile.svg';
 import UserMenuItemsGroup from './UserMenuItemsGroup';
+import { Tabs } from '../../../types/nav/Tabs.ts';
 
-const UserMenu: React.FC = () => {
+interface UserMenuProps {
+    setSelectedTab: (tab: Tabs) => void;
+}
 
+const UserMenu: React.FC<UserMenuProps> = ({ setSelectedTab }) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
     const handleButtonClick = () => {
         setIsOpen(!isOpen);
+    };
+
+    const closeMenu = () => {
+        setIsOpen(false);
     };
 
     return (
@@ -26,7 +34,7 @@ const UserMenu: React.FC = () => {
                 <img className="w-8 h-8 rounded-full shadow-md" src={noProfile} alt="" />
             </button>
             {isOpen && (
-                <UserMenuItemsGroup />
+                <UserMenuItemsGroup setSelectedTab={setSelectedTab} closeMenu={closeMenu} />
             )}
         </div>
     );

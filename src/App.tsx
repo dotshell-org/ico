@@ -22,6 +22,7 @@ import EditStockMovements from "./pages/stock/EditStockMovements.tsx";
 import SalesDashboard from "./pages/sales/SalesDashboard.tsx";
 import SalesSummary from "./pages/sales/SalesSummary.tsx";
 import EditSales from "./pages/sales/EditSales.tsx";
+import Settings from './pages/settings/Settings.tsx';
 
 function App() {
     const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.AccountingDashboard);
@@ -103,6 +104,9 @@ function App() {
                 return <SalesSummary />
             case Tabs.SalesEditSales:
                 return <EditSales />
+
+            case Tabs.Settings:
+                return <Settings />
 
             default:
                 return null;
