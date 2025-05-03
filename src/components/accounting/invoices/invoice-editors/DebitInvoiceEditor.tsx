@@ -65,16 +65,16 @@ const DebitInvoiceEditor: React.FC<DebitEditorProps> = ({ invoice }: DebitEditor
         }
 
         try {
-            // Vérifie si un produit existe déjà pour ce débit simplifié
+            // Checks if a product already exists for this simplified debit
             const existingProducts = await (window as any).ipcRenderer.invoke("getInvoiceProducts", invoice.id);
             const simpleDebitProduct = existingProducts.find((product: any) => product.name === t("simple_debit_entry"));
 
             if (simpleDebitProduct) {
-                // Met à jour le produit existant - modifie amount_excl_tax au lieu de quantity
+                // Updates the existing product - modifies amount_excl_tax instead of quantity
                 await (window as any).ipcRenderer.invoke("updateInvoiceProductAmountExclTax", simpleDebitProduct.id, newAmount);
             } else {
-                // Ajoute un nouveau produit si aucun n'existe
-                // Fixe amount_excl_tax à newAmount et quantity à 1
+                // Adds a new product if none exists
+                // Sets amount_excl_tax to newAmount and quantity to 1
                 await (window as any).ipcRenderer.invoke("addInvoiceProduct", invoice.id, t("simple_debit_entry"), newAmount, 1, 0, 0, 0);
             }
 
