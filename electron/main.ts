@@ -221,6 +221,20 @@ ipcMain.handle('deleteAccount', (_event, id: string) => {
   return getAccounts()
 })
 
+// Language management
+ipcMain.handle('changeLanguage', (_event, lang: string) => {
+  if (win) {
+    // Send the new language to the renderer process
+    win.webContents.send('language-changed', lang);
+  }
+  return lang;
+})
+
+// Get current system language
+ipcMain.handle('getSystemLanguage', () => {
+  return app.getLocale().substring(0, 2);
+})
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()

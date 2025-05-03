@@ -150,5 +150,13 @@
     "create": "Créer",
     "cancel": "Annuler",
     "confirm_delete_account": "Êtes-vous sûr de vouloir supprimer ce compte? Cette action ne peut pas être annulée.",
-    "dismiss": "Fermer"
+    "dismiss": "Fermer",
+
+    "language_management": "Gestion des langues",
+    "language_management_description": "Choisissez la langue de l'application.",
+    "current_language": "Langue actuelle",
+    "available_languages": "Langues disponibles",
+    "english": "Anglais",
+    "french": "Français",
+    "use_language": "Utiliser cette langue"
 }

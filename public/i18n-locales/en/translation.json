@@ -148,5 +148,13 @@
     "create": "Create",
     "cancel": "Cancel",
     "confirm_delete_account": "Are you sure you want to delete this account? This action cannot be undone.",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    
+    "language_management": "Language Management",
+    "language_management_description": "Choose the application language.",
+    "current_language": "Current Language",
+    "available_languages": "Available Languages",
+    "english": "English",
+    "french": "French",
+    "use_language": "Use this language"
 }
