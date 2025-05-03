@@ -7,6 +7,7 @@ db.exec(`
         object TEXT,
         quantity INTEGER,
         price REAL,
-        stock TEXT
+        stock TEXT,
+        movement_id INTEGER
     )
 `);

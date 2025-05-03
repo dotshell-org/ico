@@ -123,6 +123,12 @@
     "edit_movements": "Editer Mouvements",
     "edit": "Editer",
     "edit_sales": "Editer Ventes",
-    "price": "Prix"
+    "price": "Prix",
 
+    "stock_sync": "Synchronisation Stock",
+    "sales_stock_sync_explanation": "Cette fonctionnalité crée automatiquement des mouvements négatifs dans le stock pour chaque vente. Cliquez sur le bouton ci-dessous pour synchroniser les ventes existantes.",
+    "migrate_sales_to_stock": "Synchroniser les ventes avec le stock",
+    "migrating": "Synchronisation en cours...",
+    "migration_success": "{count} ventes ont été synchronisées avec le stock",
+    "no_sales_to_migrate": "Toutes les ventes sont déjà synchronisées avec le stock"
 }

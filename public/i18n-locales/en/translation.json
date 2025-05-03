@@ -121,6 +121,12 @@
     "edit_movements": "Edit Movements",
     "edit": "Edit",
     "edit_sales": "Edit Sales",
-    "price": "Price"
+    "price": "Price",
 
+    "stock_sync": "Stock Synchronization",
+    "sales_stock_sync_explanation": "This feature automatically creates negative stock movements for each sale. Click the button below to synchronize existing sales.",
+    "migrate_sales_to_stock": "Synchronize sales with stock",
+    "migrating": "Synchronizing...",
+    "migration_success": "{count} sales have been synchronized with stock",
+    "no_sales_to_migrate": "All sales are already synchronized with stock"
 }

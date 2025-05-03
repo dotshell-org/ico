@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import { LineChart, PieChart } from "@mui/x-charts";
 import { TextField } from "@mui/material";
 import dayjs from "dayjs";
@@ -9,6 +9,8 @@ const SalesDashboard = () => {
     const [timeFrame, setTimeFrame] = React.useState<TimeFrame>(TimeFrame.WEEK);
     const [startDate, setStartDate] = React.useState(dayjs().format('YYYY-MM-DD'));
     const [endDate, setEndDate] = React.useState(dayjs().format('YYYY-MM-DD'));
+    const [isMigrating, setIsMigrating] = useState<boolean>(false);
+    const [migrationResult, setMigrationResult] = useState<number | null>(null);
 
     const [lineChartData, setLineChartData] = React.useState<{x: string, y: number}[]>([]);
     useEffect(() => {
@@ -57,6 +59,21 @@ const SalesDashboard = () => {
             })
             .catch((error: any) => {
                 console.error("Error when fetching revenue data", error);
+            });
+    };
+
+    const handleMigration = () => {
+        setIsMigrating(true);
+        setMigrationResult(null);
+        (window as any).ipcRenderer
+            .invoke("migrateSalesToStockMovements")
+            .then((migratedCount: number) => {
+                setMigrationResult(migratedCount);
+                setIsMigrating(false);
+            })
+            .catch((error: any) => {
+                console.error("Error when migrating sales to stock movements", error);
+                setIsMigrating(false);
             });
     };
 
@@ -131,6 +148,27 @@ const SalesDashboard = () => {
                         }}
                         className="flex-1"
                     />
+                </div>
+            </div>
+
+            <h2 className="text-2xl font-bold mt-10">{"🔄 " + t("stock_sync")}</h2>
+            <div className="w-full p-4 mt-2 border border-gray-200 dark:border-gray-600 rounded-md overflow-hidden min-h-[8rem]">
+                <p className="mb-4">{t("sales_stock_sync_explanation")}</p>
+                <div className="flex items-center">
+                    <button
+                        onClick={handleMigration}
+                        disabled={isMigrating}
+                        className={`px-4 py-2 rounded-md ${isMigrating ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                    >
+                        {isMigrating ? t("migrating") : t("migrate_sales_to_stock")}
+                    </button>
+                    {migrationResult !== null && (
+                        <span className="ml-4">
+                            {migrationResult > 0 
+                                ? t("migration_success").replace("{count}", migrationResult.toString())
+                                : t("no_sales_to_migrate")}
+                        </span>
+                    )}
                 </div>
             </div>
         </div>

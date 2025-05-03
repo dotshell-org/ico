@@ -57,7 +57,8 @@ import {getRevenueData, getSales, getSalesSummary, getAllSoldObjectNames} from "
 import {
   addSale,
   editSale,
-  deleteSale
+  deleteSale,
+  migrateSalesToStockMovements
 } from "../src/backend/db/sales/setters.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -193,6 +194,7 @@ handleIpc("getAllSoldObjectNames", getAllSoldObjectNames);
 handleIpc("addSale", addSale);
 handleIpc("editSale", editSale);
 handleIpc("deleteSale", deleteSale);
+handleIpc("migrateSalesToStockMovements", migrateSalesToStockMovements);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
