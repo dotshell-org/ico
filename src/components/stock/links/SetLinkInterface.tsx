@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { InvoiceProductLink } from "../../../types/stock/InvoiceProductLink";
 import { InvoiceProductLinkProps } from "../../../types/stock/InvoiceProductLinkProps";
@@ -12,19 +12,22 @@ interface SetLinkInterfaceProps {
 const SetLinkInterface: React.FC<SetLinkInterfaceProps> = ({ link, onClose, onUpdate }) => {
     const { t } = useTranslation();
 
-    const [objectNames, setObjectNames] = React.useState<string[]>([]);
-    const [stockNames, setStockNames] = React.useState<string[]>([])
+    const [objectNames, setObjectNames] = useState<string[]>([]);
+    const [stockNames, setStockNames] = useState<string[]>([]);
+    const [filteredObjectNames, setFilteredObjectNames] = useState<string[]>([]);
+    const [filteredStockNames, setFilteredStockNames] = useState<string[]>([]);
 
-    const [name, setName] = React.useState<string>("");
-    const [quantity, setQuantity] = React.useState<number>(0);
-    const [date, setDate] = React.useState<string>(link.date);
-    const [stock_name, setStockName] = React.useState<string>("");
+    const [name, setName] = useState<string>(link.name);
+    const [quantity, setQuantity] = useState<number>(link.quantity);
+    const [date, setDate] = useState<string>(link.date);
+    const [stock_name, setStockName] = useState<string>("");
 
     useEffect(() => {
         (window as any).ipcRenderer
             .invoke("getAllObjectNames")
             .then((result: string[]) => {
                 setObjectNames(result);
+                setFilteredObjectNames(result);
             })
             .catch((error: any) => {
                 console.error("Error when fetching objects", error);
@@ -36,6 +39,7 @@ const SetLinkInterface: React.FC<SetLinkInterfaceProps> = ({ link, onClose, onUp
             .invoke("getAllStocks")
             .then((result: string[]) => {
                 setStockNames(result);
+                setFilteredStockNames(result);
             })
             .catch((error: any) => {
                 console.error("Error when fetching stocks", error);
@@ -57,6 +61,30 @@ const SetLinkInterface: React.FC<SetLinkInterfaceProps> = ({ link, onClose, onUp
             });
     }, [link.id]);
 
+    // Update filtered object names when user types
+    useEffect(() => {
+        if (name.trim() === "") {
+            setFilteredObjectNames(objectNames);
+        } else {
+            const filtered = objectNames.filter(obj =>
+                obj.toLowerCase().includes(name.toLowerCase())
+            );
+            setFilteredObjectNames(filtered);
+        }
+    }, [name, objectNames]);
+
+    // Update filtered stock names when user types
+    useEffect(() => {
+        if (stock_name.trim() === "") {
+            setFilteredStockNames(stockNames);
+        } else {
+            const filtered = stockNames.filter(s =>
+                s.toLowerCase().includes(stock_name.toLowerCase())
+            );
+            setFilteredStockNames(filtered);
+        }
+    }, [stock_name, stockNames]);
+
     const handleIgnoreButtonClicked = () => {
         (window as any).ipcRenderer
             .invoke("ignoreInvoiceProductInStock", link.id)
@@ -71,7 +99,7 @@ const SetLinkInterface: React.FC<SetLinkInterfaceProps> = ({ link, onClose, onUp
 
     const handleLinkButtonClicked = () => {
         (window as any).ipcRenderer
-            .invoke("linkInvoiceProductInStock", link.id, link.addition_id, stock_name, date, name, quantity, )
+            .invoke("linkInvoiceProductInStock", link.id, link.addition_id, stock_name, date, name, quantity)
             .then(() => {
                 onUpdate();
                 onClose();
@@ -79,7 +107,6 @@ const SetLinkInterface: React.FC<SetLinkInterfaceProps> = ({ link, onClose, onUp
             .catch((error: any) => {
                 console.error("Error editing link", error);
             });
-        onClose();
     };
 
     return (
@@ -124,9 +151,10 @@ const SetLinkInterface: React.FC<SetLinkInterfaceProps> = ({ link, onClose, onUp
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         list="nameOptions"
+                        autoComplete="off"
                     />
                     <datalist id="nameOptions">
-                        {objectNames.map((e) => (
+                        {filteredObjectNames.map((e) => (
                             <option key={e} value={e}/>
                         ))}
                     </datalist>
@@ -160,9 +188,10 @@ const SetLinkInterface: React.FC<SetLinkInterfaceProps> = ({ link, onClose, onUp
                         value={stock_name}
                         onChange={(e) => setStockName(e.target.value)}
                         list="stockOptions"
+                        autoComplete="off"
                     />
                     <datalist id="stockOptions">
-                        {stockNames.map((e) => (
+                        {filteredStockNames.map((e) => (
                             <option key={e} value={e}/>
                         ))}
                     </datalist>

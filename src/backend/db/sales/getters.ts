@@ -246,3 +246,24 @@ export function getRevenueData(timeFrame: TimeFrame): { x: string, y: number }[]
         return [];
     }
 }
+
+/**
+ * Retrieves a list of all distinct object names from the sales table.
+ * This represents all products that have been sold at least once.
+ *
+ * @return {string[]} An array of unique sold object names.
+ */
+export function getAllSoldObjectNames(): string[] {
+    try {
+        const stmt = db.prepare(`
+            SELECT DISTINCT object
+            FROM sales
+            ORDER BY object ASC
+        `);
+
+        return stmt.all().map((row: { object: string }) => row.object);
+    } catch (error) {
+        console.error("Erreur lors de la récupération des objets vendus:", error);
+        return [];
+    }
+}

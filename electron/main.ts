@@ -53,7 +53,12 @@ import {
   ignoreInvoiceProductInStock,
   linkInvoiceProductInStock
 } from "../src/backend/db/stock/setters.ts";
-import {getRevenueData, getSales, getSalesSummary} from "../src/backend/db/sales/getters.ts";
+import {getRevenueData, getSales, getSalesSummary, getAllSoldObjectNames} from "../src/backend/db/sales/getters.ts";
+import {
+  addSale,
+  editSale,
+  deleteSale
+} from "../src/backend/db/sales/setters.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -179,9 +184,15 @@ handleIpc("editMovement", editMovement);
 handleIpc("deleteMovement", deleteMovement);
 handleIpc("addMovement", addMovement);
 
+// Sales
+
 handleIpc("getSales", getSales);
 handleIpc("getSalesSummary", getSalesSummary);
 handleIpc("getRevenueData", getRevenueData);
+handleIpc("getAllSoldObjectNames", getAllSoldObjectNames);
+handleIpc("addSale", addSale);
+handleIpc("editSale", editSale);
+handleIpc("deleteSale", deleteSale);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

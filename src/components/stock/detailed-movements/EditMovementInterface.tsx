@@ -12,7 +12,9 @@ const EditMovementInterface: React.FC<EditMovementInterfaceProps> = ({ movement,
     const { t } = useTranslation();
 
     const [objectNames, setObjectNames] = React.useState<string[]>([]);
-    const [stockNames, setStockNames] = React.useState<string[]>([])
+    const [stockNames, setStockNames] = React.useState<string[]>([]);
+    const [filteredObjectNames, setFilteredObjectNames] = React.useState<string[]>([]);
+    const [filteredStockNames, setFilteredStockNames] = React.useState<string[]>([]);
 
     const [name, setName] = React.useState<string>(movement.object);
     const [movementNumber, setMovementNumber] = React.useState<number>(movement.movement);
@@ -24,6 +26,7 @@ const EditMovementInterface: React.FC<EditMovementInterfaceProps> = ({ movement,
             .invoke("getAllObjectNames")
             .then((result: string[]) => {
                 setObjectNames(result);
+                setFilteredObjectNames(result);
             })
             .catch((error: any) => {
                 console.error("Error when fetching objects", error);
@@ -35,11 +38,36 @@ const EditMovementInterface: React.FC<EditMovementInterfaceProps> = ({ movement,
             .invoke("getAllStocks")
             .then((result: string[]) => {
                 setStockNames(result);
+                setFilteredStockNames(result);
             })
             .catch((error: any) => {
                 console.error("Error when fetching stocks", error);
             });
     }, []);
+
+    // Update filtered object names when user types
+    useEffect(() => {
+        if (name.trim() === "") {
+            setFilteredObjectNames(objectNames);
+        } else {
+            const filtered = objectNames.filter(obj => 
+                obj.toLowerCase().includes(name.toLowerCase())
+            );
+            setFilteredObjectNames(filtered);
+        }
+    }, [name, objectNames]);
+
+    // Update filtered stock names when user types
+    useEffect(() => {
+        if (stock_name.trim() === "") {
+            setFilteredStockNames(stockNames);
+        } else {
+            const filtered = stockNames.filter(s => 
+                s.toLowerCase().includes(stock_name.toLowerCase())
+            );
+            setFilteredStockNames(filtered);
+        }
+    }, [stock_name, stockNames]);
 
     const handleEditButtonClicked = () => {
         (window as any).ipcRenderer
@@ -75,9 +103,10 @@ const EditMovementInterface: React.FC<EditMovementInterfaceProps> = ({ movement,
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         list="nameOptions"
+                        autoComplete="off"
                     />
                     <datalist id="nameOptions">
-                        {objectNames.map((e) => (
+                        {filteredObjectNames.map((e) => (
                             <option key={e} value={e}/>
                         ))}
                     </datalist>
@@ -111,9 +140,10 @@ const EditMovementInterface: React.FC<EditMovementInterfaceProps> = ({ movement,
                         value={stock_name}
                         onChange={(e) => setStockName(e.target.value)}
                         list="stockOptions"
+                        autoComplete="off"
                     />
                     <datalist id="stockOptions">
-                        {stockNames.map((e) => (
+                        {filteredStockNames.map((e) => (
                             <option key={e} value={e}/>
                         ))}
                     </datalist>

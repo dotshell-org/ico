@@ -1,4 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron'
+import { getSales, getSalesSummary, getRevenueData, getAllSoldObjectNames } from '../src/backend/db/sales/getters'
+import { addSale, editSale, deleteSale } from '../src/backend/db/sales/setters'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {

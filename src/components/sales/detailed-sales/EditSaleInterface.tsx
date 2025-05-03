@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import dayjs from "dayjs";
+import {Sale} from "../../../types/sales/summary/Sale.ts";
 
-interface NewMovementInterfaceProps {
+interface EditSaleInterfaceProps {
+    sale: Sale;
     onClose: () => void;
-    onAdded: () => void;
+    onEdited: () => void;
 }
 
-const NewMovementInterface: React.FC<NewMovementInterfaceProps> = ({ onClose, onAdded }) => {
+const EditSaleInterface: React.FC<EditSaleInterfaceProps> = ({ sale, onClose, onEdited }) => {
     const { t } = useTranslation();
 
     const [objectNames, setObjectNames] = useState<string[]>([]);
@@ -15,20 +16,38 @@ const NewMovementInterface: React.FC<NewMovementInterfaceProps> = ({ onClose, on
     const [filteredObjectNames, setFilteredObjectNames] = useState<string[]>([]);
     const [filteredStockNames, setFilteredStockNames] = useState<string[]>([]);
 
-    const [name, setName] = useState<string>("");
-    const [movementNumber, setMovementNumber] = useState<number>(0);
-    const [date, setDate] = useState<string>(dayjs().format("YYYY-MM-DD"));
-    const [stock_name, setStockName] = useState<string>("");
+    const [name, setName] = useState<string>(sale.object);
+    const [quantity, setQuantity] = useState<number>(sale.quantity);
+    const [price, setPrice] = useState<number>(sale.price);
+    const [date, setDate] = useState<string>(sale.date);
+    const [stock, setStock] = useState<string>(sale.stock);
 
+    // Récupérer tous les noms d'objets du stock et des objets vendus
     useEffect(() => {
+        // Récupérer les objets du stock
         (window as any).ipcRenderer
             .invoke("getAllObjectNames")
-            .then((result: string[]) => {
-                setObjectNames(result);
-                setFilteredObjectNames(result);
+            .then((stockObjects: string[]) => {
+                // Récupérer les objets vendus
+                (window as any).ipcRenderer
+                    .invoke("getAllSoldObjectNames")
+                    .then((soldObjects: string[]) => {
+                        // Combiner les deux listes et éliminer les doublons
+                        const combinedObjects = [...new Set([...stockObjects, ...soldObjects])].sort();
+                        setObjectNames(combinedObjects);
+                        setFilteredObjectNames(combinedObjects);
+                    })
+                    .catch((error: any) => {
+                        console.error("Error when fetching sold objects", error);
+                        // En cas d'erreur, utiliser uniquement les objets du stock
+                        setObjectNames(stockObjects);
+                        setFilteredObjectNames(stockObjects);
+                    });
             })
             .catch((error: any) => {
-                console.error("Error when fetching objects", error);
+                console.error("Error when fetching stock objects", error);
+                setObjectNames([]);
+                setFilteredObjectNames([]);
             });
     }, []);
 
@@ -58,25 +77,25 @@ const NewMovementInterface: React.FC<NewMovementInterfaceProps> = ({ onClose, on
 
     // Update filtered stock names when user types
     useEffect(() => {
-        if (stock_name.trim() === "") {
+        if (stock.trim() === "") {
             setFilteredStockNames(stockNames);
         } else {
             const filtered = stockNames.filter(s => 
-                s.toLowerCase().includes(stock_name.toLowerCase())
+                s.toLowerCase().includes(stock.toLowerCase())
             );
             setFilteredStockNames(filtered);
         }
-    }, [stock_name, stockNames]);
+    }, [stock, stockNames]);
 
-    const handleNewButtonClicked = () => {
+    const handleEditButtonClicked = () => {
         (window as any).ipcRenderer
-            .invoke("addMovement", name, movementNumber, date, stock_name)
+            .invoke("editSale", sale.id, name, quantity, price, date, stock)
             .then(() => {
-                onAdded();
+                onEdited();
                 onClose();
             })
             .catch(() => {
-                console.error("Error editing movement");
+                console.error("Error editing sale");
             })
     };
 
@@ -91,7 +110,7 @@ const NewMovementInterface: React.FC<NewMovementInterfaceProps> = ({ onClose, on
                     ✕
                 </button>
                 <div>
-                    <h1 className="text-2xl font-bold mb-4">{"➕ " + t("new")}</h1>
+                    <h1 className="text-2xl font-bold mb-4">{"✏️ " + t("edit")}</h1>
                 </div>
 
                 <div>
@@ -112,12 +131,23 @@ const NewMovementInterface: React.FC<NewMovementInterfaceProps> = ({ onClose, on
                 </div>
 
                 <div>
-                    <h2>{t("movement")}</h2>
+                    <h2>{t("quantity")}</h2>
                     <input
                         className="mt-1 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600"
                         type="number"
-                        value={movementNumber === 0 ? '' : movementNumber}
-                        onChange={(e) => setMovementNumber(e.target.value === '' ? 0 : Number(e.target.value))}
+                        value={quantity === 0 ? '' : quantity}
+                        onChange={(e) => setQuantity(e.target.value === '' ? 0 : Number(e.target.value))}
+                    />
+                </div>
+
+                <div>
+                    <h2>{t("price")}</h2>
+                    <input
+                        className="mt-1 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600"
+                        type="number"
+                        step="0.01"
+                        value={price === 0 ? '' : price}
+                        onChange={(e) => setPrice(e.target.value === '' ? 0 : Number(e.target.value))}
                     />
                 </div>
 
@@ -136,8 +166,8 @@ const NewMovementInterface: React.FC<NewMovementInterfaceProps> = ({ onClose, on
                     <input
                         className="mt-1 p-2 h-8 border rounded w-full dark:bg-gray-700 dark:border-gray-600 hide-calendar-picker"
                         type="text"
-                        value={stock_name}
-                        onChange={(e) => setStockName(e.target.value)}
+                        value={stock}
+                        onChange={(e) => setStock(e.target.value)}
                         list="stockOptions"
                         autoComplete="off"
                     />
@@ -151,9 +181,9 @@ const NewMovementInterface: React.FC<NewMovementInterfaceProps> = ({ onClose, on
                 <div>
                     <button
                         className="w-full p-2 mt-4 bg-gray-100 dark:bg-gray-600"
-                        onClick={handleNewButtonClicked}
+                        onClick={handleEditButtonClicked}
                     >
-                        {t("add")}
+                        {t("edit")}
                     </button>
                 </div>
             </div>
@@ -161,4 +191,4 @@ const NewMovementInterface: React.FC<NewMovementInterfaceProps> = ({ onClose, on
     );
 };
 
-export default NewMovementInterface;
+export default EditSaleInterface;
