@@ -12,7 +12,8 @@ interface InvoiceMiniatureRowProps {
 const countryCodeToEmoji = (code: Country) => {
     const emojis: Record<Country, string> = {
         [Country.None]: "🚫",
-        [Country.France]: "🇫🇷"
+        [Country.France]: "🇫🇷",
+        [Country.Debit]: "📝"
     };
 
     return emojis[code] || "❓";

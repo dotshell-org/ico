@@ -13,6 +13,7 @@ import FranceInvoiceEditor from "./components/accounting/invoices/invoice-editor
 import {Invoice} from "./types/accounting/invoices/Invoice.ts";
 import {Country} from "./types/Country.ts";
 import DefaultInvoiceEditor from "./components/accounting/invoices/invoice-editors/DefaultInvoiceEditor.tsx";
+import DebitInvoiceEditor from "./components/accounting/invoices/invoice-editors/DebitInvoiceEditor.tsx";
 import {TaxType} from "./types/accounting/invoices/TaxType.ts";
 import StockDashboard from "./pages/stock/StockDashboard.tsx";
 import StockMovementsSummary from "./pages/stock/StockMovementsSummary.tsx";
@@ -82,6 +83,8 @@ function App() {
                     return <DefaultInvoiceEditor invoice={invoiceInEditor} taxType={TaxType.None}/>;
                 } else if (invoiceInEditor.countryCode == Country.France) {
                     return <FranceInvoiceEditor invoice={invoiceInEditor}/>;
+                } else if (invoiceInEditor.countryCode == Country.Debit) {
+                    return <DebitInvoiceEditor invoice={invoiceInEditor}/>;
                 }
                 return <h1>{invoiceInEditor.countryCode}</h1>;
 

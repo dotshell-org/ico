@@ -94,6 +94,7 @@
     "tables_types": "Types des Tableaux",
     "vat_no": "N° TVA Intracommunautaire",
     "new_product": "Nouveau Produit",
+    "simple_debit_entry": "Dépense simple",
 
     "p_credit": "Vous avez actuellement {categories} catégories répertoriées dans vos Crédits pour les 12 derniers mois, représentant un montant cumulé de {amount}.",
     "p_debit": "Vous avez actuellement {categories} catégories répertoriées dans vos Débits pour les 12 derniers mois, représentant un montant cumulé de {amount}",

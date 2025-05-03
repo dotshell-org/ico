@@ -92,6 +92,7 @@
     "tables_types": "Tables Types",
     "vat_no": "VAT No.",
     "new_product": "New Product",
+    "simple_debit_entry": "Simple expense",
 
     "p_credit": "You currently have {categories} categories listed in your 📈<strong>Credits</strong> for the last 12 months, amounting to a total of {amount}.",
     "p_debit": "You currently have {categories} categories listed in your 📉<strong>Debits</strong> for the last 12 months, amounting to a total of {amount}.",

@@ -138,7 +138,7 @@ export function addInvoice(title: string, category: string, country: Country): I
 
 /**
  * Deletes an invoice and all its associated data from the database.
- * Removes associated products, their linked additions, and country-specific specifications before deleting the invoice.
+ * Removes associated products, their linked stock movements, and country-specific specifications before deleting the invoice.
  *
  * @param {number} invoiceId - The ID of the invoice to be deleted.
  * @return {void} This function does not return a value.
@@ -146,25 +146,30 @@ export function addInvoice(title: string, category: string, country: Country): I
 export function deleteInvoice(invoiceId: number): void {
     db.prepare('BEGIN TRANSACTION').run();
     try {
-        // Delete all additions linked to this invoice's products
-        db.prepare(`
-            DELETE FROM additions 
-            WHERE id IN (
-                SELECT addition_id 
-                FROM invoice_products 
-                WHERE invoice_id = ? AND addition_id IS NOT NULL
-            )
-        `).run(invoiceId);
-
+        // Find all stock movements linked to this invoice's products
+        const productMovementsStmt = db.prepare(`
+            SELECT addition_id 
+            FROM invoice_products 
+            WHERE invoice_id = ? AND addition_id > 0
+        `);
+        const linkedMovements = productMovementsStmt.all(invoiceId);
+        
         // Delete associated products first
         db.prepare('DELETE FROM invoice_products WHERE invoice_id = ?').run(invoiceId);
+
+        // Now delete any stock movements that were linked to the products
+        if (linkedMovements.length > 0) {
+            linkedMovements.forEach((movement: { addition_id: number }) => {
+                db.prepare(`DELETE FROM stock_movements WHERE id = ?`).run(movement.addition_id);
+            });
+        }
 
         // Delete country specifications
         db.prepare('DELETE FROM invoice_country_specifications WHERE invoice_id = ?').run(invoiceId);
 
         // Delete the invoice
         db.prepare('DELETE FROM invoices WHERE id = ?').run(invoiceId);
-
+        
         db.prepare('COMMIT').run();
     } catch (error) {
         db.prepare('ROLLBACK').run();
@@ -295,27 +300,35 @@ export function updateInvoiceProductQuantity(invoiceProductId: number, quantity:
 
 /**
  * Deletes an invoice product from the database identified by the given ID.
- * Also deletes the addition associated with the product.
+ * Also deletes any associated stock movement.
  *
  * @param {number} invoiceProductId - The ID of the invoice product to be deleted.
  * @return {void} This function does not return a value.
  */
 export function deleteInvoiceProduct(invoiceProductId: number): void {
-    const stmt1 = db.prepare(`
-        DELETE FROM additions
-        WHERE id = (
-            SELECT addition_id
-            FROM invoice_products
-            WHERE id = ?
-        )
+    // Check if this product has a linked stock movement
+    const checkStmt = db.prepare(`
+        SELECT addition_id
+        FROM invoice_products
+        WHERE id = ? AND addition_id > 0
     `);
-    stmt1.run(invoiceProductId);
+    const result = checkStmt.get(invoiceProductId);
+    
+    // If there's a linked stock movement, delete it
+    if (result && result.addition_id) {
+        const deleteMovementStmt = db.prepare(`
+            DELETE FROM stock_movements
+            WHERE id = ?
+        `);
+        deleteMovementStmt.run(result.addition_id);
+    }
 
-    const stmt2 = db.prepare(`
+    // Delete the invoice product
+    const deleteProductStmt = db.prepare(`
         DELETE FROM invoice_products
         WHERE id = ?
     `);
-    stmt2.run(invoiceProductId);
+    deleteProductStmt.run(invoiceProductId);
 }
 
 /**

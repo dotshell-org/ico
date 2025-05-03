@@ -26,7 +26,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
     useEffect(() => {
         const loadCategories = async () => {
             try {
-                const categories = await window.ipcRenderer.invoke("getAllCategories");
+                const categories = await (window as any).ipcRenderer.invoke("getAllCategories");
                 setAllCategories(categories);
             } catch (error) {
                 console.error("Error when loading categories:", error);
@@ -38,7 +38,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
     useEffect(() => {
         const loadTotal = async () => {
             try {
-                const total = await window.ipcRenderer.invoke("getInvoiceExclTaxTotal", invoice.id);
+                const total = await (window as any).ipcRenderer.invoke("getInvoiceExclTaxTotal", invoice.id);
                 setExclVatTotal(total);
             } catch (error) {
                 console.error("Error when loading total:", error);
@@ -50,7 +50,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
     useEffect(() => {
         const loadTotal = async () => {
             try {
-                const total = await window.ipcRenderer.invoke("getInvoiceInclTaxTotal", invoice.id);
+                const total = await (window as any).ipcRenderer.invoke("getInvoiceInclTaxTotal", invoice.id);
                 setInclVatTotal(total);
             } catch (error) {
                 console.error("Error when loading total:", error);
@@ -62,7 +62,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
     useEffect(() => {
         const loadInvoiceNo = async () => {
             try {
-                const no = await window.ipcRenderer.invoke("getInvoiceNo", invoice.id);
+                const no = await (window as any).ipcRenderer.invoke("getInvoiceNo", invoice.id);
                 setInvoiceNo(no)
             } catch (error) {
                 console.error("Error when loading invoice number:", error);
@@ -73,13 +73,13 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
 
     const handleTotalUpdate = async () => {
         try {
-            const newTotal = await window.ipcRenderer.invoke("getInvoiceExclTaxTotal", invoice.id);
+            const newTotal = await (window as any).ipcRenderer.invoke("getInvoiceExclTaxTotal", invoice.id);
             setExclVatTotal(newTotal);
         } catch (error) {
             console.error("Error when updating total:", error);
         }
         try {
-            const newTotal = await window.ipcRenderer.invoke("getInvoiceInclTaxTotal", invoice.id);
+            const newTotal = await (window as any).ipcRenderer.invoke("getInvoiceInclTaxTotal", invoice.id);
             setInclVatTotal(newTotal);
         } catch (error) {
             console.error("Error when updating total:", error);
@@ -89,7 +89,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
     const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newTitle = e.target.value;
         try {
-            await window.ipcRenderer.invoke("updateInvoiceTitle", invoice.id, newTitle);
+            await (window as any).ipcRenderer.invoke("updateInvoiceTitle", invoice.id, newTitle);
             console.log("Title updated successfully!");
             setTitleValue(newTitle);
         } catch (error) {
@@ -100,7 +100,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
     const handleCategoryChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newCategory = e.target.value;
         try {
-            await window.ipcRenderer.invoke("updateInvoiceCategory", invoice.id, newCategory);
+            await (window as any).ipcRenderer.invoke("updateInvoiceCategory", invoice.id, newCategory);
             console.log("Category updated successfully!");
             setCategoryValue(newCategory);
         } catch (error) {
@@ -113,7 +113,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
             if (value == "") {
                 return
             }
-            await window.ipcRenderer.invoke("updateInvoiceIssueDate", invoice.id, value);
+            await (window as any).ipcRenderer.invoke("updateInvoiceIssueDate", invoice.id, value);
             console.log("Issue date updated successfully!");
             setIssueDate(value);
         } catch (error) {
@@ -126,7 +126,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
             if (value == "") {
                 return
             }
-            await window.ipcRenderer.invoke("updateInvoiceSaleServiceDate", invoice.id, value);
+            await (window as any).ipcRenderer.invoke("updateInvoiceSaleServiceDate", invoice.id, value);
             console.log("Sale/service date updated successfully!");
             setServiceDate(value);
         } catch (error) {
@@ -137,7 +137,7 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
     const handleChangeNo = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newNo = e.target.value;
         try {
-            await window.ipcRenderer.invoke("updateInvoiceNo", invoice.id, newNo);
+            await (window as any).ipcRenderer.invoke("updateInvoiceNo", invoice.id, newNo);
             setInvoiceNo(newNo);
         } catch (error) {
             console.error("Error when updating invoice number:", error);

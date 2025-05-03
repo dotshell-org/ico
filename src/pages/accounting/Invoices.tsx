@@ -108,6 +108,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
                     onChange={(e) => setSelectedTableType(Number(e.target.value))}
                     className="mt-5 p-1 border rounded dark:bg-gray-900 dark:border-gray-600 cursor-pointer"
                 >
+                    <option value={Country.Debit}>{"📝 " + t("debit")}</option>
                     <option value={Country.None}>{"🚫 " + t("none")}</option>
                     <option value={Country.France}>{"🇫🇷 " + t("france")}</option>
                 </select>
