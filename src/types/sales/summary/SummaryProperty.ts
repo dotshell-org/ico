@@ -3,5 +3,6 @@ export enum SummaryProperty {
     Object = "object",
     Quantity = "quantity",
     Price = "price",
-    Stock = "stock"
+    Stock = "stock",
+    Total = "total"
 }

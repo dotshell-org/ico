@@ -122,6 +122,7 @@
     "quantity_in_invoice": "Quantité dans la Facture",
     "edit_movements": "Editer Mouvements",
     "edit": "Editer",
-    "edit_sales": "Editer Ventes"
+    "edit_sales": "Editer Ventes",
+    "price": "Prix"
 
 }
