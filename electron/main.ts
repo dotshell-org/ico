@@ -35,6 +35,7 @@ import {
   updateInvoiceCategory, updateInvoiceCountrySpecification,
   updateInvoiceIssueDate, updateInvoiceNo,
   updateInvoiceProductQuantity,
+  updateInvoiceProductAmountExclTax,
   updateInvoiceSaleServiceDate,
   updateInvoiceTitle
 } from "../src/backend/db/accounting/debits.ts";
@@ -166,6 +167,7 @@ handleIpc("getInvoiceProducts", getInvoiceProducts);
 handleIpc("addInvoiceProduct", addInvoiceProduct);
 handleIpc("deleteInvoiceProduct", deleteInvoiceProduct);
 handleIpc("updateInvoiceProductQuantity", updateInvoiceProductQuantity);
+handleIpc("updateInvoiceProductAmountExclTax", updateInvoiceProductAmountExclTax);
 handleIpc("getInvoiceExclTaxTotal", getInvoiceExclTaxTotal);
 handleIpc("getInvoiceInclTaxTotal", getInvoiceInclTaxTotal);
 

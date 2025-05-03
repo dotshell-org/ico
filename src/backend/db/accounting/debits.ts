@@ -299,6 +299,22 @@ export function updateInvoiceProductQuantity(invoiceProductId: number, quantity:
 }
 
 /**
+ * Updates the amount excluding tax of a specific product in the invoice.
+ *
+ * @param {number} invoiceProductId - The unique identifier of the product in the invoice to be updated.
+ * @param {number} amountExclTax - The new amount excluding tax to be set for the product.
+ * @return {void} Does not return a value.
+ */
+export function updateInvoiceProductAmountExclTax(invoiceProductId: number, amountExclTax: number): void {
+    const stmt = db.prepare(`
+        UPDATE invoice_products
+        SET amount_excl_tax = ?
+        WHERE id = ?
+    `);
+    stmt.run(amountExclTax, invoiceProductId);
+}
+
+/**
  * Deletes an invoice product from the database identified by the given ID.
  * Also deletes any associated stock movement.
  *
