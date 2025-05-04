@@ -19,7 +19,6 @@ An open-source, modern accounting software designed to streamline your financial
 ### Prerequisites
 - Node.js 22+
 - npm 11.2.0+
-- Docker (optional for containerized deployment)
 
 ### Installation
 1. Clone the repository:
