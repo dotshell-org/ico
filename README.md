@@ -19,7 +19,6 @@ An open-source, modern accounting software designed to streamline your financial
 ### Prerequisites
 - Node.js 22+
 - npm 11.2.0+
-- Docker (optional for containerized deployment)
 
 ### Installation
 1. Clone the repository:
@@ -34,17 +33,6 @@ An open-source, modern accounting software designed to streamline your financial
 3. Start ! :
    ```bash
    npm run dev
-   ```
-### 🐳 Running with Docker
-The project includes a `Dockerfile` to make deployment simple. Just follow these steps:
-1. Clone the repository.
-2. Build the Docker image:
-   ```bash
-   docker build -t ico
-   ```
-3. Run the container:
-   ```bash
-   docker run -p 3000:3000 ico
    ```
 ## 🤝 Contributing
 We welcome contributions! 🧑‍💻 Please feel free to submit issues, fork the repository, and make pull requests. For major changes, please open an issue to discuss what you would like to change.
