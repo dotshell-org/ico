@@ -62,13 +62,13 @@ const SaleMiniatureRow: React.FC<SaleMiniatureRowProps> = ({ sale, onClick, onDe
                 onClick={() => onClick(sale)}
                 className="w-[15%] pl-1.5 pt-3"
             >
-                {sale.quantity}
+                {sale.movement}
             </div>
             <div
                 onClick={() => onClick(sale)}
                 className="w-[15%] pl-1.5 pt-3"
             >
-                {formatPrice(sale.price*sale.quantity)}
+                {formatPrice(sale.price*sale.movement)}
             </div>
             <div className="w-10">
                 <button

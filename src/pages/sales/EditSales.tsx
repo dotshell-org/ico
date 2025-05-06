@@ -1,4 +1,4 @@
-import {t} from "i18next";
+ import {t} from "i18next";
 import React, {useEffect, useState} from "react";
 import {Filter} from "../../types/stock/summary/filter/Filter.ts";
 import {Sort} from "../../types/stock/summary/sort/Sort.ts";
@@ -23,6 +23,7 @@ const EditSales: React.FC = () => {
         date: "2000-00-00",
         object: "",
         quantity: 0,
+        movement: 0,
         price: 0,
         stock: ""
     });

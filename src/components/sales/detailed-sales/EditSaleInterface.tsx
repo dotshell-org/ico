@@ -17,7 +17,7 @@ const EditSaleInterface: React.FC<EditSaleInterfaceProps> = ({ sale, onClose, on
     const [filteredStockNames, setFilteredStockNames] = useState<string[]>([]);
 
     const [name, setName] = useState<string>(sale.object);
-    const [quantity, setQuantity] = useState<number>(sale.quantity);
+    const [quantity, setQuantity] = useState<number>(sale.movement);
     const [price, setPrice] = useState<number>(sale.price);
     const [date, setDate] = useState<string>(sale.date);
     const [stock, setStock] = useState<string>(sale.stock);

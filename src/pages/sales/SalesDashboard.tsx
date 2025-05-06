@@ -87,7 +87,6 @@ const SalesDashboard = () => {
                     value={TimeFrame[timeFrame]}
                     onChange={handleTimeFrameChange}
                 >
-                    <option value={TimeFrame[TimeFrame.DAY]}>{t("day")}</option>
                     <option value={TimeFrame[TimeFrame.WEEK]}>{t("week")}</option>
                     <option value={TimeFrame[TimeFrame.MONTH]}>{t("month")}</option>
                     <option value={TimeFrame[TimeFrame.YEAR]}>{t("year")}</option>

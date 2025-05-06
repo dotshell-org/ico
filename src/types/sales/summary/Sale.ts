@@ -1,9 +1,10 @@
 export interface Sale {
     id: number;
-    local_id?: number; // ID réel stocké en base de données
+    local_id?: number;
     date: string;
     object: string;
     quantity: number;
+    movement: number;
     price: number;
     stock: string;
 }

@@ -191,6 +191,8 @@ handleIpc("editSale", editSale);
 handleIpc("deleteSale", deleteSale);
 handleIpc("migrateSalesToStockMovements", migrateSalesToStockMovements);
 
+console.log(getSales([], []));
+
 // Account management
 
 ipcMain.handle('getAccounts', () => getAccounts())
