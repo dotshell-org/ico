@@ -1,4 +1,6 @@
 # 📊 ico - Modern Accounting Software
+[![GitHub license](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Dependabot badge](https://badgen.net/github/dependabot/dotshell-org/ico)](https://github.com/dotshell-org/ico/pulls?q=is%3Apr+author%3Aapp%2Fdependabot)
 
 Welcome to **ico**! 🎉  
 An open-source, modern accounting software designed to streamline your financial processes and help you focus on what matters most.  
