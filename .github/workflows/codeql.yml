@@ -42,6 +42,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate Electron Build
+        run: npm run generate-electron-build
+
       - name: Build project (compilation TS, bundling, etc.)
         run: npm run build:ci
 
