@@ -1,5 +1,5 @@
-import { SummaryProperty } from "../summary/SummaryProperty"
-import { Orientation } from "./Orientation";
+import { SummaryProperty } from "../summary/SummaryProperty.js"
+import { Orientation } from "./Orientation.js";
 
 export interface Sort {
     property: SummaryProperty,
