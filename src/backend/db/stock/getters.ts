@@ -1,12 +1,12 @@
-import {StockObject} from "../../../types/stock/StockObject.ts";
-import {db, typeToOperator} from "../config.ts";
-import {Filter} from "../../../types/stock/summary/filter/Filter.ts";
-import {Sort} from "../../../types/stock/summary/sort/Sort.ts";
-import {Movement} from "../../../types/stock/summary/Movement.ts";
-import {SummaryProperty} from "../../../types/stock/summary/SummaryProperty.ts";
-import {Operator} from "../../../types/stock/summary/filter/Operator.ts";
-import {InvoiceProductLink} from "../../../types/stock/InvoiceProductLink.ts";
-import {InvoiceProductLinkProps} from "../../../types/stock/InvoiceProductLinkProps.ts";
+import {StockObject} from "../../../types/stock/StockObject.js";
+import {db, typeToOperator} from "../config.js";
+import {Filter} from "../../../types/stock/summary/filter/Filter.js";
+import {Sort} from "../../../types/stock/summary/sort/Sort.js";
+import {Movement} from "../../../types/stock/summary/Movement.js";
+import {SummaryProperty} from "../../../types/stock/summary/SummaryProperty.js";
+import {Operator} from "../../../types/stock/summary/filter/Operator.js";
+import {InvoiceProductLink} from "../../../types/stock/InvoiceProductLink.js";
+import {InvoiceProductLinkProps} from "../../../types/stock/InvoiceProductLinkProps.js";
 
 /**
  * Fetches the current inventory of objects based on movements in the database up to a specific date.

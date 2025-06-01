@@ -1,11 +1,11 @@
-import {db, typeToOperator} from "../config.ts";
-import {Sale} from "../../../types/sales/summary/Sale.ts";
-import {Filter} from "../../../types/sales/summary/filter/Filter.ts";
-import {Sort} from "../../../types/sales/summary/sort/Sort.ts";
-import {Operator} from "../../../types/sales/summary/filter/Operator.ts";
-import {SummaryProperty} from "../../../types/sales/summary/SummaryProperty.ts";
+import {db, typeToOperator} from "../config.js";
+import {Sale} from "../../../types/sales/summary/Sale.js";
+import {Filter} from "../../../types/sales/summary/filter/Filter.js";
+import {Sort} from "../../../types/sales/summary/sort/Sort.js";
+import {Operator} from "../../../types/sales/summary/filter/Operator.js";
+import {SummaryProperty} from "../../../types/sales/summary/SummaryProperty.js";
 import { format } from 'date-fns';
-import {TimeFrame} from "../../../types/sales/TimeFrame.ts";
+import {TimeFrame} from "../../../types/sales/TimeFrame.js";
 
 export function getSales(filters: Filter[], sorts: Sort[]): Sale[] {
     try {

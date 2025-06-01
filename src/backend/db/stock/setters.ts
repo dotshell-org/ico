@@ -1,4 +1,4 @@
-import {db} from "../config.ts";
+import {db} from "../config.js";
 
 /**
  * Ignores the stock entry associated with a specific invoice product by deleting the linked movement and updating the product's addition reference.

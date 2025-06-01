@@ -1,12 +1,12 @@
-import { db, typeToOperator } from '../config.ts';
-import { Filter } from "../../../types/accounting/filter/Filter.ts";
-import { Sort } from "../../../types/accounting/sort/Sort.ts";
-import { Invoice } from "../../../types/accounting/invoices/Invoice.ts";
+import { db, typeToOperator } from '../config.js';
+import { Filter } from "../../../types/accounting/filter/Filter.js";
+import { Sort } from "../../../types/accounting/sort/Sort.js";
+import { Invoice } from "../../../types/accounting/invoices/Invoice.js";
 import dayjs from "dayjs";
-import { Operator } from "../../../types/accounting/filter/Operator.ts";
-import { SummaryProperty } from "../../../types/accounting/summary/SummaryProperty.ts";
-import {Country} from "../../../types/Country.ts";
-import {InvoiceProduct} from "../../../types/accounting/invoices/InvoiceProduct.ts";
+import { Operator } from "../../../types/accounting/filter/Operator.js";
+import { SummaryProperty } from "../../../types/accounting/summary/SummaryProperty.js";
+import {Country} from "../../../types/Country.js";
+import {InvoiceProduct} from "../../../types/accounting/invoices/InvoiceProduct.js";
 
 /**
  * Retrieves a list of invoices based on the specified filters and sorting options.
@@ -153,7 +153,7 @@ export function deleteInvoice(invoiceId: number): void {
             WHERE invoice_id = ? AND addition_id > 0
         `);
         const linkedMovements = productMovementsStmt.all(invoiceId);
-        
+
         // Delete associated products first
         db.prepare('DELETE FROM invoice_products WHERE invoice_id = ?').run(invoiceId);
 
@@ -169,7 +169,7 @@ export function deleteInvoice(invoiceId: number): void {
 
         // Delete the invoice
         db.prepare('DELETE FROM invoices WHERE id = ?').run(invoiceId);
-        
+
         db.prepare('COMMIT').run();
     } catch (error) {
         db.prepare('ROLLBACK').run();
@@ -329,7 +329,7 @@ export function deleteInvoiceProduct(invoiceProductId: number): void {
         WHERE id = ? AND addition_id > 0
     `);
     const result = checkStmt.get(invoiceProductId);
-    
+
     // If there's a linked stock movement, delete it
     if (result && result.addition_id) {
         const deleteMovementStmt = db.prepare(`

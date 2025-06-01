@@ -1,4 +1,4 @@
-import { db } from '../config.ts';
+import { db } from '../config.js';
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS invoices (
@@ -20,7 +20,7 @@ db.exec(`
         tax_rate REAL,
         discount_percentage REAL,
         discount_amount REAL,
-        
+
         FOREIGN KEY (invoice_id) REFERENCES invoices(id)
     );
     CREATE TABLE IF NOT EXISTS invoice_country_specifications (
