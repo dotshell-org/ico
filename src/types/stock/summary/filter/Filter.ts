@@ -1,5 +1,5 @@
-import {SummaryProperty} from "../SummaryProperty.ts";
-import {Operator} from "./Operator.ts";
+import {SummaryProperty} from "../SummaryProperty";
+import {Operator} from "./Operator";
 
 export interface Filter {
     property: SummaryProperty,

@@ -1,5 +1,5 @@
-import {SummaryProperty} from "../SummaryProperty.ts";
-import {Orientation} from "../../../accounting/sort/Orientation.ts";
+import {SummaryProperty} from "../SummaryProperty";
+import {Orientation} from "../../../accounting/sort/Orientation";
 
 export interface Sort {
     property: SummaryProperty,

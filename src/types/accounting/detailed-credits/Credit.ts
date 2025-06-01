@@ -1,4 +1,4 @@
-import {MoneyType} from "./MoneyType.ts";
+import {MoneyType} from "./MoneyType";
 
 export interface Credit {
     category: string;

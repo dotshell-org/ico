@@ -7,7 +7,9 @@
     "rootDir": "..",
     "esModuleInterop": true,
     "sourceMap": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": false
   },
   "include": [
     "main.ts",
