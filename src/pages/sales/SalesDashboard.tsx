@@ -3,7 +3,7 @@ import { LineChart, PieChart } from "@mui/x-charts";
 import { TextField } from "@mui/material";
 import dayjs from "dayjs";
 import { t } from "i18next";
-import { TimeFrame } from "../../types/sales/TimeFrame.ts";
+import { TimeFrame } from "../../types/sales/TimeFrame";
 
 const SalesDashboard = () => {
     const [timeFrame, setTimeFrame] = React.useState<TimeFrame>(TimeFrame.WEEK);
@@ -87,6 +87,7 @@ const SalesDashboard = () => {
                     value={TimeFrame[timeFrame]}
                     onChange={handleTimeFrameChange}
                 >
+                    <option value={TimeFrame[TimeFrame.DAY]}>{t("day")}</option>
                     <option value={TimeFrame[TimeFrame.WEEK]}>{t("week")}</option>
                     <option value={TimeFrame[TimeFrame.MONTH]}>{t("month")}</option>
                     <option value={TimeFrame[TimeFrame.YEAR]}>{t("year")}</option>

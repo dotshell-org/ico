@@ -1,11 +1,11 @@
-import {db, typeToOperator} from '../config.ts';
-import {Filter} from "../../../types/accounting/filter/Filter.ts";
-import {Sort} from "../../../types/accounting/sort/Sort.ts";
-import {Operator} from "../../../types/accounting/filter/Operator.ts";
-import {SummaryProperty} from "../../../types/accounting/summary/SummaryProperty.ts";
-import {Credit} from "../../../types/accounting/detailed-credits/Credit.ts";
-import {CreditTable, CreditTableRow} from "../../../types/accounting/detailed-credits/CreditTable.ts";
-import {MoneyType} from "../../../types/accounting/detailed-credits/MoneyType.ts";
+import {db, typeToOperator} from '../config.js';
+import {Filter} from "../../../types/accounting/filter/Filter.js";
+import {Sort} from "../../../types/accounting/sort/Sort.js";
+import {Operator} from "../../../types/accounting/filter/Operator.js";
+import {SummaryProperty} from "../../../types/accounting/summary/SummaryProperty.js";
+import {Credit} from "../../../types/accounting/detailed-credits/Credit.js";
+import {CreditTable, CreditTableRow} from "../../../types/accounting/detailed-credits/CreditTable.js";
+import {MoneyType} from "../../../types/accounting/detailed-credits/MoneyType.js";
 import dayjs from "dayjs";
 
 /**

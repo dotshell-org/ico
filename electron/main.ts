@@ -1,9 +1,9 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import "../src/backend/db/accounting/tables.ts"
-import "../src/backend/db/stock/tables.ts"
-import "../src/backend/db/sales/tables.ts"
+import "../src/backend/db/accounting/tables.js"
+import "../src/backend/db/stock/tables.js"
+import "../src/backend/db/sales/tables.js"
 import {
   addCreditGroup,
   addCreditRow,
@@ -20,8 +20,8 @@ import {
   updateCreditRow,
   updateCreditTitle,
   updateOtherCreditRow
-} from "../src/backend/db/accounting/credits.ts";
-import {getCreditsSumByCategory, getDebitsSumByCategory, getTransactionsByMonth} from "../src/backend/db/accounting/reports.ts";
+} from "../src/backend/db/accounting/credits.js";
+import {getCreditsSumByCategory, getDebitsSumByCategory, getTransactionsByMonth} from "../src/backend/db/accounting/reports.js";
 import {
   addInvoice,
   addInvoiceProduct,
@@ -38,7 +38,7 @@ import {
   updateInvoiceProductAmountExclTax,
   updateInvoiceSaleServiceDate,
   updateInvoiceTitle
-} from "../src/backend/db/accounting/debits.ts";
+} from "../src/backend/db/accounting/debits.js";
 import {
   getAllObjectNames,
   getAllObjects,
@@ -46,28 +46,28 @@ import {
   getInventory,
   getMovements,
   getObjectAmountCurve, getStockLinkProps, getStockLinks
-} from "../src/backend/db/stock/getters.ts";
+} from "../src/backend/db/stock/getters.js";
 import {
   addMovement,
   deleteMovement,
   editMovement,
   ignoreInvoiceProductInStock,
   linkInvoiceProductInStock
-} from "../src/backend/db/stock/setters.ts";
-import {getRevenueData, getSales, getSalesSummary, getAllSoldObjectNames} from "../src/backend/db/sales/getters.ts";
+} from "../src/backend/db/stock/setters.js";
+import {getRevenueData, getSales, getSalesSummary, getAllSoldObjectNames} from "../src/backend/db/sales/getters.js";
 import {
   addSale,
   editSale,
   deleteSale,
   migrateSalesToStockMovements
-} from "../src/backend/db/sales/setters.ts";
+} from "../src/backend/db/sales/setters.js";
 import { 
   getAccounts, 
   getCurrentAccount, 
   createAccount, 
   switchAccount, 
   deleteAccount
-} from '../src/backend/account-manager'
+} from '../src/backend/account-manager.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

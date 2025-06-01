@@ -1,4 +1,4 @@
-import {db} from "../config.ts";
+import {db} from "../config.js";
 
 /**
  * Adds a new sale entry to the database and creates a corresponding negative stock movement.
@@ -20,7 +20,7 @@ export function addSale(name: string, quantity: number, price: number, date: str
         `);
         // Negative quantity for stock reduction
         const movementResult = movementStmt.run(stock, date, name, -Math.abs(quantity));
-        
+
         // Then create the sale with a reference to the movement
         const insertStmt = db.prepare(`
             INSERT INTO sales (date, object, quantity, price, stock, movement_id)
@@ -49,7 +49,7 @@ export function editSale(id: number, name: string, quantity: number, price: numb
             SELECT movement_id FROM sales WHERE id = ?
         `);
         const sale = getSaleStmt.get(id);
-        
+
         if (sale && sale.movement_id) {
             // Update the associated stock movement
             const updateMovementStmt = db.prepare(`
@@ -70,14 +70,14 @@ export function editSale(id: number, name: string, quantity: number, price: numb
             `);
             // Negative quantity for stock reduction
             const movementResult = movementStmt.run(stock, date, name, -Math.abs(quantity));
-            
+
             // Store the new movement_id
             const updateMovementIdStmt = db.prepare(`
                 UPDATE sales SET movement_id = ? WHERE id = ?
             `);
             updateMovementIdStmt.run(movementResult.lastInsertRowid, id);
         }
-        
+
         // Update the sale
         const updateSaleStmt = db.prepare(`
             UPDATE sales
@@ -106,14 +106,14 @@ export function deleteSale(id: number): void {
             SELECT movement_id FROM sales WHERE id = ?
         `);
         const sale = getSaleStmt.get(id);
-        
+
         // Delete the sale
         const deleteSaleStmt = db.prepare(`
             DELETE FROM sales
             WHERE id = ?
         `);
         deleteSaleStmt.run(id);
-        
+
         // If there's an associated movement, delete it too
         if (sale && sale.movement_id) {
             const deleteMovementStmt = db.prepare(`
@@ -133,7 +133,7 @@ export function deleteSale(id: number): void {
  */
 export function migrateSalesToStockMovements(): number {
     let migratedCount = 0;
-    
+
     // Use a transaction for the entire migration
     db.transaction(() => {
         // Find all sales without an associated movement_id or with a null/0 movement_id
@@ -142,9 +142,9 @@ export function migrateSalesToStockMovements(): number {
             FROM sales
             WHERE movement_id IS NULL OR movement_id = 0
         `);
-        
+
         const sales = findSalesStmt.all();
-        
+
         for (const sale of sales) {
             // Create a negative stock movement
             const movementStmt = db.prepare(`
@@ -153,7 +153,7 @@ export function migrateSalesToStockMovements(): number {
             `);
             // Negative quantity for stock reduction
             const movementResult = movementStmt.run(sale.stock, sale.date, sale.object, -Math.abs(sale.quantity));
-            
+
             // Update the sale with the new movement_id
             const updateSaleStmt = db.prepare(`
                 UPDATE sales
@@ -161,10 +161,10 @@ export function migrateSalesToStockMovements(): number {
                 WHERE id = ?
             `);
             updateSaleStmt.run(movementResult.lastInsertRowid, sale.id);
-            
+
             migratedCount++;
         }
     })();
-    
+
     return migratedCount;
 }

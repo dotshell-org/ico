@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "outDir": "../dist-electron",
+    "rootDir": "..",
+    "esModuleInterop": true,
+    "sourceMap": false,
+    "skipLibCheck": true,
+    "noEmit": false
+  },
+  "include": [
+    "main.ts",
+    "preload.ts",
+    "../src/backend/**/*.ts",
+    "../src/types/**/*.ts"
+  ]
+}
