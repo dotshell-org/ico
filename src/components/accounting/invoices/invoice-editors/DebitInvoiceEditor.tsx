@@ -55,7 +55,7 @@ const DebitInvoiceEditor: React.FC<DebitEditorProps> = ({ invoice }: DebitEditor
         } catch (error) {
             console.error("Error when updating issue date:", error);
         }
-    }
+    };
 
     const handleAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newAmount = parseFloat(e.target.value);
