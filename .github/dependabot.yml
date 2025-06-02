@@ -9,3 +9,6 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+    ignore:
+      - dependency-name: "tailwindcss"
+      - dependency-name: "@typescript-eslint/eslint-plugin"
