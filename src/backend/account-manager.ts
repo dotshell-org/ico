@@ -48,42 +48,49 @@ function getAccountsMetadataPath(): string {
 function initializeAccountsMetadataFile(): void {
     const metadataPath = getAccountsMetadataPath();
     
-    if (!fs.existsSync(metadataPath)) {
-        // Create a default account if no metadata file exists yet
-        const defaultAccountPath = path.join(getAccountsDirectory(), 'default.account');
-        const defaultAccount: AccountInfo = {
-            id: 'default',
-            name: 'Default Account',
-            path: defaultAccountPath,
-            createdAt: new Date().toISOString(),
-            lastAccessedAt: new Date().toISOString(),
-            isDefault: true
-        };
-        
-        // If the default account file doesn't exist, create it or copy from root if it exists
-        try {
-            const fd = fs.openSync(defaultAccountPath, fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_RDWR, 0o600);
-            fs.closeSync(fd);
-        } catch (e: any) {
-            if (e.code !== 'EEXIST') {
-                throw e;
-            }
-            // File already exists, do nothing
+    // The if (!fs.existsSync(metadataPath)) check is removed to avoid TOCTOU.
+    // The logic below will attempt to create files atomically.
+
+    // Create a default account if no metadata file exists yet
+    const defaultAccountPath = path.join(getAccountsDirectory(), 'default.account');
+    const defaultAccount: AccountInfo = {
+        id: 'default',
+        name: 'Default Account',
+        path: defaultAccountPath,
+        createdAt: new Date().toISOString(),
+        lastAccessedAt: new Date().toISOString(),
+        isDefault: true
+    };
+    
+    // If the default account file doesn't exist, create it atomically
+    try {
+        // Renamed fd to fdDefaultAccount for clarity as its scope changed
+        const fdDefaultAccount = fs.openSync(defaultAccountPath, fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_RDWR, 0o600);
+        fs.closeSync(fdDefaultAccount);
+    } catch (e: any) {
+        if (e.code !== 'EEXIST') { // If error is not 'file already exists', then throw
+            throw e;
         }
-        
-        try {
-            const fd = fs.openSync(metadataPath, fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_RDWR, 0o600);
-            fs.writeFileSync(fd, JSON.stringify({ 
-                accounts: [defaultAccount],
-                currentAccount: 'default'
-            }));
-            fs.closeSync(fd);
-        } catch (e: any) {
-            if (e.code === 'EEXIST') {
-                // File already exists, do nothing or handle as needed
-            } else {
-                throw e;
-            }
+        // File default.account already exists, do nothing
+    }
+    
+    // Attempt to create and initialize the metadata file (accounts.json) atomically
+    try {
+        // Renamed fd to fdMetadata for clarity
+        const fdMetadata = fs.openSync(metadataPath, fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_RDWR, 0o600);
+        // Use fs.writeSync with the file descriptor from fs.openSync
+        fs.writeSync(fdMetadata, JSON.stringify({ 
+            accounts: [defaultAccount],
+            currentAccount: 'default'
+        }));
+        fs.closeSync(fdMetadata);
+    } catch (e: any) {
+        if (e.code === 'EEXIST') {
+            // metadataPath (accounts.json) already exists. This means it was previously initialized.
+            // Do nothing in this case, as the file should not be overwritten if it exists.
+        } else {
+            // For any other error, rethrow it.
+            throw e;
         }
     }
 }
