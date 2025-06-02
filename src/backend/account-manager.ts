@@ -66,15 +66,14 @@ function initializeAccountsMetadataFile(): void {
         }));
         
         // If the default account file doesn't exist, create it or copy from root if it exists
-        if (!fs.existsSync(defaultAccountPath)) {
-            const rootDefaultAccountPath = path.join(app.getPath('userData'), '..', '..', 'default.account');
-            if (fs.existsSync(rootDefaultAccountPath)) {
-                fs.copyFileSync(rootDefaultAccountPath, defaultAccountPath);
-            } else {
-                // Create an empty SQLite database file
-                const db = new Database(defaultAccountPath);
-                db.close();
+        try {
+            const fd = fs.openSync(defaultAccountPath, fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_RDWR, 0o600);
+            fs.closeSync(fd);
+        } catch (e: any) {
+            if (e.code !== 'EEXIST') {
+                throw e;
             }
+            // File already exists, do nothing
         }
     }
 }

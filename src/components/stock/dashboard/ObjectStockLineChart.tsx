@@ -2,6 +2,7 @@ import {LineChart} from "@mui/x-charts";
 import dayjs from "dayjs";
 import {t} from "i18next";
 import React, {useEffect, useState} from "react";
+import DOMPurify from 'dompurify';
 
 interface ObjectStockLineChartProps {
     stockName: string;
@@ -65,6 +66,8 @@ const ObjectStockLineChart: React.FC<ObjectStockLineChartProps> = ({ stockName }
         .replace("{max_amount}", `<strong>${selectedObjectMax.toString()}</strong>`)
         .replace("{object}", `<strong>${selectedObject}</strong>`);
 
+    const sanitizedStockText = DOMPurify.sanitize(accumulatedStockText);
+
     return (
         <div className="flex items-center">
             <div className="w-1/6 h-[21rem] p-4 mr-2 rounded shadow-sm border border-gray-300 dark:border-gray-700">
@@ -82,7 +85,7 @@ const ObjectStockLineChart: React.FC<ObjectStockLineChartProps> = ({ stockName }
                         ))}
                     </select>
                     <div
-                        dangerouslySetInnerHTML={{ __html: accumulatedStockText }}
+                        dangerouslySetInnerHTML={{ __html: sanitizedStockText }}
                     />
                 </div>
             </div>
