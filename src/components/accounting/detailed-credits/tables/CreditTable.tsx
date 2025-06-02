@@ -51,7 +51,7 @@ const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
         else if (type == MoneyType.Other) {
             return "💳️";
         }
-    }
+    };
 
     const typeToTitle = () => {
         if (type === MoneyType.Coins) {
