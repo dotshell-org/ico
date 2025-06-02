@@ -60,11 +60,6 @@ function initializeAccountsMetadataFile(): void {
             isDefault: true
         };
         
-        fs.writeFileSync(metadataPath, JSON.stringify({ 
-            accounts: [defaultAccount],
-            currentAccount: 'default'
-        }));
-        
         // If the default account file doesn't exist, create it or copy from root if it exists
         try {
             const fd = fs.openSync(defaultAccountPath, fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_RDWR, 0o600);
@@ -74,6 +69,21 @@ function initializeAccountsMetadataFile(): void {
                 throw e;
             }
             // File already exists, do nothing
+        }
+        
+        try {
+            const fd = fs.openSync(metadataPath, fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_RDWR, 0o600);
+            fs.writeFileSync(fd, JSON.stringify({ 
+                accounts: [defaultAccount],
+                currentAccount: 'default'
+            }));
+            fs.closeSync(fd);
+        } catch (e: any) {
+            if (e.code === 'EEXIST') {
+                // File already exists, do nothing or handle as needed
+            } else {
+                throw e;
+            }
         }
     }
 }
