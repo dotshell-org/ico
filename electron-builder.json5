@@ -1,9 +1,8 @@
 // @see - https://www.electron.build/configuration/configuration
 {
-  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",  "appId": "org.dotshell.ico",
   "asar": true,
-  "productName": "YourAppName",
+  "productName": "Ico",
   "directories": {
     "output": "release/${version}"
   },
@@ -34,12 +33,16 @@
     "perMachine": false,
     "allowToChangeInstallationDirectory": true,
     "deleteAppDataOnUninstall": false
-  },
-  "linux": {
+  },  "linux": {
     "target": [
-      "AppImage"
+      "AppImage",
+      "deb"
     ],
     "artifactName": "${productName}-Linux-${version}.${ext}",
-    "category": "Utility"
+    "category": "Office",
+    "maintainer": "Dotshell",
+    "vendor": "Dotshell",
+    "synopsis": "An open source, modern accounting software",
+    "description": "Ico is an open source, modern accounting software that helps you manage your business finances efficiently."
   }
 }
