@@ -231,6 +231,8 @@ app.on('window-all-closed', () => {
   }
 });
 
+app.commandLine.appendSwitch('gtk-version', '3');
+
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
