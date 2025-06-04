@@ -141,6 +141,8 @@
     "created": "Created",
     "default": "Default",
     "switch_to": "Switch to",
+    "rename": "Rename",
+    "rename_account": "Rename Account",
     "delete": "Delete",
     "create_new_account": "Create New Account",
     "new_account": "New Account",

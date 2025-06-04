@@ -19,7 +19,7 @@ export interface AccountInfo {
 // Get the appropriate data directory for different operating systems
 function getAccountsDirectory(): string {
     let accountsDir: string;
-    
+
     if (process.platform === 'win32') {
         // Windows: %APPDATA%\ico\accounts
         accountsDir = path.join(app.getPath('appData'), 'ico', 'accounts');
@@ -30,12 +30,12 @@ function getAccountsDirectory(): string {
         // Linux: ~/.config/ico/accounts
         accountsDir = path.join(app.getPath('userData'), 'accounts');
     }
-    
+
     // Create directory if it doesn't exist
     if (!fs.existsSync(accountsDir)) {
         fs.mkdirSync(accountsDir, { recursive: true });
     }
-    
+
     return accountsDir;
 }
 
@@ -47,7 +47,7 @@ function getAccountsMetadataPath(): string {
 // Initialize the account metadata file if it doesn't exist
 function initializeAccountsMetadataFile(): void {
     const metadataPath = getAccountsMetadataPath();
-    
+
     // The if (!fs.existsSync(metadataPath)) check is removed to avoid TOCTOU.
     // The logic below will attempt to create files atomically.
 
@@ -61,7 +61,7 @@ function initializeAccountsMetadataFile(): void {
         lastAccessedAt: new Date().toISOString(),
         isDefault: true
     };
-    
+
     // If the default account file doesn't exist, create it atomically
     try {
         // Renamed fd to fdDefaultAccount for clarity as its scope changed
@@ -73,7 +73,7 @@ function initializeAccountsMetadataFile(): void {
         }
         // File default.account already exists, do nothing
     }
-    
+
     // Attempt to create and initialize the metadata file (accounts.json) atomically
     try {
         // Renamed fd to fdMetadata for clarity
@@ -115,14 +115,14 @@ export function getCurrentAccount(): AccountInfo {
 // Create a new account
 export function createAccount(name: string): AccountInfo {
     initializeAccountsMetadataFile();
-    
+
     const metadataPath = getAccountsMetadataPath();
     const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
-    
+
     // Generate a unique ID
     const id = Date.now().toString();
     const accountPath = path.join(getAccountsDirectory(), `${id}.account`);
-    
+
     const newAccount: AccountInfo = {
         id,
         name,
@@ -131,81 +131,118 @@ export function createAccount(name: string): AccountInfo {
         lastAccessedAt: new Date().toISOString(),
         isDefault: false
     };
-    
+
     // Create new SQLite database file
     const db = new Database(accountPath);
-    
+
     // Close the connection
     db.close();
-    
+
     // Add to metadata
     metadata.accounts.push(newAccount);
     fs.writeFileSync(metadataPath, JSON.stringify(metadata));
-    
+
     return newAccount;
 }
 
 // Switch to a different account
 export function switchAccount(id: string): AccountInfo {
     initializeAccountsMetadataFile();
-    
+
     const metadataPath = getAccountsMetadataPath();
     const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
-    
+
     // Find the account
     const account = metadata.accounts.find((account: AccountInfo) => account.id === id);
     if (!account) {
         throw new Error(`Account with ID ${id} not found`);
     }
-    
+
     // Update last accessed time
     account.lastAccessedAt = new Date().toISOString();
-    
+
     // Update current account
     metadata.currentAccount = id;
-    
+
     // Save changes
     fs.writeFileSync(metadataPath, JSON.stringify(metadata));
-    
+
     return account;
 }
 
 // Delete an account
 export function deleteAccount(id: string): void {
     initializeAccountsMetadataFile();
-    
+
     const metadataPath = getAccountsMetadataPath();
     const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
-    
+
     // Find the account
     const accountIndex = metadata.accounts.findIndex((account: AccountInfo) => account.id === id);
     if (accountIndex === -1) {
         throw new Error(`Account with ID ${id} not found`);
     }
-    
+
     const account = metadata.accounts[accountIndex];
-    
-    // Cannot delete the default account
-    if (account.isDefault) {
-        throw new Error('Cannot delete the default account');
+
+    // Cannot delete the account if it's the only one
+    if (metadata.accounts.length <= 1) {
+        throw new Error('Cannot delete the only account');
     }
-    
+
+    // If this is the default account and we're deleting it, we need to set another account as default
+    if (account.isDefault) {
+        // Find another account to set as default
+        const newDefaultAccount = metadata.accounts.find((acc: AccountInfo) => acc.id !== id);
+        if (newDefaultAccount) {
+            newDefaultAccount.isDefault = true;
+        }
+    }
+
     // Delete the file
     if (fs.existsSync(account.path)) {
         fs.unlinkSync(account.path);
     }
-    
+
     // Remove from metadata
     metadata.accounts.splice(accountIndex, 1);
-    
-    // If this was the current account, switch to default
+
+    // If this was the current account, switch to another account
     if (metadata.currentAccount === id) {
+        // First try to find the default account
         const defaultAccount = metadata.accounts.find((acc: AccountInfo) => acc.isDefault);
-        metadata.currentAccount = defaultAccount.id;
+        if (defaultAccount) {
+            metadata.currentAccount = defaultAccount.id;
+        } else if (metadata.accounts.length > 0) {
+            // If no default account, just use the first available account
+            metadata.currentAccount = metadata.accounts[0].id;
+        }
     }
-    
+
     // Save changes
     fs.writeFileSync(metadataPath, JSON.stringify(metadata));
+}
+
+// Rename an account
+export function renameAccount(id: string, newName: string): AccountInfo {
+    initializeAccountsMetadataFile();
+
+    const metadataPath = getAccountsMetadataPath();
+    const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+
+    // Find the account
+    const account = metadata.accounts.find((account: AccountInfo) => account.id === id);
+    if (!account) {
+        throw new Error(`Account with ID ${id} not found`);
+    }
+
+    // Update the name
+    account.name = newName;
+
+    // Save changes
+    fs.writeFileSync(metadataPath, JSON.stringify(metadata));
+
+    return account;
 }
 
 // Update the database connection based on the current account

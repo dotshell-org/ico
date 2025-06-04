@@ -143,6 +143,8 @@
     "created": "Créé le",
     "default": "Par défaut",
     "switch_to": "Utiliser",
+    "rename": "Renommer",
+    "rename_account": "Renommer le Compte",
     "delete": "Supprimer",
     "create_new_account": "Créer un nouveau compte",
     "new_account": "Nouveau compte",

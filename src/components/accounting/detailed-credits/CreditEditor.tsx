@@ -28,7 +28,6 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
             if (dateValue !== credit.date) {
                 try {
                     await (window as any).ipcRenderer.invoke("updateCreditDate", credit.id, dateValue);
-                    console.log("Date updated successfully!");
                 } catch (error) {
                     console.error("Error when updating the date:", error);
                 }
@@ -43,7 +42,6 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
             if (titleValue !== credit.title) {
                 try {
                     await (window as any).ipcRenderer.invoke("updateCreditTitle", credit.id, titleValue);
-                    console.log("Title updated successfully!");
                 } catch (error) {
                     console.error("Error when updating the title:", error);
                 }
@@ -75,7 +73,6 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
         const newCategory = e.target.value;
         try {
             await (window as any).ipcRenderer.invoke("updateCreditCategory", credit.id, newCategory);
-            console.log("Category updated successfully!");
             setCategoryValue(newCategory);
         } catch (error) {
             console.error("Error when updating the category:", error);
@@ -89,7 +86,6 @@ const CreditEditor: React.FC<CreditEditorProps> = ({ credit }) => {
                 credit.id,
                 selectedTableType
             );
-            console.log("New table created with id:", newTableId);
             setTableIds(prevTableIds => [...prevTableIds, newTableId]);
         } catch (error) {
             console.error("Error when creating a new table:", error);

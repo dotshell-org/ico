@@ -22,12 +22,10 @@ const SaleMiniatureRow: React.FC<SaleMiniatureRowProps> = ({ sale, onClick, onDe
 
     const handleDeleted = (e: React.MouseEvent) => {
         e.stopPropagation(); // Empêche le clic de se propager à l'élément parent
-        
-        console.log("Tentative de suppression de la vente avec ID:", sale.id);
+
         (window as any).ipcRenderer
             .invoke("deleteSale", sale.local_id || sale.id) // Utilise local_id si disponible, sinon utilise id
             .then(() => {
-                console.log("Vente supprimée avec succès");
                 onDelete();
             })
             .catch((error: any) => {

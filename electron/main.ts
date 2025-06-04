@@ -66,7 +66,8 @@ import {
   getCurrentAccount, 
   createAccount, 
   switchAccount, 
-  deleteAccount
+  deleteAccount,
+  renameAccount
 } from '../src/backend/account-manager.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -83,8 +84,8 @@ let win: BrowserWindow | null
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    minWidth: 800,
+    minHeight: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
@@ -118,6 +119,8 @@ handleIpc("getDebits", getInvoices);
 handleIpc("getTransactionsByMonth", getTransactionsByMonth);
 handleIpc("getCreditsSumByCategory", getCreditsSumByCategory);
 handleIpc("getDebitsSumByCategory", getDebitsSumByCategory);
+handleIpc("getAllCreditsSumByCategory", () => getCreditsSumByCategory(false));
+handleIpc("getAllDebitsSumByCategory", () => getDebitsSumByCategory(false));
 handleIpc("getCreditsList", getCreditsList);
 handleIpc("getCreditTableFromId", getCreditTableFromId);
 handleIpc("getOtherMoneyCreditsFromId", getOtherMoneyCreditsFromId);
@@ -191,8 +194,6 @@ handleIpc("editSale", editSale);
 handleIpc("deleteSale", deleteSale);
 handleIpc("migrateSalesToStockMovements", migrateSalesToStockMovements);
 
-console.log(getSales([], []));
-
 // Account management
 
 ipcMain.handle('getAccounts', () => getAccounts())
@@ -208,6 +209,10 @@ ipcMain.handle('switchAccount', (_event, id: string) => {
 ipcMain.handle('deleteAccount', (_event, id: string) => {
   deleteAccount(id)
   return getAccounts()
+})
+
+ipcMain.handle('renameAccount', (_event, id: string, newName: string) => {
+  return renameAccount(id, newName)
 })
 
 // Language management

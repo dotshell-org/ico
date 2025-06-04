@@ -102,7 +102,6 @@ async function scanReceipt(imagePath: string): Promise<ReceiptData> {
 export async function processReceipt(imagePath: string): Promise<ReceiptData> {
     try {
         const result = await scanReceipt(imagePath);
-        console.log('Data extracted:', JSON.stringify(result, null, 2));
         return result;
     } catch (error) {
         console.error('Error:', error);

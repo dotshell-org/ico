@@ -24,6 +24,14 @@ function AccountingDashboard() {
         categories: [],
         values: [],
     });
+    const [allCredits, setAllCredits] = useState<{ categories: string[]; values: number[] }>({
+        categories: [],
+        values: [],
+    });
+    const [allDebits, setAllDebits] = useState<{ categories: string[]; values: number[] }>({
+        categories: [],
+        values: [],
+    });
 
     useEffect(() => {
         (window as any).ipcRenderer
@@ -52,9 +60,27 @@ function AccountingDashboard() {
             .catch((err: any) => {
                 console.error("Error when fetching debits", err);
             });
+
+        (window as any).ipcRenderer
+            .invoke("getAllCreditsSumByCategory")
+            .then((result: { categories: string[]; values: number[] }) => {
+                setAllCredits(result);
+            })
+            .catch((err: any) => {
+                console.error("Error when fetching all credits", err);
+            });
+
+        (window as any).ipcRenderer
+            .invoke("getAllDebitsSumByCategory")
+            .then((result: { categories: string[]; values: number[] }) => {
+                setAllDebits(result);
+            })
+            .catch((err: any) => {
+                console.error("Error when fetching all debits", err);
+            });
     }, []);
 
-    // Création de maps pour un accès rapide aux valeurs par catégorie
+    // Création de maps pour un accès rapide aux valeurs par catégorie (pour les graphiques)
     const creditMap = useMemo(() => {
         return credits.categories.reduce<Record<string, number>>((acc, cat, idx) => {
             acc[cat] = credits.values[idx];
@@ -69,16 +95,31 @@ function AccountingDashboard() {
         }, {});
     }, [debits]);
 
-    // Union des catégories présentes dans les crédits et débits
+    // Création de maps pour un accès rapide aux valeurs par catégorie (pour le tableau - toutes les catégories)
+    const allCreditMap = useMemo(() => {
+        return allCredits.categories.reduce<Record<string, number>>((acc, cat, idx) => {
+            acc[cat] = allCredits.values[idx];
+            return acc;
+        }, {});
+    }, [allCredits]);
+
+    const allDebitMap = useMemo(() => {
+        return allDebits.categories.reduce<Record<string, number>>((acc, cat, idx) => {
+            acc[cat] = allDebits.values[idx];
+            return acc;
+        }, {});
+    }, [allDebits]);
+
+    // Union des catégories présentes dans les crédits et débits (pour le tableau - toutes les catégories)
     const synthesizedData = useMemo(() => {
-        const allCategories = Array.from(new Set([...credits.categories, ...debits.categories]));
+        const allCategories = Array.from(new Set([...allCredits.categories, ...allDebits.categories]));
         return allCategories.map((category) => {
-            const credit = creditMap[category] || 0;
-            const debit = debitMap[category] || 0;
+            const credit = allCreditMap[category] || 0;
+            const debit = allDebitMap[category] || 0;
             const profit = credit - debit;
             return { category, credit, debit, profit };
-        });
-    }, [credits, debits, creditMap, debitMap]);
+        }).sort((a, b) => a.category.localeCompare(b.category)); // Sort alphabetically by category
+    }, [allCredits, allDebits, allCreditMap, allDebitMap]);
 
     // Fonction de formatage spécifique pour la colonne profit
     const formatProfit = (value: number): string => {
@@ -138,9 +179,9 @@ function AccountingDashboard() {
                 <tbody>
                     <tr>
                         <DashboardTR border={false} content={""} property={null} />
-                        <DashboardTR border={false} content={`€${debits.values.reduce((a: number, b: number) => a + b, 0).toFixed(2)}`} property={DashboardCharts.Debit} />
-                        <DashboardTR border={false} content={`€${credits.values.reduce((a: number, b: number) => a + b, 0).toFixed(2)}`} property={DashboardCharts.Credit} />
-                        <DashboardTR border={false} content={`${formatProfit(credits.values.reduce((a: number, b: number) => a + b, 0) - debits.values.reduce((a: number, b: number) => a + b, 0))}`} property={DashboardCharts.Profit} />
+                        <DashboardTR border={false} content={`€${allDebits.values.reduce((a: number, b: number) => a + b, 0).toFixed(2)}`} property={DashboardCharts.Debit} />
+                        <DashboardTR border={false} content={`€${allCredits.values.reduce((a: number, b: number) => a + b, 0).toFixed(2)}`} property={DashboardCharts.Credit} />
+                        <DashboardTR border={false} content={`${formatProfit(allCredits.values.reduce((a: number, b: number) => a + b, 0) - allDebits.values.reduce((a: number, b: number) => a + b, 0))}`} property={DashboardCharts.Profit} />
                     </tr>
                 </tbody>
             </table>

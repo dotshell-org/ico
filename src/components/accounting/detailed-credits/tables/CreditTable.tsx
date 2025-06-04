@@ -157,9 +157,6 @@ const CreditTable: React.FC<CreditTableProps> = ({ id, handleRemoveTable }) => {
         // Then delete from database
         (window as any).ipcRenderer
             .invoke("deleteCreditTable", id)
-            .then(() => {
-                console.log("Table deleted successfully!");
-            })
             .catch((error: any) => {
                 console.error("Error deleting table", error);
             });

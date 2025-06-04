@@ -143,7 +143,7 @@ function Summary({ title, objects, filters, sorts, onFilterAdded, onFilterRemove
             </table>
 
             <AggregationToolbar columnIndex={selectedColumn} values={selectedValues} />
-            <div className="h-20"></div>
+            <div className="h-32"></div>
         </>
     );
 }

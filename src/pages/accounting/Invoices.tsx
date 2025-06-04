@@ -17,7 +17,7 @@ const Invoices: React.FC<InvoicesProps> = ({ handleInvoiceMiniatureRowClicked })
     const [filters, setFilters] = useState<Filter[]>([]);
     const [sorts, setSorts] = useState<Sort[]>([{property: SummaryProperty.Date, orientation: Orientation.Desc}]);
     const [invoices, setInvoices] = useState<Invoice[]>([]);
-    const [selectedTableType, setSelectedTableType] = useState<Country>(Country.None);
+    const [selectedTableType, setSelectedTableType] = useState<Country>(Country.Debit);
 
     const handleFilterAdded = (filter: Filter) => {
         setFilters(prev => [...prev, filter]);

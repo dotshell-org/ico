@@ -65,17 +65,20 @@ const DebitInvoiceEditor: React.FC<DebitEditorProps> = ({ invoice }: DebitEditor
         }
 
         try {
-            // Checks if a product already exists for this simplified debit
-            const existingProducts = await (window as any).ipcRenderer.invoke("getInvoiceProducts", invoice.id);
-            const simpleDebitProduct = existingProducts.find((product: any) => product.name === t("simple_debit_entry"));
+            // Only use Simple Expense functionality if the invoice is not from a Debit country
+            if (invoice.countryCode !== 0) { // Country.Debit is 0 as defined in the Country enum
+                // Checks if a product already exists for this simplified debit
+                const existingProducts = await (window as any).ipcRenderer.invoke("getInvoiceProducts", invoice.id);
+                const simpleDebitProduct = existingProducts.find((product: any) => product.name === t("simple_debit_entry"));
 
-            if (simpleDebitProduct) {
-                // Updates the existing product - modifies amount_excl_tax instead of quantity
-                await (window as any).ipcRenderer.invoke("updateInvoiceProductAmountExclTax", simpleDebitProduct.id, newAmount);
-            } else {
-                // Adds a new product if none exists
-                // Sets amount_excl_tax to newAmount and quantity to 1
-                await (window as any).ipcRenderer.invoke("addInvoiceProduct", invoice.id, t("simple_debit_entry"), newAmount, 1, 0, 0, 0);
+                if (simpleDebitProduct) {
+                    // Updates the existing product - modifies amount_excl_tax instead of quantity
+                    await (window as any).ipcRenderer.invoke("updateInvoiceProductAmountExclTax", simpleDebitProduct.id, newAmount);
+                } else {
+                    // Adds a new product if none exists
+                    // Sets amount_excl_tax to newAmount and quantity to 1
+                    await (window as any).ipcRenderer.invoke("addInvoiceProduct", invoice.id, t("simple_debit_entry"), newAmount, 1, 0, 0, 0);
+                }
             }
 
             setTotalAmount(newAmount);

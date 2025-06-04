@@ -90,7 +90,6 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
         const newTitle = e.target.value;
         try {
             await (window as any).ipcRenderer.invoke("updateInvoiceTitle", invoice.id, newTitle);
-            console.log("Title updated successfully!");
             setTitleValue(newTitle);
         } catch (error) {
             console.error("Error when updating title:", error);
@@ -101,7 +100,6 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
         const newCategory = e.target.value;
         try {
             await (window as any).ipcRenderer.invoke("updateInvoiceCategory", invoice.id, newCategory);
-            console.log("Category updated successfully!");
             setCategoryValue(newCategory);
         } catch (error) {
             console.error("Error when updating category:", error);
@@ -114,7 +112,6 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
                 return
             }
             await (window as any).ipcRenderer.invoke("updateInvoiceIssueDate", invoice.id, value);
-            console.log("Issue date updated successfully!");
             setIssueDate(value);
         } catch (error) {
             console.error("Error when updating issue date:", error);
@@ -127,7 +124,6 @@ const FranceInvoiceEditor: React.FC<FranceEditorProps> = ({ invoice, taxType, ch
                 return
             }
             await (window as any).ipcRenderer.invoke("updateInvoiceSaleServiceDate", invoice.id, value);
-            console.log("Sale/service date updated successfully!");
             setServiceDate(value);
         } catch (error) {
             console.error("Error when updating sale/service date:", error);

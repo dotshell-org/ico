@@ -67,11 +67,12 @@ export function getTransactionsByMonth(): number[][] {
  * the credits rows. The results are grouped by category and include
  * only data from the last 12 months.
  *
+ * @param {boolean} limitResults - Whether to limit the results to 10 categories (for pie charts)
  * @return {Object} An object containing two arrays:
  *                  - `categories`: An array of category names.
  *                  - `values`: An array of summed-up credit values corresponding to the categories.
  */
-export function getCreditsSumByCategory(): { categories: string[]; values: number[] } {
+export function getCreditsSumByCategory(limitResults: boolean = true): { categories: string[]; values: number[] } {
     const dateThreshold = dayjs().subtract(12, "month").toISOString();
     const query = `
         SELECT cg.category, SUM(cr.quantity * cr.amount) as total
@@ -80,6 +81,8 @@ export function getCreditsSumByCategory(): { categories: string[]; values: numbe
                  JOIN credits_rows cr ON ct.id = cr.table_id
         WHERE cg.date > ?
         GROUP BY cg.category
+        ORDER BY total DESC
+        ${limitResults ? 'LIMIT 10' : ''}
     `;
     const stmt = db.prepare(query);
     const rows = stmt.all(dateThreshold);
@@ -93,11 +96,12 @@ export function getCreditsSumByCategory(): { categories: string[]; values: numbe
 /**
  * Retrieves the sum of debit amounts grouped by category for the past 12 months.
  *
+ * @param {boolean} limitResults - Whether to limit the results to 10 categories (for pie charts)
  * @return {Object} An object containing two arrays:
  *         - 'categories' which lists the unique debit categories
  *         - 'values' which lists the corresponding total debit amounts for each category.
  */
-export function getDebitsSumByCategory(): { categories: string[]; values: number[] } {
+export function getDebitsSumByCategory(limitResults: boolean = true): { categories: string[]; values: number[] } {
     const dateThreshold = dayjs().subtract(12, "month").toISOString();
     const query = `
         SELECT i.category,
@@ -106,6 +110,8 @@ export function getDebitsSumByCategory(): { categories: string[]; values: number
                  JOIN invoice_products ip ON i.id = ip.invoice_id
         WHERE i.issue_date >= ?
         GROUP BY i.category
+        ORDER BY total DESC
+        ${limitResults ? 'LIMIT 10' : ''}
     `;
     const stmt = db.prepare(query);
     const rows = stmt.all(dateThreshold);

@@ -10,6 +10,9 @@ const Settings: React.FC = () => {
     const [currentAccount, setCurrentAccount] = useState<AccountInfo | null>(null);
     const [newAccountName, setNewAccountName] = useState("");
     const [isCreating, setIsCreating] = useState(false);
+    const [isRenaming, setIsRenaming] = useState(false);
+    const [accountToRename, setAccountToRename] = useState<AccountInfo | null>(null);
+    const [newName, setNewName] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [currentLanguage, setCurrentLanguage] = useState<string>(i18n.language);
 
@@ -71,6 +74,31 @@ const Settings: React.FC = () => {
         }
     };
 
+    const handleStartRenaming = (account: AccountInfo) => {
+        setAccountToRename(account);
+        setNewName(account.name);
+        setIsRenaming(true);
+    };
+
+    const handleRenameAccount = async () => {
+        if (!accountToRename) return;
+
+        if (!newName.trim()) {
+            setError("Account name cannot be empty");
+            return;
+        }
+
+        try {
+            await (window as any).ipcRenderer.invoke("renameAccount", accountToRename.id, newName);
+            setIsRenaming(false);
+            setAccountToRename(null);
+            setNewName("");
+            await loadAccounts();
+        } catch (err: any) {
+            setError(err.message || "Failed to rename account");
+        }
+    };
+
     const handleChangeLanguage = async (language: string) => {
         try {
             const success = await changeLanguage(language);
@@ -94,11 +122,11 @@ const Settings: React.FC = () => {
     return (
         <div className="pb-10">
             <h1 className="text-3xl font-bold mt-2">{"⚙️ " + t("settings")}</h1>
-            
+
             <div className="mt-8">
                 <h2 className="text-2xl font-bold">{"💼 " + t("account_management")}</h2>
                 <p className="text-gray-500 dark:text-gray-400 mt-2 mb-4">{t("account_management_description")}</p>
-                
+
                 {error && (
                     <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
                         <p>{error}</p>
@@ -113,7 +141,7 @@ const Settings: React.FC = () => {
 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
                     <h3 className="text-lg font-semibold mb-4">{t("current_account")}</h3>
-                    
+
                     {currentAccount && (
                         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-4 mb-4">
                             <div className="flex items-center">
@@ -133,7 +161,7 @@ const Settings: React.FC = () => {
                     )}
 
                     <h3 className="text-lg font-semibold mb-4">{t("available_accounts")}</h3>
-                    
+
                     {accounts.length === 0 ? (
                         <p className="text-gray-500 dark:text-gray-400">{t("no_accounts")}</p>
                     ) : (
@@ -168,7 +196,14 @@ const Settings: React.FC = () => {
                                                 {t("switch_to")}
                                             </button>
                                         )}
-                                        {!account.isDefault && (
+                                        <button
+                                            className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-sm transition-colors"
+                                            onClick={() => handleStartRenaming(account)}
+                                        >
+                                            {t("rename")}
+                                        </button>
+                                        {/* Allow deleting any account as long as it's not the only one */}
+                                        {accounts.length > 1 && (
                                             <button
                                                 className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm transition-colors"
                                                 onClick={() => handleDeleteAccount(account.id)}
@@ -181,7 +216,39 @@ const Settings: React.FC = () => {
                             ))}
                         </div>
                     )}
-                    
+
+                    {isRenaming && accountToRename && (
+                        <div className="mt-6 border rounded-md p-4 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                            <h4 className="font-medium mb-2">{t("rename_account")}: {accountToRename.name}</h4>
+                            <input
+                                type="text"
+                                className="w-full p-2 border rounded mb-3 dark:bg-gray-700 dark:border-gray-600"
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                placeholder={t("new_account_name_placeholder")}
+                                autoFocus
+                            />
+                            <div className="flex space-x-2">
+                                <button
+                                    className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-sm transition-colors"
+                                    onClick={handleRenameAccount}
+                                >
+                                    {t("rename")}
+                                </button>
+                                <button
+                                    className="px-3 py-1 bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded text-sm transition-colors"
+                                    onClick={() => {
+                                        setIsRenaming(false);
+                                        setAccountToRename(null);
+                                        setNewName("");
+                                    }}
+                                >
+                                    {t("cancel")}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {isCreating ? (
                         <div className="mt-6 border rounded-md p-4 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                             <h4 className="font-medium mb-2">{t("create_new_account")}</h4>
