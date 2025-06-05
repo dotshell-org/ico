@@ -65,8 +65,14 @@ const DebitInvoiceEditor: React.FC<DebitEditorProps> = ({ invoice }: DebitEditor
         }
 
         try {
-            // Only use Simple Expense functionality if the invoice is not from a Debit country
-            if (invoice.countryCode !== 0) { // Country.Debit is 0 as defined in the Country enum
+            // For pure Debit invoices (Country.Debit = 0), we only update the total amount without creating any invoice products
+            // This avoids cluttering the stock links with unnecessary "Simple expense" entries
+            if (invoice.countryCode === 0) {
+                // For pure debit invoices, update the total amount directly in the database
+                await (window as any).ipcRenderer.invoke("updateInvoiceTotalAmount", invoice.id, newAmount);
+                setTotalAmount(newAmount);
+            } else {
+                // For other invoice types (France, None), use the Simple Expense functionality
                 // Checks if a product already exists for this simplified debit
                 const existingProducts = await (window as any).ipcRenderer.invoke("getInvoiceProducts", invoice.id);
                 const simpleDebitProduct = existingProducts.find((product: any) => product.name === t("simple_debit_entry"));
@@ -79,9 +85,8 @@ const DebitInvoiceEditor: React.FC<DebitEditorProps> = ({ invoice }: DebitEditor
                     // Sets amount_excl_tax to newAmount and quantity to 1
                     await (window as any).ipcRenderer.invoke("addInvoiceProduct", invoice.id, t("simple_debit_entry"), newAmount, 1, 0, 0, 0);
                 }
+                setTotalAmount(newAmount);
             }
-
-            setTotalAmount(newAmount);
         } catch (error) {
             console.error("Error when updating amount:", error);
         }

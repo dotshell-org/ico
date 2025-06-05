@@ -8,7 +8,8 @@ db.exec(`
         issue_date TEXT,
         sale_service_date TEXT,
         country_code INTEGER,
-        no TEXT
+        no TEXT,
+        total_amount REAL DEFAULT 0
     );
     CREATE TABLE IF NOT EXISTS invoice_products (
         id INTEGER PRIMARY KEY,
@@ -50,3 +51,10 @@ db.exec(`
         FOREIGN KEY (table_id) REFERENCES credits_tables(id)
     );
 `);
+
+// Migration: Add total_amount column to existing invoices table if it doesn't exist
+try {
+    db.exec(`ALTER TABLE invoices ADD COLUMN total_amount REAL DEFAULT 0;`);
+} catch (error) {
+    // Column already exists, ignore the error
+}

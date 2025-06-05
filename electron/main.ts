@@ -22,8 +22,7 @@ import {
   updateOtherCreditRow
 } from "../src/backend/db/accounting/credits.js";
 import {getCreditsSumByCategory, getDebitsSumByCategory, getTransactionsByMonth} from "../src/backend/db/accounting/reports.js";
-import {
-  addInvoice,
+import {  addInvoice,
   addInvoiceProduct,
   deleteInvoice,
   deleteInvoiceProduct,
@@ -37,7 +36,8 @@ import {
   updateInvoiceProductQuantity,
   updateInvoiceProductAmountExclTax,
   updateInvoiceSaleServiceDate,
-  updateInvoiceTitle
+  updateInvoiceTitle,
+  updateInvoiceTotalAmount
 } from "../src/backend/db/accounting/debits.js";
 import {
   getAllObjectNames,
@@ -152,6 +152,7 @@ handleIpc("updateInvoiceIssueDate", updateInvoiceIssueDate);
 handleIpc("updateInvoiceSaleServiceDate", updateInvoiceSaleServiceDate);
 handleIpc("updateInvoiceCategory", updateInvoiceCategory);
 handleIpc("updateInvoiceTitle", updateInvoiceTitle);
+handleIpc("updateInvoiceTotalAmount", updateInvoiceTotalAmount);
 
 handleIpc("getInvoiceProducts", getInvoiceProducts);
 handleIpc("addInvoiceProduct", addInvoiceProduct);

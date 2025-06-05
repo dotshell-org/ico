@@ -23,7 +23,10 @@ export function getInvoices(filters: Filter[], sort: Sort[]): Invoice[] {
             i.issue_date,
             i.sale_service_date,
             i.country_code,
-            COALESCE(SUM((ip.amount_excl_tax * ip.quantity * (1 - ip.discount_percentage / 100) * (1 + ip.tax_rate / 100)) - ip.discount_amount), 0) as total_amount
+            CASE 
+                WHEN i.country_code = 0 THEN COALESCE(i.total_amount, 0)
+                ELSE COALESCE(SUM((ip.amount_excl_tax * ip.quantity * (1 - ip.discount_percentage / 100) * (1 + ip.tax_rate / 100)) - ip.discount_amount), 0)
+            END as total_amount
         FROM invoices i
             LEFT JOIN invoice_products ip ON i.id = ip.invoice_id`;
     const queryParams: any[] = [];
@@ -460,4 +463,22 @@ export function updateInvoiceNo(invoiceId: number, no: string): void {
         WHERE id = ?
     `);
     stmt.run(no, invoiceId);
+}
+
+/**
+ * Updates the total amount for a debit invoice directly in the invoices table.
+ * This function is specifically designed for pure debit invoices (countryCode === 0)
+ * that don't use invoice_products to store their total amount.
+ *
+ * @param {number} invoiceId - The ID of the invoice to update.
+ * @param {number} totalAmount - The new total amount to set.
+ * @return {void} No return value.
+ */
+export function updateInvoiceTotalAmount(invoiceId: number, totalAmount: number): void {
+    const stmt = db.prepare(`
+        UPDATE invoices
+        SET total_amount = ?
+        WHERE id = ?
+    `);
+    stmt.run(totalAmount, invoiceId);
 }
