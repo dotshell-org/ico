@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useMediaQuery, createTheme, ThemeProvider } from '@mui/material';
 import NavBar from "./components/nav/NavBar";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { Tabs } from './types/nav/Tabs.ts';
 import AccountingDashboard from './pages/accounting/AccountingDashboard.tsx';
 import DebitSummary from './pages/accounting/DebitSummary';
@@ -78,13 +79,12 @@ function App() {
                 return <Invoices handleInvoiceMiniatureRowClicked={(invoice: Invoice) => {
                     setInvoiceInEditor(invoice);
                     setSelectedTab(Tabs.AccountingInvoiceEditor);
-                }}/>;
-            case Tabs.AccountingInvoiceEditor:
-                if (invoiceInEditor.countryCode == Country.None) {
+                }}/>;            case Tabs.AccountingInvoiceEditor:
+                if (invoiceInEditor.countryCode === Country.None) {
                     return <DefaultInvoiceEditor invoice={invoiceInEditor} taxType={TaxType.None}/>;
-                } else if (invoiceInEditor.countryCode == Country.France) {
+                } else if (invoiceInEditor.countryCode === Country.France) {
                     return <FranceInvoiceEditor invoice={invoiceInEditor}/>;
-                } else if (invoiceInEditor.countryCode == Country.Debit) {
+                } else if (invoiceInEditor.countryCode === Country.Debit) {
                     return <DebitInvoiceEditor invoice={invoiceInEditor}/>;
                 }
                 return <h1>{invoiceInEditor.countryCode}</h1>;
@@ -114,14 +114,15 @@ function App() {
   };
 
 
-
   return (
-      <ThemeProvider theme={theme}>
-        <NavBar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-        <div className="absolute top-16 bottom-0 left-0 right-0 p-10">
-          {renderContent()}
-        </div>
-      </ThemeProvider>
+      <ErrorBoundary>
+        <ThemeProvider theme={theme}>
+          <NavBar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+          <div className="absolute top-16 bottom-0 left-0 right-0 p-10">
+            {renderContent()}
+          </div>
+        </ThemeProvider>
+      </ErrorBoundary>
   );
 }
 

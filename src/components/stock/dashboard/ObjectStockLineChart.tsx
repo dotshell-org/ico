@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import {t} from "i18next";
 import React, {useEffect, useState} from "react";
 import DOMPurify from 'dompurify';
+import IPCService from '../../../services/IPCService';
 
 interface ObjectStockLineChartProps {
     stockName: string;
@@ -19,12 +20,11 @@ const ObjectStockLineChart: React.FC<ObjectStockLineChartProps> = ({ stockName }
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        (window as any).ipcRenderer
-            .invoke("getAllObjects")
-            .then((result: string[]) => {
+        IPCService.invoke<string[]>("getAllObjects")
+            .then((result) => {
                 setAllObjects(result);
             })
-            .catch((error: any) => {
+            .catch((error) => {
                 console.error("Error when fetching objects", error);
             });
     }, []);

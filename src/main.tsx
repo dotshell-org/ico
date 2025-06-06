@@ -14,7 +14,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 )
 
 // Using contextBridge
-// @ts-ignore
 window.ipcRenderer.on('main-process-message', (_event: any, message: any) => {
     console.log(message)
 })

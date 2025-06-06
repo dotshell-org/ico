@@ -73,11 +73,9 @@ const SalesDashboard = () => {
             })
             .catch((error: any) => {
                 console.error("Error when migrating sales to stock movements", error);
-                setIsMigrating(false);
-            });
+                setIsMigrating(false);            });
     };
 
-    // @ts-ignore
     return (
         <div className="pb-10">
             <div>

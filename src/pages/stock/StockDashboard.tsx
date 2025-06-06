@@ -76,10 +76,9 @@ const StockDashboard: React.FC = () => {
                 onChange={(e) => setStockName(e.target.value)}
                 value={stockName}
             >
-                <option value="">{t("all")}</option>
-                {
+                <option value="">{t("all")}</option>                {
                     allStocks.map((stock) => (
-                        <option value={stock}>{stock}</option>
+                        <option key={stock} value={stock}>{stock}</option>
                     ))
                 }
             </select>
