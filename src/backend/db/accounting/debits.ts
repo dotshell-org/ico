@@ -24,7 +24,7 @@ export function getInvoices(filters: Filter[], sort: Sort[]): Invoice[] {
             i.sale_service_date,
             i.country_code,
             CASE 
-                WHEN i.country_code = 0 THEN COALESCE(i.total_amount, 0)
+                WHEN i.country_code = 0 OR i.country_code IS NULL THEN COALESCE(i.total_amount, 0)
                 ELSE COALESCE(SUM((ip.amount_excl_tax * ip.quantity * (1 - ip.discount_percentage / 100) * (1 + ip.tax_rate / 100)) - ip.discount_amount), 0)
             END as total_amount
         FROM invoices i

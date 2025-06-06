@@ -22,14 +22,26 @@ export function getTransactionsByMonth(): number[][] {
     `);
     const creditRecords = creditStmt.all(startDate);
 
-    const debitStmt = db.prepare(`
+    // Débits avec produits (compatibilité anciens mouvements)
+    const debitWithProductsStmt = db.prepare(`
         SELECT i.issue_date as date, SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate/100) * (1 - ip.discount_percentage / 100) - ip.discount_amount) as amount
         FROM invoices i
             JOIN invoice_products ip ON i.id = ip.invoice_id
-        WHERE i.issue_date >= ?
+        WHERE i.issue_date >= ? AND (i.country_code IS NULL OR i.country_code != 0 OR i.country_code = 0)
         GROUP BY i.issue_date
     `);
-    const debitRecords = debitStmt.all(startDate);
+    const debitWithProductsRecords = debitWithProductsStmt.all(startDate);
+
+    // Débits simples (country_code = 0 ou NULL, sans produits)
+    const debitSimpleStmt = db.prepare(`
+        SELECT i.issue_date as date, i.total_amount as amount
+        FROM invoices i
+        WHERE i.issue_date >= ? AND (i.country_code = 0 OR i.country_code IS NULL)
+    `);
+    const debitSimpleRecords = debitSimpleStmt.all(startDate);
+
+    // Fusionner les deux tableaux de débits
+    const allDebitRecords = [...debitWithProductsRecords, ...debitSimpleRecords];
 
     const months: string[] = [];
     const startMonth = dayjs().subtract(11, 'month').startOf('month');
@@ -47,8 +59,7 @@ export function getTransactionsByMonth(): number[][] {
             creditSums[monthIndex] += credit.amount;
         }
     }
-
-    for (const debit of debitRecords) {
+    for (const debit of allDebitRecords) {
         const monthKey = dayjs(debit.date).format('YYYY-MM');
         const monthIndex = months.indexOf(monthKey);
         if (monthIndex !== -1) {
@@ -104,17 +115,27 @@ export function getCreditsSumByCategory(limitResults: boolean = true): { categor
 export function getDebitsSumByCategory(limitResults: boolean = true): { categories: string[]; values: number[] } {
     const dateThreshold = dayjs().subtract(12, "month").toISOString();
     const query = `
-        SELECT i.category,
-               SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate/100) * (1 - ip.discount_percentage / 100) - ip.discount_amount) as total
-        FROM invoices i
-                 JOIN invoice_products ip ON i.id = ip.invoice_id
-        WHERE i.issue_date >= ?
-        GROUP BY i.category
+        SELECT category, SUM(total) as total FROM (
+            -- Débits avec produits (compatibilité anciens mouvements)
+            SELECT i.category,
+                   SUM(ip.amount_excl_tax * ip.quantity * (1 + ip.tax_rate/100) * (1 - ip.discount_percentage / 100) - ip.discount_amount) as total
+            FROM invoices i
+                     JOIN invoice_products ip ON i.id = ip.invoice_id
+            WHERE i.issue_date >= ? AND (i.country_code IS NULL OR i.country_code != 0 OR i.country_code = 0)
+            GROUP BY i.category, i.issue_date
+            UNION ALL
+            -- Débits simples (country_code = 0 ou NULL, sans produits)
+            SELECT i.category,
+                   i.total_amount as total
+            FROM invoices i
+            WHERE i.issue_date >= ? AND (i.country_code = 0 OR i.country_code IS NULL)
+        )
+        GROUP BY category
         ORDER BY total DESC
         ${limitResults ? 'LIMIT 10' : ''}
     `;
     const stmt = db.prepare(query);
-    const rows = stmt.all(dateThreshold);
+    const rows = stmt.all(dateThreshold, dateThreshold);
 
     const categories = rows.map((row: { category: string; total: number }) => row.category);
     const values = rows.map((row: { category: string; total: number }) => row.total);
